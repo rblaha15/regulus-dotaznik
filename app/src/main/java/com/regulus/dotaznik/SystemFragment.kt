@@ -4,7 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_system.*
 import java.util.*
@@ -28,9 +29,7 @@ class SystemFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_system, container, false)
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -113,7 +112,7 @@ class SystemFragment : Fragment() {
         }
 
 
-        update(view)
+        update()
 
         val task = object : TimerTask() {
             override fun run() {
@@ -180,28 +179,16 @@ class SystemFragment : Fragment() {
     }
 
 
-    private fun update(view: View = requireView()) {
+    private fun update() {
 
 
-        val spNadrzTyp1: Spinner = view.findViewById(R.id.spNadrzTyp1)
-        val spNadrzTyp2: Spinner = view.findViewById(R.id.spNadrzTyp2)
-        val etNadrzObjem: EditText = view.findViewById(R.id.etNadrzObjem)
-        val tvNadrzObjem: TextView = view.findViewById(R.id.tvNadrzObjem)
 
         spNadrzTyp2.visibility = if (spNadrzTyp1.selectedItemPosition != 0) View.VISIBLE else View.GONE
         etNadrzObjem.visibility = if (spNadrzTyp1.selectedItemPosition != 0) View.VISIBLE else View.GONE
         tvNadrzObjem.visibility = if (spNadrzTyp1.selectedItemPosition != 0) View.VISIBLE else View.GONE
 
-
-        val spZasobnikTyp: Spinner = view.findViewById(R.id.spZasobnikTyp)
-        val etZasobnikObjem: EditText = view.findViewById(R.id.etZasobnikObjem)
-        val tvZasobnikObjem: TextView = view.findViewById(R.id.tvZasobnikObjem)
-
         etZasobnikObjem.visibility = if (spZasobnikTyp.selectedItemPosition != 0) View.VISIBLE else View.GONE
         tvZasobnikObjem.visibility = if (spZasobnikTyp.selectedItemPosition != 0) View.VISIBLE else View.GONE
-
-        val spTcTyp: Spinner = view.findViewById(R.id.spTcTyp)
-        val spTcModel: Spinner = view.findViewById(R.id.spTcModel)
 
         spTcModel.adapter = if (spTcTyp.selectedItemPosition != 0) adapter2a else adapter2
 
@@ -211,8 +198,6 @@ class SystemFragment : Fragment() {
             2 -> adapter5a
             else -> adapter5b
         }
-
-
 
         val saver = Saver(requireActivity())
         val stranky = saver.get()
