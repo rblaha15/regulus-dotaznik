@@ -76,6 +76,7 @@ class KontaktyFragment : Fragment() {
                 }
 
 
+                if (stranky.kontakty == Stranky.Kontakty()) return
 
 
                 saver.save(stranky)

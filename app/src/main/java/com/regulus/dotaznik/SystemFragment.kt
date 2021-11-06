@@ -143,6 +143,8 @@ class SystemFragment : Fragment() {
                 }
 
 
+                if (stranky.system == Stranky.System_()) return
+
                 saver.save(stranky)
 
 

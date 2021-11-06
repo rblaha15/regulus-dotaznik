@@ -111,6 +111,8 @@ class ZdrojeFragment : Fragment() {
                     poznamka = etPoznamka6.text.toString()
                 }
 
+                if (stranky.zdrojeTop == Stranky.ZdrojeTop()) return
+                if (stranky.zdrojeTv == Stranky.ZdrojeTv()) return
 
                 saver.save(stranky)
             }

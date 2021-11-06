@@ -93,6 +93,7 @@ class BazenFragment : Fragment() {
                     poznamka = etPoznamka4.text.toString()
                 }
 
+                if (stranky.bazen == Stranky.Bazen()) return
 
                 saver.save(stranky)
             }

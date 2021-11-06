@@ -73,6 +73,7 @@ class DetailObjektuFragment : Fragment() {
                     poznamka = etPoznamka2.text.toString()
                 }
 
+                if (stranky.detailObjektu == Stranky.DetailObjektu()) return
 
                 saver.save(stranky)
             }
