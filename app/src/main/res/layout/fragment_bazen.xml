@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:baselineAligned="false"
+    tools:context=".BazenFragment">
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/etPoznamka4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvDoba"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/bazen_doba_uzivani"
+                app:layout_constraintEnd_toStartOf="@+id/spDoba"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Spinner
+                android:id="@+id/spDoba"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvDoba"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvDoba" />
+
+            <TextView
+                android:id="@+id/tvUmisteni"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/bazen_umisteni"
+                app:layout_constraintEnd_toStartOf="@+id/spUmisteni"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvDoba" />
+
+            <Spinner
+                android:id="@+id/spUmisteni"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintBottom_toBottomOf="@id/tvUmisteni"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tvUmisteni" />
+
+
+            <TextView
+                android:id="@+id/tvDruhVody"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/bazen_druh_vody"
+                app:layout_constraintEnd_toStartOf="@+id/spDruhVody"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvUmisteni" />
+
+            <Spinner
+                android:id="@+id/spDruhVody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintBottom_toBottomOf="@id/tvDruhVody"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tvDruhVody" />
+
+            <TextView
+                android:id="@+id/tvTvar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/bazen_tvar"
+                app:layout_constraintEnd_toStartOf="@+id/spTvar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvDruhVody" />
+
+            <Spinner
+                android:id="@+id/spTvar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintBottom_toBottomOf="@id/tvTvar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tvTvar" />
+
+            <TextView
+                android:id="@+id/tvDelka"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/bazen_delka"
+                app:layout_constraintBottom_toBottomOf="@+id/etDelka"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/etDelka" />
+
+            <EditText
+                android:id="@+id/etDelka"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:importantForAutofill="no"
+                android:inputType="numberDecimal"
+                app:layout_constraintEnd_toStartOf="@+id/tvDelkaJednotky"
+                app:layout_constraintStart_toEndOf="@+id/tvDelka"
+                app:layout_constraintTop_toBottomOf="@+id/tvTvar"
+                tools:ignore="LabelFor" />
+
+            <TextView
+                android:id="@+id/tvDelkaJednotky"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="@string/m"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@+id/etDelka"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/etDelka" />
+
+            <TextView
+                android:id="@+id/tvSirka"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/bazen_sirka"
+                app:layout_constraintBottom_toBottomOf="@+id/etSirka"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/etSirka" />
+
+            <EditText
+                android:id="@+id/etSirka"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:importantForAutofill="no"
+                android:inputType="numberDecimal"
+                app:layout_constraintEnd_toStartOf="@+id/tvSirkaJednotky"
+                app:layout_constraintStart_toEndOf="@+id/tvSirka"
+                app:layout_constraintTop_toBottomOf="@+id/etDelka"
+                tools:ignore="LabelFor" />
+
+            <TextView
+                android:id="@+id/tvSirkaJednotky"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="@string/m"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@+id/etSirka"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/etSirka" />
+
+            <TextView
+                android:id="@+id/tvPrumer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/bazen_radius"
+                app:layout_constraintBottom_toBottomOf="@+id/etPrumer"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/etPrumer" />
+
+            <EditText
+                android:id="@+id/etPrumer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:importantForAutofill="no"
+                android:inputType="numberDecimal"
+                app:layout_constraintEnd_toStartOf="@+id/tvPrumerJednotky"
+                app:layout_constraintStart_toEndOf="@+id/tvPrumer"
+                app:layout_constraintTop_toBottomOf="@+id/etSirka"
+                tools:ignore="LabelFor" />
+
+            <TextView
+                android:id="@+id/tvPrumerJednotky"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="@string/m"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@+id/etPrumer"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/etPrumer" />
+
+            <TextView
+                android:id="@+id/tvHloubka"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/bazen_hloubka"
+                app:layout_constraintBottom_toBottomOf="@+id/etHloubka"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/etHloubka" />
+
+            <EditText
+                android:id="@+id/etHloubka"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:importantForAutofill="no"
+                android:inputType="numberDecimal"
+                app:layout_constraintEnd_toStartOf="@+id/tvHloubkaJednotky"
+                app:layout_constraintStart_toEndOf="@+id/tvHloubka"
+                app:layout_constraintTop_toBottomOf="@+id/etPrumer"
+                tools:ignore="LabelFor" />
+
+            <TextView
+                android:id="@+id/tvHloubkaJednotky"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="@string/m"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@+id/etHloubka"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/etHloubka" />
+
+            <TextView
+                android:id="@+id/tvZakryti"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/bazen_zakryti"
+                app:layout_constraintEnd_toStartOf="@+id/spZakryti"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/etHloubka" />
+
+            <Spinner
+                android:id="@+id/spZakryti"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintBottom_toBottomOf="@id/tvZakryti"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tvZakryti" />
+
+            <TextView
+                android:id="@+id/tvTeplota"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/bazen_teplota"
+                app:layout_constraintBottom_toBottomOf="@+id/etTeplota"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/etTeplota" />
+
+            <EditText
+                android:id="@+id/etTeplota"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:ems="10"
+                android:importantForAutofill="no"
+                android:inputType="numberDecimal"
+                app:layout_constraintEnd_toStartOf="@+id/tvTeplotaJednotky"
+                app:layout_constraintStart_toEndOf="@+id/tvTeplota"
+                app:layout_constraintTop_toBottomOf="@+id/tvZakryti"
+                tools:ignore="LabelFor" />
+
+            <TextView
+                android:id="@+id/tvTeplotaJednotky"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="@string/stupen_c"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@+id/etTeplota"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/etTeplota" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/tvPoznamka4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="@string/poznamka"
+        app:layout_constraintBottom_toBottomOf="@id/etPoznamka4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/etPoznamka4" />
+
+    <EditText
+        android:id="@+id/etPoznamka4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:importantForAutofill="no"
+        android:inputType="textCapSentences"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tvPoznamka4"
+        tools:ignore="LabelFor" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

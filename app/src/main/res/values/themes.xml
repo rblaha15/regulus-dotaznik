@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Dotazník" parent="Theme.AppCompat.Light">
+
+        <item name="colorPrimaryDark">#FF0000</item>
+        <item name="colorPrimary">#FF0000</item>
+        <item name="colorAccent">#00FFFF</item>
+
+        <item name="actionBarTheme">@style/Theme.Dotazník.ActionBar</item>
+
+    </style>
+
+
+    <style name="Theme.Dotazník.ActionBar" parent="Widget.AppCompat.ActionBar">
+        <item name="titleTextColor">@color/white</item>
+        <item name="colorControlNormal">@color/white</item>
+    </style>
+
+    <style name="Theme.Dotazník.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Dotazník.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.Dotazník.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+
+</resources>

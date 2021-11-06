@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Dotazník" parent="Theme.AppCompat">
+
+        <item name="floatingActionButtonStyle">@style/Theme.Dotazník.FloatingActionButton</item>
+        <item name="colorPrimaryDark">#FF0000</item>
+        <item name="colorPrimary">#FF0000</item>
+        <item name="colorAccent">#00FFFF</item>
+
+        <item name="actionBarTheme">@style/Theme.Dotazník.ActionBar</item>
+
+    </style>
+
+    <style name="Theme.Dotazník.FloatingActionButton" parent="Widget.Design.FloatingActionButton">
+        <item name="tint">@color/black</item>
+    </style>
+
+    <style name="Theme.Dotazník.ActionBar" parent="Widget.AppCompat.ActionBar">
+        <item name="titleTextColor">@color/white</item>
+        <item name="colorControlNormal">@color/white</item>
+    </style>
+
+
+</resources>

@@ -1,0 +1,220 @@
+<resources>
+    <string-array name="ica">
+        <item>ADAM ALEŠ - 71544313</item>
+        <item>BARFUS - 45409145</item>
+        <item>BENEŠ JOSEF - 01317946</item>
+        <item>BOHÁČ LUBOMÍR - 18487033</item>
+        <item>BORASETI - 26345927</item>
+        <item>BURIAN PETR - 71782435</item>
+        <item>BYRTUS JAN - 88145247</item>
+        <item>ČAPEK PF - 27108872</item>
+        <item>ČERNÝ ÚSTÍ - 27438562</item>
+        <item>DITTRICH HERBERT - 73206644</item>
+        <item>DRDA TOMÁŠ - 76185699</item>
+        <item>DVOŘÁK ANTONÍN - 68517335</item>
+        <item>DZAMULIČ - 63253909</item>
+        <item>EIDELPES OLDŘICH - 41641833</item>
+        <item>ERMONT - 62029771</item>
+        <item>FRIKO - 04270029</item>
+        <item>GLEJTEK IVAN - 70655375</item>
+        <item>HANZLÍČEK - 49187406</item>
+        <item>HEJSEK - 73750433</item>
+        <item>HROMJAK MARTIN - 66142431</item>
+        <item>HYDROPLASTIK - 28066332</item>
+        <item>IRLBEKFR - 66346851</item>
+        <item>IVOTOP - 02333953</item>
+        <item>JAKTECH - 27860922</item>
+        <item>JÁRA - 70722528</item>
+        <item>JEZBERA - 10412069</item>
+        <item>Jirasko - 73167649</item>
+        <item>KAČÍREK_SRO - 26747537</item>
+        <item>KAFKAMARTIN - 87226596</item>
+        <item>KAPOLKA - 73672262</item>
+        <item>KLABOUCHSRO - 06847706</item>
+        <item>KLÍMAZDENĚK - 14726351</item>
+        <item>KOLÁČEK IVT - 03912973</item>
+        <item>KRÁLPETRELEKTRO - 06491341</item>
+        <item>KRAUSZDENĚK - 68793596</item>
+        <item>KŘESÁKJINDŘICH - 68775644</item>
+        <item>KUBÁTJIŘÍ - 42645662</item>
+        <item>LEMIGAS - 26402734</item>
+        <item>MAREŠJAN2 - 01156021</item>
+        <item>MARIŠKA - 02138689</item>
+        <item>MASNIČÁK - 61202941</item>
+        <item>Matoušek Radek - 14699681</item>
+        <item>MAZÁK - 46099891</item>
+        <item>MAZÁKDOMA - 46099891</item>
+        <item>MINAŘÍK JAN - 71985590</item>
+        <item>MOOS - 62549936</item>
+        <item>MUŽÍKJOS - 69443025</item>
+        <item>NOVÁČEK PETR - 49187112</item>
+        <item>NOVÁKKOLÍN - 62479598</item>
+        <item>NOVÁKZDENĚKST - 43840124</item>
+        <item>NOVÝMILOŠ - 74691538</item>
+        <item>OPAT - 61132721</item>
+        <item>OZESOLAR - 28109031</item>
+        <item>PACINSTAL - 28080173</item>
+        <item>PASTOREK ZDENĚK - 67538606</item>
+        <item>PATRIOT - 24289612</item>
+        <item>PECHAČ - 18617808</item>
+        <item>PLYNOPHABÁŇ - 29208351</item>
+        <item>PORT - 29006546</item>
+        <item>P-PLAST - 01600397</item>
+        <item>PRAVEČEK - 64382991</item>
+        <item>PROTOM - 43841252</item>
+        <item>ROSECKÝ - 45586250</item>
+        <item>SANITOPCENTRUM - 29086582</item>
+        <item>SEMRADL - 86561812</item>
+        <item>SMRČKAJIŘÍ - 42838312</item>
+        <item>SOUKUPMICHAL ELEKTRO - 71533711</item>
+        <item>STAMAROSTRAVA - 10625518</item>
+        <item>STOHR JAN - 66366780</item>
+        <item>SUKSTAVBY - 26379414</item>
+        <item>SVOBODAJOSEFTA - 41908121</item>
+        <item>ŠKAVRAŇOK TOMÁŠ - 42872162</item>
+        <item>ŠREK VLADIMÍR - 66987130</item>
+        <item>ŠTRÉBL - 25000691</item>
+        <item>TACINA - 12662607</item>
+        <item>TERMOS - 46344527</item>
+        <item>TOPITE - 06770525</item>
+        <item>TOPITO - 27547922</item>
+        <item>TOPSUNSERVIS - 27259196</item>
+        <item>TOUŠ - 69011702</item>
+        <item>TOVOSO - 24818577</item>
+        <item>TRISMONT - 29303338</item>
+        <item>VAŠÁK - 72778458</item>
+        <item>VEČERNÍK - 68526237</item>
+        <item>VENTA - 15048217</item>
+        <item>VITERA - 43819303</item>
+        <item>VOJÁČEK MARTIN - 74694642</item>
+        <item>ZDRAŽILROST - 73640522</item>
+    </string-array>
+
+    <string-array name="jednotky">
+        <item>@string/q</item>
+        <item>@string/m3</item>
+        <item>@string/kWh</item>
+    </string-array>
+
+    <string-array name="tcTyp">
+        <item>@string/vzduch_voda</item>
+        <item>@string/zeme_voda</item>
+    </string-array>
+    <string-array name="tcModel">
+        <item>@string/vyberte</item>
+        <item>ECOAIR 400</item>
+        <item>ECOAIR 600</item>
+        <item>RTC 6i</item>
+        <item>RTC 12i</item>
+        <item>ECOAIR 614M</item>
+        <item>ECOAIR 622M</item>
+        <item>ECOAIR 510M</item>
+        <item>ECOAIR 406</item>
+        <item>ECOAIR 408</item>
+        <item>ECOAIR 410</item>
+        <item>ECOAIR 415</item>
+        <item>ECOAIR 420</item>
+    </string-array>
+    <string-array name="tcModelA">
+        <item>@string/vyberte</item>
+        <item>ECOPART</item>
+        <item>ECOHEAT</item>
+        <item>ECOPART 406</item>
+        <item>ECOPART 408</item>
+        <item>ECOPART 410</item>
+        <item>ECOPART 412</item>
+        <item>ECOPART 414</item>
+        <item>ECOPART 417</item>
+        <item>ECOPART 435</item>
+        <item>ECOHEAT 406</item>
+        <item>ECOHEAT 408</item>
+        <item>ECOHEAT 410</item>
+        <item>ECOHEAT 412</item>
+    </string-array>
+    <string-array name="jednotka">
+        <item>@string/zadna</item>
+        <item>RegulusBOX</item>
+        <item>EcoZenith i360</item>
+        <item>EcoZenith i250</item>
+    </string-array>
+    <string-array name="nadrzTyp1">
+        <item>@string/zadna</item>
+        <item>DUO</item>
+        <item>HSK</item>
+        <item>PS</item>
+    </string-array>
+    <string-array name="nadrzTyp2">
+        <item>-</item>
+        <item>P</item>
+        <item>PR</item>
+        <item>K</item>
+        <item>K P</item>
+        <item>K PR</item>
+    </string-array>
+    <string-array name="nadrzTyp2A">
+        <item>P</item>
+        <item>PR</item>
+        <item>PV</item>
+    </string-array>
+    <string-array name="nadrzTyp2B">
+        <item>E+</item>
+        <item>ES+</item>
+        <item>N+</item>
+        <item>K+</item>
+        <item>2F</item>
+        <item>WF</item>
+    </string-array>
+    <string-array name="zasobnik">
+        <item>@string/zadny</item>
+        <item>RDC</item>
+        <item>R2DC</item>
+        <item>R0BC</item>
+        <item>RBC</item>
+        <item>RBC HP</item>
+        <item>R2BC</item>
+        <item>NBC</item>
+        <item>RGC</item>
+    </string-array>
+    <string-array name="os">
+        <item>@string/system_os_1okruh</item>
+        <item>@string/system_os_2okruhy</item>
+        <item>@string/system_os_invertor</item>
+        <item>@string/jiny</item>
+    </string-array>
+    <string-array name="dobaVyuzivani">
+        <item>@string/bazen_doba_celorocni</item>
+        <item>@string/bazen_doba_sezonni</item>
+    </string-array>
+    <string-array name="umisteni">
+        <item>@string/bazen_umisteni_venkovni</item>
+        <item>@string/bazen_umisteni_vnitrni</item>
+    </string-array>
+    <string-array name="druhVody">
+        <item>@string/bazen_druh_sladka</item>
+        <item>@string/bazen_druh_slana</item>
+    </string-array>
+    <string-array name="tvar">
+        <item>@string/bazen_tvar_obdelnikovy</item>
+        <item>@string/bazen_tvar_ovalny</item>
+        <item>@string/bazen_tvar_kruhovy</item>
+    </string-array>
+    <string-array name="zakryti">
+        <item>@string/zadne</item>
+        <item>@string/bazen_zakryti_pevna</item>
+        <item>@string/bazen_zakryti_polykarbonat</item>
+        <item>@string/jine</item>
+    </string-array>
+    <string-array name="nove">
+        <item>@string/zdroje_stavajici</item>
+        <item>@string/zdroje_nove</item>
+    </string-array>
+    <string-array name="novy">
+        <item>@string/zdroje_stavajici</item>
+        <item>@string/zdroje_novy</item>
+    </string-array>
+    <string-array name="kamTeleso">
+        <item>@string/zdroje_tv_do_zasuvky</item>
+        <item>@string/zdroje_tv_z_regulace</item>
+    </string-array>
+
+</resources>
