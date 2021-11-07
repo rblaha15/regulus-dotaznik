@@ -12,10 +12,11 @@ import java.util.*
 
 class ZdrojeFragment : Fragment() {
 
-    private val timer = Timer()
+    private var timer = Timer()
     override fun onStop() {
         super.onStop()
         timer.cancel()
+        timer = Timer()
     }
 
     override fun onCreateView(
@@ -42,6 +43,11 @@ class ZdrojeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        init()
+    }
+
+    private fun init() {
 
         val adapter1 = ArrayAdapter.createFromResource(requireActivity(), R.array.nove, android.R.layout.simple_spinner_item)
         val adapter2 = ArrayAdapter.createFromResource(requireActivity(), R.array.novy, android.R.layout.simple_spinner_item)
@@ -119,7 +125,6 @@ class ZdrojeFragment : Fragment() {
         }
 
 
-        timer.scheduleAtFixedRate(task, 0, 200)
 
 
         val saver = Saver(requireActivity())
@@ -152,6 +157,7 @@ class ZdrojeFragment : Fragment() {
 
         }
 
+        timer.scheduleAtFixedRate(task, 0, 200)
 
         cbTvTopneTeleso.setOnClickListener { update() }
 
@@ -169,6 +175,6 @@ class ZdrojeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        onViewCreated(requireView(), null)
+        init()
     }
 }

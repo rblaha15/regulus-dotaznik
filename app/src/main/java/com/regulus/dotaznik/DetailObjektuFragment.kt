@@ -13,10 +13,11 @@ import java.util.*
 
 class DetailObjektuFragment : Fragment() {
 
-    private val timer = Timer()
+    private var timer = Timer()
     override fun onStop() {
         super.onStop()
         timer.cancel()
+        timer = Timer()
     }
 
     override fun onCreateView(
@@ -29,17 +30,19 @@ class DetailObjektuFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        init()
 
-        val adapter = ArrayAdapter.createFromResource(
-            requireActivity(),
-            R.array.jednotky,
-            android.R.layout.simple_spinner_item
-        )
+    }
+
+    private fun init() {
+        // adapter
+        val adapter = ArrayAdapter.createFromResource(requireActivity(), R.array.jednotky, android.R.layout.simple_spinner_item)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         spSpotreba.adapter = adapter
         spSpotreba2.adapter = adapter
 
+        // znovu prihlasit
         tvPotrebaVytapeniJednotky.setOnLongClickListener {
             val intent = Intent(activity, PrihlaseniActivity::class.java)
             startActivity(intent)
@@ -49,6 +52,7 @@ class DetailObjektuFragment : Fragment() {
             return@setOnLongClickListener true
         }
 
+        // saving
         val task = object : TimerTask() {
             override fun run() {
 
@@ -80,9 +84,7 @@ class DetailObjektuFragment : Fragment() {
         }
 
 
-        timer.scheduleAtFixedRate(task, 0, 200)
-
-
+        // nacitani
         val saver = Saver(requireActivity())
         val stranky = saver.get()
 
@@ -103,12 +105,13 @@ class DetailObjektuFragment : Fragment() {
         }
 
 
+        timer.scheduleAtFixedRate(task, 0, 200)
     }
 
     override fun onResume() {
         super.onResume()
 
-        onViewCreated(requireView(), null)
+        init()
     }
 
 

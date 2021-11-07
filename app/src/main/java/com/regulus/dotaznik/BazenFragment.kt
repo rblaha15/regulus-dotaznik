@@ -13,10 +13,11 @@ import java.util.*
 
 class BazenFragment : Fragment() {
 
-    private val timer = Timer()
+    private var timer = Timer()
     override fun onStop() {
         super.onStop()
         timer.cancel()
+        timer = Timer()
     }
 
     override fun onCreateView(
@@ -29,6 +30,12 @@ class BazenFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        init()
+        
+    }
+
+    private fun init() {
 
 
         val adapter1 = ArrayAdapter.createFromResource(requireActivity(), R.array.dobaVyuzivani, android.R.layout.simple_spinner_item)
@@ -100,7 +107,6 @@ class BazenFragment : Fragment() {
         }
 
 
-        timer.scheduleAtFixedRate(task, 0, 200)
 
 
         val saver = Saver(requireActivity())
@@ -123,10 +129,9 @@ class BazenFragment : Fragment() {
 
         }
 
+        timer.scheduleAtFixedRate(task, 0, 200)
 
-        
     }
-
 
     private fun update() {
 
@@ -146,7 +151,7 @@ class BazenFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         
-        onViewCreated(requireView(), null)
+        init()
     }
 
 }

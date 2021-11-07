@@ -19,10 +19,11 @@ class SystemFragment : Fragment() {
     private lateinit var adapter5a: ArrayAdapter<CharSequence>
     private lateinit var adapter5b: ArrayAdapter<CharSequence>
 
-    private val timer = Timer()
+    private var timer = Timer()
     override fun onStop() {
         super.onStop()
         timer.cancel()
+        timer = Timer()
     }
     
     override fun onCreateView(
@@ -35,15 +36,20 @@ class SystemFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        init()
+    }
+
+    private fun init() {
+
 
         val adapter1  = ArrayAdapter.createFromResource(requireActivity(), R.array.tcTyp, android.R.layout.simple_spinner_item)
-            adapter2  = ArrayAdapter.createFromResource(requireActivity(), R.array.tcModel, android.R.layout.simple_spinner_item)
-            adapter2a = ArrayAdapter.createFromResource(requireActivity(), R.array.tcModelA, android.R.layout.simple_spinner_item)
+        adapter2  = ArrayAdapter.createFromResource(requireActivity(), R.array.tcModel, android.R.layout.simple_spinner_item)
+        adapter2a = ArrayAdapter.createFromResource(requireActivity(), R.array.tcModelA, android.R.layout.simple_spinner_item)
         val adapter3  = ArrayAdapter.createFromResource(requireActivity(), R.array.jednotka, android.R.layout.simple_spinner_item)
         val adapter4  = ArrayAdapter.createFromResource(requireActivity(), R.array.nadrzTyp1, android.R.layout.simple_spinner_item)
-            adapter5  = ArrayAdapter.createFromResource(requireActivity(), R.array.nadrzTyp2, android.R.layout.simple_spinner_item)
-            adapter5a = ArrayAdapter.createFromResource(requireActivity(), R.array.nadrzTyp2A, android.R.layout.simple_spinner_item)
-            adapter5b = ArrayAdapter.createFromResource(requireActivity(), R.array.nadrzTyp2B, android.R.layout.simple_spinner_item)
+        adapter5  = ArrayAdapter.createFromResource(requireActivity(), R.array.nadrzTyp2, android.R.layout.simple_spinner_item)
+        adapter5a = ArrayAdapter.createFromResource(requireActivity(), R.array.nadrzTyp2A, android.R.layout.simple_spinner_item)
+        adapter5b = ArrayAdapter.createFromResource(requireActivity(), R.array.nadrzTyp2B, android.R.layout.simple_spinner_item)
         val adapter6  = ArrayAdapter.createFromResource(requireActivity(), R.array.zasobnik, android.R.layout.simple_spinner_item)
         val adapter7  = ArrayAdapter.createFromResource(requireActivity(), R.array.os, android.R.layout.simple_spinner_item)
 
@@ -152,7 +158,6 @@ class SystemFragment : Fragment() {
         }
 
 
-        timer.scheduleAtFixedRate(task, 0, 200)
 
 
         val saver = Saver(requireActivity())
@@ -177,6 +182,7 @@ class SystemFragment : Fragment() {
             etPoznamka3.setText(stranky.system.poznamka)
 
         }
+        timer.scheduleAtFixedRate(task, 0, 200)
 
     }
 
@@ -215,7 +221,7 @@ class SystemFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        onViewCreated(requireView(), null)
+        init()
     }
 
 }

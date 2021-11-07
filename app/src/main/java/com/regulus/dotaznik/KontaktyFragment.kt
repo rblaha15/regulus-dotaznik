@@ -12,13 +12,13 @@ import java.util.*
 
 class KontaktyFragment : Fragment() {
 
-
-    private var timer = Timer()
     private var isFirst = true
 
+    private var timer = Timer()
     override fun onStop() {
         super.onStop()
         timer.cancel()
+        timer = Timer()
     }
 
     override fun onCreateView(
@@ -32,6 +32,11 @@ class KontaktyFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        init()
+    }
+
+    private fun init() {
 
         btnVybratFirmu.setOnClickListener {
             val intent = Intent(requireActivity(), FirmyActivity::class.java)
@@ -84,7 +89,6 @@ class KontaktyFragment : Fragment() {
         }
 
 
-        timer.scheduleAtFixedRate(task, 0, 200)
 
 
         val saver = Saver(requireActivity())
@@ -109,6 +113,7 @@ class KontaktyFragment : Fragment() {
 
         }
 
+        timer.scheduleAtFixedRate(task, 0, 200)
     }
 
     override fun onResume() {
@@ -119,11 +124,9 @@ class KontaktyFragment : Fragment() {
             return
         }
 
-        onViewCreated(requireView(), null)
-
         (activity as MainActivity).recreateKontaktyFragment()
 
-        onViewCreated(requireView(), null)
+        //init()
 
     }
 
