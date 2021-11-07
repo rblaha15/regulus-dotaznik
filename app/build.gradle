@@ -15,7 +15,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 30
         versionCode 1
-        versionName "4.1.8 – Oprava chyb"
+        versionName "4.1.9 – Oprava chyb"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
