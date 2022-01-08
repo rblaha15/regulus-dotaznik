@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
@@ -37,22 +38,34 @@ class FotkyAdapter(private val activity: FotkyActivity) : RecyclerView.Adapter<F
 
         val sharedPref = activity.getSharedPreferences("PREFS_DOTAZNIK", Context.MODE_PRIVATE)
 
-        val file = File(activity.filesDir, "photo${position+1}.jpg")
-        val imageUri = FileProvider.getUriForFile(activity, "${activity.applicationContext.packageName}.provider", file)
+        val file = File(activity.filesDir, "photo${position + 1}.jpg")
 
-        Log.i("foto", file.absolutePath)
-        Log.i("foto", imageUri.path!!)
+        try {
+            val imageUri = FileProvider.getUriForFile(activity, "${activity.applicationContext.packageName}.provider", file)
 
-        val bitmap = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-            MediaStore.Images.Media.getBitmap(activity.contentResolver, imageUri)
+            Log.i("foto", file.absolutePath)
+            Log.i("foto", imageUri.path!!)
+
+            val bitmap = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                MediaStore.Images.Media.getBitmap(activity.contentResolver, imageUri)
+            }
+            else {
+                val source = ImageDecoder.createSource(activity.contentResolver, imageUri)
+                ImageDecoder.decodeBitmap(source)
+            }
+            viewHolder.ivFotka.setImageBitmap(bitmap)
+
+        } catch (e: Throwable) {
+
+
+            AlertDialog.Builder(activity).apply {
+                setTitle("Něco se pokazilo!")
+
+                setMessage("Podrobnější informace:\n\n$position\n\n${e.stackTraceToString()}\n\n${activity.filesDir}")
+            }
+
+            return
         }
-        else {
-            val source = ImageDecoder.createSource(activity.contentResolver, imageUri)
-            ImageDecoder.decodeBitmap(source)
-        }
-        viewHolder.ivFotka.setImageBitmap(bitmap)
-
-
 
 
 

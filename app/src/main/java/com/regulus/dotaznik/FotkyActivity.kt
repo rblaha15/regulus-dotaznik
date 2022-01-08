@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_fotky.*
 import java.io.File
+import java.io.FileNotFoundException
 
 
 class FotkyActivity : AppCompatActivity() {
@@ -70,11 +72,23 @@ class FotkyActivity : AppCompatActivity() {
                     return@registerForActivityResult
                 }
 
-                val outputStream = contentResolver.openInputStream(uri)!!
-                val file = File(filesDir, "photo${i+1}.jpg")
+                try {
 
-                outputStream.copyTo(file.outputStream())
+                    val outputStream = contentResolver.openInputStream(uri)!!
+                    val file = File(filesDir, "photo${i + 1}.jpg")
 
+                    outputStream.copyTo(file.outputStream())
+
+                } catch (e: FileNotFoundException) {
+
+                    AlertDialog.Builder(this).apply {
+                        setTitle("Něco se pokazilo!")
+
+                        setMessage("Podrobnější informace:\n\n$i\n\n${e.stackTraceToString()}\n\n$filesDir")
+                    }
+
+                    return@registerForActivityResult
+                }
 
                 adapter.notifyItemInserted(i + 1)
                 adapter.notifyDataSetChanged()

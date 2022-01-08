@@ -751,7 +751,7 @@ class MainActivity : AppCompatActivity(), DrawerLayout.DrawerListener {
 
                                     val builder3 = AlertDialog.Builder(this@MainActivity).apply {
 
-                                        setMessage(e.toString())
+                                        setMessage(e.stackTraceToString())
                                         setTitle(getString(R.string.export_email_neodeslan, getString(R.string.toto_je_chyba)))
                                         setCancelable(false)
                                         setPositiveButton(getString(R.string.ok)) { dialog, _ ->
@@ -772,7 +772,7 @@ class MainActivity : AppCompatActivity(), DrawerLayout.DrawerListener {
                         else -> {
                             AlertDialog.Builder(this@MainActivity).apply {
 
-                                setMessage(e.toString())
+                                setMessage(e.stackTraceToString())
                                 setTitle(getString(R.string.export_email_neodeslan, getString(R.string.toto_je_chyba)))
                                 setCancelable(false)
                                 setPositiveButton(getString(R.string.ok)) { dialog, _ ->

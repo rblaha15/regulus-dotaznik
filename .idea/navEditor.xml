@@ -24,7 +24,7 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_bazenFragment_to_zdrojeTopFragment">
+                            <entry key="action_bazenFragment_to_zdrojeFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -71,6 +71,11 @@
                         </option>
                         <option name="myPositions">
                           <map>
+                            <entry key="action_kontaktyFragment_self">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                             <entry key="action_kontaktyFragment_to_detailObjektuFragment">
                               <value>
                                 <LayoutPositions />
@@ -102,7 +107,7 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_systemFragment_to_zdrojeTopFragment">
+                            <entry key="action_systemFragment_to_zdrojeFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -124,49 +129,28 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="zdrojeTopFragment">
+                  <entry key="zdrojeFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="500" />
-                            <option name="y" value="655" />
+                            <option name="x" value="32" />
+                            <option name="y" value="12" />
                           </Point>
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_zdrojeTopFragment_to_bazenFragment">
+                            <entry key="action_zdrojeFragment_self">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_zdrojeTopFragment_to_systemFragment">
+                            <entry key="action_zdrojeFragment_to_bazenFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_zdrojeTopFragment_to_zdrojeTvFragment">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                          </map>
-                        </option>
-                      </LayoutPositions>
-                    </value>
-                  </entry>
-                  <entry key="zdrojeTvFragment">
-                    <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="744" />
-                            <option name="y" value="724" />
-                          </Point>
-                        </option>
-                        <option name="myPositions">
-                          <map>
-                            <entry key="action_zdrojeTvFragment_to_zdrojeTopFragment">
+                            <entry key="action_zdrojeFragment_to_systemFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
