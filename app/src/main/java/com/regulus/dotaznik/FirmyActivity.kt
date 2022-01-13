@@ -30,12 +30,12 @@ class FirmyActivity : AppCompatActivity() {
                     if(it.isEmpty())
                         ""
                     else
-                        it.split(" - ")[1]
+                        it.split(" – ")[1]
                 stranky.kontakty.firma =
                     if(it.isEmpty())
                         ""
                     else
-                        it.split(" - ")[0]
+                        it.split(" – ")[0]
 
 
                 saver.save(stranky)

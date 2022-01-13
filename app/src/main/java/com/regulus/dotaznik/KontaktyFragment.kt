@@ -33,17 +33,11 @@ class KontaktyFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        init()
-    }
-
-    private fun init() {
-
         btnVybratFirmu.setOnClickListener {
             val intent = Intent(requireActivity(), FirmyActivity::class.java)
 
             startActivity(intent)
         }
-
 
         val task = object : TimerTask() {
             override fun run() {
@@ -51,7 +45,7 @@ class KontaktyFragment : Fragment() {
                 val saver = Saver(requireActivity())
                 val stranky = saver.get()
 
-                val firmy = resources.getStringArray(R.array.ica).toList()
+                val firmy = resources.getStringArray(R.array.ica)
 
                 stranky.kontakty.apply {
                     prijmeni = etPrijmeni.text.toString()
@@ -64,11 +58,9 @@ class KontaktyFragment : Fragment() {
                     ico = etIco.text.toString()
                     poznamka = etPoznamka.text.toString()
 
-                    firma =
-                        if (ico in firmy.map { it.split(" - ")[1] })
-                            firmy.filter { it.contains(ico) }[0].split(" - ")[0]
-                        else
-                            ""
+                    firma = firmy.firstOrNull { it.split(" – ").last() == ico }?.split(" – ")?.first()
+                        ?: ""
+
 
 
                     activity?.runOnUiThread {
@@ -87,8 +79,6 @@ class KontaktyFragment : Fragment() {
                 saver.save(stranky)
             }
         }
-
-
 
 
         val saver = Saver(requireActivity())
@@ -125,8 +115,6 @@ class KontaktyFragment : Fragment() {
         }
 
         (activity as MainActivity).recreateKontaktyFragment()
-
-        //init()
 
     }
 

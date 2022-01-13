@@ -20,11 +20,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Dotazník"
         tools:ignore="AllowBackup">
-        <activity android:name=".FirmyActivity" />
-        <activity android:name=".FotkyActivity" />
-        <activity android:name=".AdminActivity" />
-        <activity android:name=".PrihlaseniActivity" />
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".FirmyActivity"
+            android:exported="false" />
+        <activity android:name=".FotkyActivity"
+            android:exported="false"  />
+        <activity android:name=".AdminActivity"
+            android:exported="false"  />
+        <activity android:name=".PrihlaseniActivity"
+            android:exported="false"  />
+        <activity android:name=".MainActivity"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

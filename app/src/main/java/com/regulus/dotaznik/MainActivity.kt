@@ -14,6 +14,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.fragment.NavHostFragment
@@ -75,6 +76,10 @@ class MainActivity : AppCompatActivity(), DrawerLayout.DrawerListener {
 
 
         val sharedPref = this.getSharedPreferences("PREFS_PRIHLASENI", Context.MODE_PRIVATE)
+
+        sharedPref.edit {
+            putInt("verze", 4111)
+        }
 
         val header = navigationView.getHeaderView(0)
 
