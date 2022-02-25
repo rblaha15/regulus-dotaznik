@@ -2,6 +2,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/nav_header"
@@ -15,32 +16,33 @@
 
     <TextView
         android:id="@+id/tvNavJmeno"
-        android:textColor="@color/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="8dp" />
+        android:paddingTop="8dp"
+        android:textColor="?attr/colorOnSurface"
+        tools:text="@tools:sample/first_names" />
 
 
     <TextView
         android:id="@+id/tvNavKod"
-        android:textColor="@color/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="?attr/colorOnSurface"
         android:paddingTop="8dp" />
 
 
     <TextView
         android:id="@+id/tvNavEmail"
-        android:textColor="@color/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="?attr/colorOnSurface"
         android:paddingTop="8dp" />
 
     <TextView
         android:id="@+id/tvNavIco"
-        android:textColor="@color/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="?attr/colorOnSurface"
         android:paddingTop="8dp" />
 
 </LinearLayout>

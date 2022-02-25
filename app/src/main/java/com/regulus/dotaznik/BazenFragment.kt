@@ -23,20 +23,15 @@ class BazenFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-
-        return inflater.inflate(R.layout.fragment_bazen, container, false)
-    }
+    ): View? = inflater.inflate(R.layout.fragment_bazen, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         init()
-        
     }
 
     private fun init() {
-
 
         val adapter1 = ArrayAdapter.createFromResource(requireActivity(), R.array.dobaVyuzivani, android.R.layout.simple_spinner_item)
         val adapter2 = ArrayAdapter.createFromResource(requireActivity(), R.array.umisteni, android.R.layout.simple_spinner_item)
@@ -62,24 +57,18 @@ class BazenFragment : Fragment() {
 
         spTvar.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View,
-                    position: Int,
-                    id: Long
-                ) {
+                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                     update()
                 }
 
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
+                override fun onNothingSelected(p0: AdapterView<*>?) {}
             }
 
 
         val task = object : TimerTask() {
             override fun run() {
 
-                val saver = Saver(requireActivity())
-                val stranky = saver.get()
+                val stranky = requireContext().saver.get()
 
                 stranky.bazen.apply {
                     dobaPos = spDoba.selectedItemPosition
@@ -90,28 +79,23 @@ class BazenFragment : Fragment() {
                     druhVody = spDruhVody.selectedItem.toString()
                     tvarPos = spTvar.selectedItemPosition
                     tvar = spTvar.selectedItem.toString()
-                    delka = etDelka.text.toString()
-                    sirka = etSirka.text.toString()
-                    prumer = etPrumer.text.toString()
-                    hloubka = etHloubka.text.toString()
+                    delka = etDelka.editText!!.text.toString()
+                    sirka = etSirka.editText!!.text.toString()
+                    prumer = etPrumer.editText!!.text.toString()
+                    hloubka = etHloubka.editText!!.text.toString()
                     zakrytiPos = spZakryti.selectedItemPosition
                     zakryti = spZakryti.selectedItem.toString()
-                    teplota = etTeplota.text.toString()
-                    poznamka = etPoznamka4.text.toString()
+                    teplota = etTeplota.editText!!.text.toString()
+                    poznamka = etPoznamka4.editText!!.text.toString()
                 }
 
                 if (stranky.bazen == Stranky.Bazen()) return
 
-                saver.save(stranky)
+                requireContext().saver.save(stranky)
             }
         }
 
-
-
-
-        val saver = Saver(requireActivity())
-        val stranky = saver.get()
-
+        val stranky = requireContext().saver.get()
 
         requireActivity().runOnUiThread {
 
@@ -119,13 +103,13 @@ class BazenFragment : Fragment() {
             spUmisteni.setSelection(stranky.bazen.umisteniPos)
             spDruhVody.setSelection(stranky.bazen.druhVodyPos)
             spTvar.setSelection(stranky.bazen.tvarPos)
-            etDelka.setText(stranky.bazen.delka)
-            etSirka.setText(stranky.bazen.sirka)
-            etPrumer.setText(stranky.bazen.prumer)
-            etHloubka.setText(stranky.bazen.hloubka)
+            etDelka.editText!!.setText(stranky.bazen.delka)
+            etSirka.editText!!.setText(stranky.bazen.sirka)
+            etPrumer.editText!!.setText(stranky.bazen.prumer)
+            etHloubka.editText!!.setText(stranky.bazen.hloubka)
             spZakryti.setSelection(stranky.bazen.zakrytiPos)
-            etTeplota.setText(stranky.bazen.teplota)
-            etPoznamka4.setText(stranky.bazen.poznamka)
+            etTeplota.editText!!.setText(stranky.bazen.teplota)
+            etPoznamka4.editText!!.setText(stranky.bazen.poznamka)
 
         }
 
@@ -139,13 +123,6 @@ class BazenFragment : Fragment() {
         etSirka.visibility = if (spTvar.selectedItemPosition != 2) View.VISIBLE else View.GONE
         etPrumer.visibility = if (spTvar.selectedItemPosition == 2) View.VISIBLE else View.GONE
 
-        tvDelka.visibility = if (spTvar.selectedItemPosition != 2) View.VISIBLE else View.GONE
-        tvSirka.visibility = if (spTvar.selectedItemPosition != 2) View.VISIBLE else View.GONE
-        tvPrumer.visibility = if (spTvar.selectedItemPosition == 2) View.VISIBLE else View.GONE
-
-        tvDelkaJednotky.visibility = if (spTvar.selectedItemPosition != 2) View.VISIBLE else View.GONE
-        tvSirkaJednotky.visibility = if (spTvar.selectedItemPosition != 2) View.VISIBLE else View.GONE
-        tvPrumerJednotky.visibility = if (spTvar.selectedItemPosition == 2) View.VISIBLE else View.GONE
     }
 
     override fun onResume() {

@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="gray">#505050</color>
-    <color name="gray2">#606060</color>
-    <color name="gray3">#707070</color>
-    <color name="text">@android:color/primary_text_dark</color>
+    <color name="md_theme_surfaceVariant">@color/md_theme_dark_surfaceVariant</color>
 </resources>

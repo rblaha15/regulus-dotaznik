@@ -6,8 +6,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -15,17 +18,15 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
-import kotlinx.android.synthetic.main.activity_admin.*
 import kotlinx.android.synthetic.main.activity_prihlaseni.*
-import kotlinx.android.synthetic.main.fragment_kontakty.*
 import kotlin.system.exitProcess
 
 
 class PrihlaseniActivity : AppCompatActivity() {
 
     private var currentSelection: Clovek? = null
-    private lateinit var zamestnanci: MutableList<Clovek>
-    private lateinit var zastupci: MutableList<Clovek>
+    private lateinit var zamestnanci: List<Clovek>
+    private lateinit var zastupci: List<Clovek>
 
 
     private fun Int.toBoolean() = this == 1
@@ -48,9 +49,9 @@ class PrihlaseniActivity : AppCompatActivity() {
 
             Log.d("Firebase", value2)
 
-            etZadat?.setText(value2)
+            /*etZadat!!.setText(value2)
 
-            tvZkontrolovat?.text = value2
+            tvZkontrolovat!!.text = value2*/
 
 
             setAdapters(value2.split("\n"))
@@ -73,9 +74,9 @@ class PrihlaseniActivity : AppCompatActivity() {
 
                 Log.d("Firebase", value2)
 
-                etZadat?.setText(value2)
+                /*etZadat?.setText(value2)
 
-                tvZkontrolovat?.text = value2
+                tvZkontrolovat?.text = value2*/
 
 
                 setAdapters(value2.split("\n"))
@@ -108,24 +109,17 @@ class PrihlaseniActivity : AppCompatActivity() {
                 tvInfo.text = ""
                 tvInfo2.text = ""
 
+                tvInfo3.visibility = vis
                 etPrihlaseniEmail.visibility = vis
                 etPrihlaseniIco.visibility = vis
                 etPrihlaseniJmeno.visibility = vis
                 etPrihlaseniPrijmeni.visibility = vis
-                tvPrihlaseniEmail.visibility = vis
-                tvPrihlaseniIco.visibility = vis
-                tvPrihlaseniJmeno.visibility = vis
-                tvPrihlaseniPrijmeni.visibility = vis
 
                 if (position == 0) return
-
-
 
                 val lidi = if (rbJsem.isChecked) zamestnanci else zastupci
 
                 currentSelection = lidi[position - 1]
-
-
 
                 if (rbJsem.isChecked) {
                     tvInfo.text = getString(R.string.prihlaseni_vybrany_jmeno_prijmeni, currentSelection!!.jmeno, currentSelection!!.prijmeni) +
@@ -142,10 +136,6 @@ class PrihlaseniActivity : AppCompatActivity() {
         spZamestnanci.onItemSelectedListener = l
         spZastupci.onItemSelectedListener = l
 
-
-
-
-
         clJsem.visibility =  View.GONE
         clNejsem.visibility =  View.VISIBLE
 
@@ -161,23 +151,18 @@ class PrihlaseniActivity : AppCompatActivity() {
 
         }
 
-
         btnOk.setOnClickListener {
 
-
-
-            if (etPrihlaseniJmeno.text.toString() == etPrihlaseniPrijmeni.text.toString() &&
-                    etPrihlaseniPrijmeni.text.toString() == "admin" &&
-                    etPrihlaseniIco.text.toString() == "12345678") { admin(); return@setOnClickListener }
+            if (etPrihlaseniJmeno.editText!!.text.toString() == etPrihlaseniPrijmeni.editText!!.text.toString() &&
+                    etPrihlaseniPrijmeni.editText!!.text.toString() == "admin" &&
+                    etPrihlaseniIco.editText!!.text.toString() == "12345678") { admin(); return@setOnClickListener }
 
             val sharedPref = this.getSharedPreferences("PREFS_PRIHLASENI", Context.MODE_PRIVATE)
 
-            sharedPref.edit().apply {
+            sharedPref.edit {
 
                 if (rbJsem.isChecked) {
                     if (currentSelection == null) return@setOnClickListener
-
-
 
                     putString("jmeno", currentSelection!!.jmeno + " " + currentSelection!!.prijmeni)
                     putString("kod", currentSelection!!.cislo_ko)
@@ -188,19 +173,18 @@ class PrihlaseniActivity : AppCompatActivity() {
                 } else {
 
                     if (currentSelection == null) { Toast.makeText(this@PrihlaseniActivity, R.string.je_potreba_zadat_zastupce, Toast.LENGTH_SHORT).show(); return@setOnClickListener }
-                    if (etPrihlaseniEmail.text.toString() == "") { Toast.makeText(this@PrihlaseniActivity, R.string.je_potreba_zadat_email, Toast.LENGTH_SHORT).show(); return@setOnClickListener }
-                    if (etPrihlaseniJmeno.text.toString() == "") { Toast.makeText(this@PrihlaseniActivity, R.string.je_potreba_zadat_jmeno, Toast.LENGTH_SHORT).show(); return@setOnClickListener }
-                    if (etPrihlaseniPrijmeni.text.toString() == "") { Toast.makeText(this@PrihlaseniActivity, R.string.je_potreba_zadat_prijmeni, Toast.LENGTH_SHORT).show(); return@setOnClickListener }
+                    if (etPrihlaseniEmail.editText!!.text.toString() == "") { Toast.makeText(this@PrihlaseniActivity, R.string.je_potreba_zadat_email, Toast.LENGTH_SHORT).show(); return@setOnClickListener }
+                    if (etPrihlaseniJmeno.editText!!.text.toString() == "") { Toast.makeText(this@PrihlaseniActivity, R.string.je_potreba_zadat_jmeno, Toast.LENGTH_SHORT).show(); return@setOnClickListener }
+                    if (etPrihlaseniPrijmeni.editText!!.text.toString() == "") { Toast.makeText(this@PrihlaseniActivity, R.string.je_potreba_zadat_prijmeni, Toast.LENGTH_SHORT).show(); return@setOnClickListener }
 
                     putString("kod", currentSelection!!.cislo_ko)
-                    putString("ico", etPrihlaseniIco.text.toString())
-                    putString("email", etPrihlaseniEmail.text.toString())
-                    putString("jmeno", etPrihlaseniJmeno.text.toString() + " " + etPrihlaseniPrijmeni.text.toString())
+                    putString("ico", etPrihlaseniIco.editText!!.text.toString())
+                    putString("email", etPrihlaseniEmail.editText!!.text.toString())
+                    putString("jmeno", etPrihlaseniJmeno.editText!!.text.toString() + " " + etPrihlaseniPrijmeni.editText!!.text.toString())
                 }
 
                 putBoolean("prihlasen", true)
 
-                apply()
             }
 
             finish()
@@ -213,35 +197,23 @@ class PrihlaseniActivity : AppCompatActivity() {
     }
 
     private fun setAdapters(stringy: List<String>) {
-        zamestnanci = mutableListOf()
-        zastupci = mutableListOf()
-
-        val zamestnanciJmena = mutableListOf(resources.getString(R.string.vyberte))
-        val zastupciJmena = mutableListOf(resources.getString(R.string.vyberte))
-
-
-        for (i in stringy.indices) {
-            zamestnanci.add(Clovek())
-
-            stringy[i].split(";").apply {
-                zamestnanci[i].cislo_ko = this[0]
-                zamestnanci[i].prijmeni = this[1]
-                zamestnanci[i].jmeno = this[2]
-                zamestnanci[i].email = this[3]
-                zamestnanci[i].jeZastupce = this[4].toInt().toBoolean()
-            }
-
-            zamestnanci[i].apply {zamestnanciJmena.add("$jmeno $prijmeni")}
-
-
-
-            if (zamestnanci[i].jeZastupce) {
-                zastupci.add(zamestnanci[i])
-
-                zastupci.last().apply {zastupciJmena.add("$jmeno $prijmeni")}
-            }
+        zamestnanci = stringy.map {
+            Clovek(
+                email = it.split(";")[3],
+                jmeno = it.split(";")[2],
+                prijmeni = it.split(";")[1],
+                cislo_ko = it.split(";")[0],
+                jeZastupce = it.split(";")[4].toInt().toBoolean()
+            )
         }
 
+        zastupci = zamestnanci.filter { it.jeZastupce }
+
+        val zamestnanciJmena = listOf(getString(R.string.vyberte)) +
+                zamestnanci.map { "${it.jmeno} ${it.prijmeni}" }
+
+        val zastupciJmena = listOf(getString(R.string.vyberte)) +
+                zastupci.map { "${it.jmeno} ${it.prijmeni}" }
 
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, zamestnanciJmena)
         val adapter2 = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, zastupciJmena)

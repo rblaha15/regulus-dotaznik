@@ -43,11 +43,9 @@ class DetailObjektuFragment : Fragment() {
         spSpotreba2.adapter = adapter
 
         // znovu prihlasit
-        tvPotrebaVytapeniJednotky.setOnLongClickListener {
+        category8.setOnLongClickListener {
             val intent = Intent(activity, PrihlaseniActivity::class.java)
             startActivity(intent)
-
-
 
             return@setOnLongClickListener true
         }
@@ -56,52 +54,50 @@ class DetailObjektuFragment : Fragment() {
         val task = object : TimerTask() {
             override fun run() {
 
-                val saver = Saver(requireActivity())
-                val stranky = saver.get()
+                val stranky = requireContext().saver.get()
 
                 stranky.detailObjektu.apply {
-                    ztrata = etZtrata.text.toString()
-                    potrebaVytapeni = etPotrebaVytapeni.text.toString()
-                    potrebaTv = etPotrebaTv.text.toString()
-                    plocha = etPlocha.text.toString()
-                    objem = etObjem.text.toString()
-                    naklady = etNaklady.text.toString()
-                    druhPaliva = etDruh.text.toString()
-                    spotreba = etSpotreba.text.toString()
+                    ztrata = etZtrata.editText!!.text.toString()
+                    potrebaVytapeni = etPotrebaVytapeni.editText!!.toString()
+                    potrebaTv = etPotrebaTv.editText!!.text.toString()
+                    plocha = etPlocha.editText!!.text.toString()
+                    objem = etObjem.editText!!.text.toString()
+                    naklady = etNaklady.editText!!.text.toString()
+                    druhPaliva = etDruh.editText!!.text.toString()
+                    spotreba = etSpotreba.editText!!.text.toString()
                     spotrebaJednotkyPos = spSpotreba.selectedItemPosition
                     spotrebaJednotky = spSpotreba.selectedItem.toString()
-                    druhPaliva2 = etDruh2.text.toString()
-                    spotreba2 = etSpotreba2.text.toString()
+                    druhPaliva2 = etDruh2.editText!!.text.toString()
+                    spotreba2 = etSpotreba2.editText!!.text.toString()
                     spotrebaJednotky2Pos = spSpotreba2.selectedItemPosition
                     spotrebaJednotky2 = spSpotreba2.selectedItem.toString()
-                    poznamka = etPoznamka2.text.toString()
+                    poznamka = etPoznamka2.editText!!.text.toString()
                 }
 
                 if (stranky.detailObjektu == Stranky.DetailObjektu()) return
 
-                saver.save(stranky)
+                requireContext().saver.save(stranky)
             }
         }
 
 
         // nacitani
-        val saver = Saver(requireActivity())
-        val stranky = saver.get()
+        val stranky = requireContext().saver.get()
 
         requireActivity().runOnUiThread {
-            etZtrata.setText(stranky.detailObjektu.ztrata)
-            etPotrebaVytapeni.setText(stranky.detailObjektu.potrebaVytapeni)
-            etPotrebaTv.setText(stranky.detailObjektu.potrebaTv)
-            etPlocha.setText(stranky.detailObjektu.plocha)
-            etObjem.setText(stranky.detailObjektu.objem)
-            etNaklady.setText(stranky.detailObjektu.naklady)
-            etDruh.setText(stranky.detailObjektu.druhPaliva)
-            etSpotreba.setText(stranky.detailObjektu.spotreba)
+            etZtrata.editText!!.setText(stranky.detailObjektu.ztrata)
+            etPotrebaVytapeni.editText!!.setText(stranky.detailObjektu.potrebaVytapeni)
+            etPotrebaTv.editText!!.setText(stranky.detailObjektu.potrebaTv)
+            etPlocha.editText!!.setText(stranky.detailObjektu.plocha)
+            etObjem.editText!!.setText(stranky.detailObjektu.objem)
+            etNaklady.editText!!.setText(stranky.detailObjektu.naklady)
+            etDruh.editText!!.setText(stranky.detailObjektu.druhPaliva)
+            etSpotreba.editText!!.setText(stranky.detailObjektu.spotreba)
             spSpotreba.setSelection(stranky.detailObjektu.spotrebaJednotkyPos)
-            etDruh2.setText(stranky.detailObjektu.druhPaliva2)
-            etSpotreba2.setText(stranky.detailObjektu.spotreba2)
+            etDruh2.editText!!.setText(stranky.detailObjektu.druhPaliva2)
+            etSpotreba2.editText!!.setText(stranky.detailObjektu.spotreba2)
             spSpotreba2.setSelection(stranky.detailObjektu.spotrebaJednotky2Pos)
-            etPoznamka2.setText(stranky.detailObjektu.poznamka)
+            etPoznamka2.editText!!.setText(stranky.detailObjektu.poznamka)
         }
 
 

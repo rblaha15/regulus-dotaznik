@@ -42,21 +42,20 @@ class KontaktyFragment : Fragment() {
         val task = object : TimerTask() {
             override fun run() {
 
-                val saver = Saver(requireActivity())
-                val stranky = saver.get()
+                val stranky = requireContext().saver.get()
 
                 val firmy = resources.getStringArray(R.array.ica)
 
                 stranky.kontakty.apply {
-                    prijmeni = etPrijmeni.text.toString()
-                    jmeno = etJmeno.text.toString()
-                    ulice = etUlice.text.toString()
-                    mesto = etMesto.text.toString()
-                    psc = etPSC.text.toString()
-                    telefon = etTelefon.text.toString()
-                    email = etEmail.text.toString()
-                    ico = etIco.text.toString()
-                    poznamka = etPoznamka.text.toString()
+                    prijmeni = etPrijmeni.editText!!.text.toString()
+                    jmeno = etJmeno.editText!!.text.toString()
+                    ulice = etUlice.editText!!.text.toString()
+                    mesto = etMesto.editText!!.text.toString()
+                    psc = etPSC.editText!!.text.toString()
+                    telefon = etTelefon.editText!!.text.toString()
+                    email = etEmail.editText!!.text.toString()
+                    ico = etIco.editText!!.text.toString()
+                    poznamka = etPoznamka.editText!!.text.toString()
 
                     firma = firmy.firstOrNull { it.split(" – ").last() == ico }?.split(" – ")?.first()
                         ?: ""
@@ -76,30 +75,29 @@ class KontaktyFragment : Fragment() {
                 if (stranky.kontakty == Stranky.Kontakty()) return
 
 
-                saver.save(stranky)
+                requireContext().saver.save(stranky)
             }
         }
 
 
-        val saver = Saver(requireActivity())
-        val stranky = saver.get()
+        val stranky = requireContext().saver.get()
 
         requireActivity().runOnUiThread {
 
-            etPrijmeni.setText(stranky.kontakty.prijmeni)
-            etJmeno.setText(stranky.kontakty.jmeno)
-            etUlice.setText(stranky.kontakty.ulice)
-            etMesto.setText(stranky.kontakty.mesto)
-            etPSC.setText(stranky.kontakty.psc)
-            etTelefon.setText(stranky.kontakty.telefon)
-            etEmail.setText(stranky.kontakty.email)
-            etIco.setText(stranky.kontakty.ico)
+            etPrijmeni.editText!!.setText(stranky.kontakty.prijmeni)
+            etJmeno.editText!!.setText(stranky.kontakty.jmeno)
+            etUlice.editText!!.setText(stranky.kontakty.ulice)
+            etMesto.editText!!.setText(stranky.kontakty.mesto)
+            etPSC.editText!!.setText(stranky.kontakty.psc)
+            etTelefon.editText!!.setText(stranky.kontakty.telefon)
+            etEmail.editText!!.setText(stranky.kontakty.email)
+            etIco.editText!!.setText(stranky.kontakty.ico)
             btnVybratFirmu.text =
                 if (stranky.kontakty.firma.isEmpty())
                     "Vyberat firmu"
                 else
                     stranky.kontakty.firma
-            etPoznamka.setText(stranky.kontakty.poznamka)
+            etPoznamka.editText!!.setText(stranky.kontakty.poznamka)
 
         }
 

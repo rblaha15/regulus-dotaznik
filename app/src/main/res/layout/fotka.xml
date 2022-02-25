@@ -26,8 +26,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnOdstranit"
+            style="@style/Widget.Material3.Button.TonalButton.Icon"
+            app:icon="@drawable/ic_baseline_delete_24"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"

@@ -18,7 +18,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_r_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Dotazník"
+        android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
         <activity
             android:name=".FirmyActivity"

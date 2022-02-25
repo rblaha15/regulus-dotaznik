@@ -19,339 +19,253 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-
-            <TextView
-                android:id="@+id/tvZtrata"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="@string/detail_objektu_ztrata"
-                app:layout_constraintBottom_toBottomOf="@id/etZtrata"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/etZtrata" />
-
-            <EditText
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/etZtrata"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:importantForAutofill="no"
-                android:inputType="numberDecimal"
-                app:layout_constraintEnd_toStartOf="@+id/tvZtrataJednotky"
-                app:layout_constraintStart_toEndOf="@id/tvZtrata"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="LabelFor" />
-
-            <TextView
-                android:id="@+id/tvZtrataJednotky"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                android:text="@string/kW"
-                app:layout_constraintBottom_toBottomOf="@id/etZtrata"
+                android:hint="@string/detail_objektu_ztrata"
+                android:inputType="numberDecimal"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/etZtrata" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:suffixText="@string/kW">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal" />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/category8"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:background="@color/gray"
+                android:background="@color/md_theme_surfaceVariant"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/etZtrata">
 
-                <TextView
-                    android:id="@+id/tvPotrebaVytapeni"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="@string/detail_objektu_potreba_vytapeni"
-                    app:layout_constraintBottom_toBottomOf="@+id/etPotrebaVytapeni"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/etPotrebaVytapeni" />
-
-                <EditText
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/etPotrebaVytapeni"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="4dp"
-                    android:importantForAutofill="no"
-                    android:inputType="number"
-                    app:layout_constraintEnd_toStartOf="@+id/tvPotrebaVytapeniJednotky"
-                    app:layout_constraintStart_toEndOf="@id/tvPotrebaVytapeni"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="LabelFor" />
-
-                <TextView
-                    android:id="@+id/tvPotrebaVytapeniJednotky"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
-                    android:text="@string/kWh"
-                    app:layout_constraintBottom_toBottomOf="@+id/etPotrebaVytapeni"
+                    android:hint="@string/detail_objektu_potreba_vytapeni"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/etPotrebaVytapeni" />
-
-                <TextView
-                    android:id="@+id/tvPotrebaTv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="@string/detail_objektu_potreba_tv"
-                    app:layout_constraintBottom_toBottomOf="@+id/etPotrebaTv"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/etPotrebaTv" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:suffixText="@string/kWh">
 
-                <EditText
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/etPotrebaTv"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginBottom="4dp"
-                    android:importantForAutofill="no"
-                    android:inputType="number"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/tvPotrebaTvJednotky"
-                    app:layout_constraintStart_toEndOf="@id/tvPotrebaTv"
-                    app:layout_constraintTop_toBottomOf="@+id/etPotrebaVytapeni"
-                    tools:ignore="LabelFor" />
-
-                <TextView
-                    android:id="@+id/tvPotrebaTvJednotky"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
-                    android:text="@string/kWh"
-                    app:layout_constraintBottom_toBottomOf="@+id/etPotrebaTv"
+                    android:layout_marginBottom="4dp"
+                    android:hint="@string/detail_objektu_potreba_tv"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/etPotrebaTv" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/etPotrebaVytapeni"
+                    app:suffixText="@string/kWh">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number" />
+
+                </com.google.android.material.textfield.TextInputLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-            <TextView
-                android:id="@+id/tvPlocha"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="9dp"
-                android:layout_marginBottom="9dp"
-                android:text="@string/detail_objektu_plocha"
-                app:layout_constraintBottom_toBottomOf="@+id/etPlocha"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/etPlocha" />
-
-            <EditText
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/etPlocha"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="4dp"
-                android:importantForAutofill="no"
-                android:inputType="numberDecimal"
-                app:layout_constraintEnd_toStartOf="@+id/tvPlochaJednotky"
-                app:layout_constraintStart_toEndOf="@+id/tvPlocha"
-                app:layout_constraintTop_toBottomOf="@+id/category8"
-                tools:ignore="LabelFor" />
-
-            <TextView
-                android:id="@+id/tvPlochaJednotky"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                android:text="@string/m2"
-                app:layout_constraintBottom_toBottomOf="@+id/etPlocha"
+                android:hint="@string/detail_objektu_plocha"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/etPlocha" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/category8"
+                app:suffixText="@string/m2">
 
-            <EditText
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/etObjem"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
-                android:importantForAutofill="no"
-                android:inputType="numberDecimal"
-                app:layout_constraintEnd_toStartOf="@+id/tvObjemJednotky"
-                app:layout_constraintStart_toEndOf="@+id/tvObjem"
-                app:layout_constraintTop_toBottomOf="@+id/etPlocha"
-                tools:ignore="LabelFor" />
-
-            <TextView
-                android:id="@+id/tvObjem"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="@string/detail_objektu_objem"
-                app:layout_constraintBottom_toBottomOf="@+id/etObjem"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/etObjem" />
-
-            <TextView
-                android:id="@+id/tvObjemJednotky"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                android:text="@string/m3"
-                app:layout_constraintBottom_toBottomOf="@+id/etObjem"
+                android:hint="@string/detail_objektu_objem"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/etObjem" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/etPlocha"
+                app:suffixText="@string/m3">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal" />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/category4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:background="@color/gray"
+                android:background="@color/md_theme_surfaceVariant"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/etObjem">
 
-                <TextView
-                    android:id="@+id/tvNaklady"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="@string/detail_objektu_naklady"
-                    app:layout_constraintBottom_toBottomOf="@+id/etNaklady"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/etNaklady" />
-
-                <EditText
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/etNaklady"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:importantForAutofill="no"
-                    android:inputType="number"
-                    app:layout_constraintEnd_toStartOf="@+id/tvNakladyJednotky"
-                    app:layout_constraintStart_toEndOf="@id/tvNaklady"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="LabelFor" />
-
-                <TextView
-                    android:id="@+id/tvNakladyJednotky"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
-                    android:text="@string/Kc"
-                    app:layout_constraintBottom_toBottomOf="@+id/etNaklady"
+                    android:hint="@string/detail_objektu_naklady"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/etNaklady" />
-
-                <TextView
-                    android:id="@+id/tvDruhPaliva"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="@string/detail_objektu_druh"
-                    app:layout_constraintBottom_toBottomOf="@+id/etDruh"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/etDruh" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:suffixText="@string/Kc">
 
-                <EditText
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:id="@+id/etDruh"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="16dp"
-                    android:importantForAutofill="no"
-                    android:inputType="text"
+                    android:hint="@string/detail_objektu_druh"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/tvDruhPaliva"
-                    app:layout_constraintTop_toBottomOf="@id/etNaklady"
-                    tools:ignore="LabelFor" />
-
-                <TextView
-                    android:id="@+id/tvSpotreba"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="@string/detail_objektu_spotreba"
-                    app:layout_constraintBottom_toBottomOf="@+id/etSpotreba"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/etSpotreba" />
+                    app:layout_constraintTop_toBottomOf="@id/etNaklady">
 
-                <EditText
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/etSpotreba"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:importantForAutofill="no"
-                    android:inputType="numberDecimal"
+                    android:layout_marginEnd="8dp"
+                    android:hint="@string/detail_objektu_spotreba"
                     app:layout_constraintEnd_toStartOf="@id/spSpotreba"
-                    app:layout_constraintStart_toEndOf="@id/tvSpotreba"
-                    app:layout_constraintTop_toBottomOf="@id/etDruh"
-                    tools:ignore="LabelFor" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/etDruh">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal" />
+
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <Spinner
                     android:id="@+id/spSpotreba"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
+                    android:minHeight="48dp"
                     app:layout_constraintBottom_toBottomOf="@+id/etSpotreba"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/etSpotreba" />
 
-                <TextView
-                    android:id="@+id/tvDruhPaliva2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="@string/detail_objektu_druh2"
-                    app:layout_constraintBottom_toBottomOf="@+id/etDruh2"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/etDruh2" />
-
-                <EditText
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:id="@+id/etDruh2"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="16dp"
-                    android:importantForAutofill="no"
-                    android:inputType="text"
+                    android:hint="@string/detail_objektu_druh2"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/tvDruhPaliva2"
-                    app:layout_constraintTop_toBottomOf="@id/etSpotreba"
-                    tools:ignore="LabelFor" />
-
-                <TextView
-                    android:id="@+id/tvSpotreba2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="@string/detail_objektu_spotreba2"
-                    app:layout_constraintBottom_toBottomOf="@+id/etSpotreba2"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/etSpotreba2" />
+                    app:layout_constraintTop_toBottomOf="@id/etSpotreba">
 
-                <EditText
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/etSpotreba2"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:importantForAutofill="no"
-                    android:inputType="numberDecimal"
+                    android:layout_marginEnd="8dp"
+                    android:hint="@string/detail_objektu_spotreba2"
                     app:layout_constraintEnd_toStartOf="@id/spSpotreba2"
-                    app:layout_constraintStart_toEndOf="@id/tvSpotreba2"
-                    app:layout_constraintTop_toBottomOf="@id/etDruh2"
-                    tools:ignore="LabelFor" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/etDruh2">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal" />
+
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <Spinner
                     android:id="@+id/spSpotreba2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
+                    android:minHeight="48dp"
                     app:layout_constraintBottom_toBottomOf="@+id/etSpotreba2"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/etSpotreba2" />
@@ -362,30 +276,25 @@
 
     </ScrollView>
 
-    <EditText
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
         android:id="@+id/etPoznamka2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:importantForAutofill="no"
         android:inputType="text|textCapSentences"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/tvPoznamka2"
-        tools:ignore="LabelFor" />
+        android:hint="@string/poznamka"
+        app:layout_constraintStart_toStartOf="parent" >
 
-    <TextView
-        android:id="@+id/tvPoznamka2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:text="@string/poznamka"
-        app:layout_constraintBottom_toBottomOf="@id/etPoznamka2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/etPoznamka2" />
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal" />
 
+    </com.google.android.material.textfield.TextInputLayout>
 
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

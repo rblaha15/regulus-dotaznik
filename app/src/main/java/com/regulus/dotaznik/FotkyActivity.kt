@@ -11,12 +11,12 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_fotky.*
 import java.io.File
 import java.io.FileNotFoundException
@@ -32,6 +32,7 @@ class FotkyActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fotky)
 
+        setSupportActionBar(topAppBarFotky)
 
         title = getString(R.string.fotky_sprava_fotek)
 
@@ -81,7 +82,7 @@ class FotkyActivity : AppCompatActivity() {
 
                 } catch (e: FileNotFoundException) {
 
-                    AlertDialog.Builder(this).apply {
+                    MaterialAlertDialogBuilder(this).apply {
                         setTitle("Něco se pokazilo!")
 
                         setMessage("Podrobnější informace:\n\n$i\n\n${e.stackTraceToString()}\n\n$filesDir")

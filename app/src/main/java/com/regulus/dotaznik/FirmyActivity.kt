@@ -22,27 +22,22 @@ class FirmyActivity : AppCompatActivity() {
 
         val callback: (String) -> Unit = {
 
-            val t = Thread {
-                val saver = Saver(this)
-                val stranky = saver.get()
+            val stranky = saver.get()
 
-                stranky.kontakty.ico =
-                    if(it.isEmpty())
-                        ""
-                    else
-                        it.split(" – ")[1]
-                stranky.kontakty.firma =
-                    if(it.isEmpty())
-                        ""
-                    else
-                        it.split(" – ")[0]
+            stranky.kontakty.ico =
+                if(it.isEmpty())
+                    ""
+                else
+                    it.split(" – ")[1]
+            stranky.kontakty.firma =
+                if(it.isEmpty())
+                    ""
+                else
+                    it.split(" – ")[0]
 
 
-                saver.save(stranky)
-            }
+            saver.save(stranky)
 
-            t.start()
-            t.join()
 
             finish()
 
@@ -67,14 +62,11 @@ class FirmyActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
 
-        Thread {
-            val saver = Saver(this)
-            val stranky = saver.get()
+        val stranky = saver.get()
 
-            stranky.kontakty.firma = ""
-            stranky.kontakty.ico = ""
+        stranky.kontakty.firma = ""
+        stranky.kontakty.ico = ""
 
-            saver.save(stranky)
-        }.start()
+        saver.save(stranky)
     }
 }

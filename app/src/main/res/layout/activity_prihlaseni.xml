@@ -29,14 +29,14 @@
                 android:layout_marginEnd="16dp">
 
 
-                <RadioButton
+                <com.google.android.material.radiobutton.MaterialRadioButton
                     android:id="@+id/rbJsem"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/prihlaseni_jsem_zamestanec" />
 
 
-                <RadioButton
+                <com.google.android.material.radiobutton.MaterialRadioButton
                     android:id="@+id/rbNejsem"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -76,10 +76,11 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="16dp"
-                    android:textSize="20sp"
+                    android:minHeight="48dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tvVyberSe" />
+                    app:layout_constraintTop_toBottomOf="@id/tvVyberSe"
+                    tools:ignore="SpeakableTextPresentCheck" />
 
                 <TextView
                     android:id="@+id/tvInfo"
@@ -87,7 +88,6 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
                     android:layout_marginTop="8dp"
-                    android:textSize="20sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/spZamestnanci" />
@@ -121,10 +121,11 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="16dp"
-                    android:textSize="20sp"
+                    android:minHeight="48dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tvVyberte" />
+                    app:layout_constraintTop_toBottomOf="@id/tvVyberte"
+                    tools:ignore="SpeakableTextPresentCheck" />
 
                 <TextView
                     android:id="@+id/tvInfo2"
@@ -132,103 +133,96 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:gravity="center_horizontal"
-                    android:textSize="20sp"
+                    android:text=""
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/spZastupci" />
 
                 <TextView
-                    android:id="@+id/tvPrihlaseniEmail"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tvInfo3"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/prihlaseni_vas_email"
-                    app:layout_constraintBottom_toBottomOf="@+id/etPrihlaseniEmail"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_horizontal"
+                    android:text="@string/prihlaseni_doplnit_info"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/etPrihlaseniEmail" />
+                    app:layout_constraintTop_toBottomOf="@id/tvInfo2" />
 
-                <EditText
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/etPrihlaseniEmail"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:hint="@string/prihlaseni_sem_email"
-                    android:importantForAutofill="no"
-                    android:inputType="textEmailAddress"
-                    android:textSize="20sp"
+                    android:hint="@string/prihlaseni_vas_email"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/tvPrihlaseniEmail"
-                    app:layout_constraintTop_toBottomOf="@+id/tvInfo2" />
-
-                <TextView
-                    android:id="@+id/tvPrihlaseniIco"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/prihlaseni_vase_ico"
-                    app:layout_constraintBottom_toBottomOf="@+id/etPrihlaseniIco"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/etPrihlaseniIco" />
+                    app:layout_constraintTop_toBottomOf="@+id/tvInfo3">
 
-                <EditText
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textEmailAddress" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/etPrihlaseniIco"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:hint="@string/prihlaseni_sem_ico"
-                    android:importantForAutofill="no"
-                    android:inputType="number"
+                    android:hint="@string/prihlaseni_vase_ico"
                     android:maxLength="8"
-                    android:textSize="20sp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/tvPrihlaseniIco"
-                    app:layout_constraintTop_toBottomOf="@+id/etPrihlaseniEmail" />
-
-                <TextView
-                    android:id="@+id/tvPrihlaseniJmeno"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/prihlaseni_vase_jmeno"
-                    app:layout_constraintBottom_toBottomOf="@+id/etPrihlaseniJmeno"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/etPrihlaseniJmeno" />
+                    app:layout_constraintTop_toBottomOf="@+id/etPrihlaseniEmail">
 
-                <EditText
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColorHint="#8D6E63"
+                        android:inputType="number" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/etPrihlaseniJmeno"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:hint="@string/prihlaseni_sem_jmeno"
-                    android:importantForAutofill="no"
-                    android:inputType="textCapWords"
-                    android:textSize="20sp"
+                    android:hint="@string/prihlaseni_vase_jmeno"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/tvPrihlaseniJmeno"
-                    app:layout_constraintTop_toBottomOf="@+id/etPrihlaseniIco" />
-
-                <TextView
-                    android:id="@+id/tvPrihlaseniPrijmeni"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/prihlaseni_vase_prijmeni"
-                    app:layout_constraintBottom_toBottomOf="@+id/etPrihlaseniPrijmeni"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/etPrihlaseniPrijmeni" />
+                    app:layout_constraintTop_toBottomOf="@+id/etPrihlaseniIco">
 
-                <EditText
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapWords" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/etPrihlaseniPrijmeni"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:hint="@string/prihlaseni_sem_prijmeni"
-                    android:importantForAutofill="no"
-                    android:inputType="textCapWords"
-                    android:textSize="20sp"
+                    android:hint="@string/prihlaseni_vase_prijmeni"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/tvPrihlaseniPrijmeni"
-                    app:layout_constraintTop_toBottomOf="@+id/etPrihlaseniJmeno" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/etPrihlaseniJmeno">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapWords" />
+
+                </com.google.android.material.textfield.TextInputLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -237,8 +231,9 @@
     </ScrollView>
 
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnZrusit"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -247,7 +242,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnOk"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

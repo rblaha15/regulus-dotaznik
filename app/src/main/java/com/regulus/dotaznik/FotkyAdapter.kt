@@ -10,9 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.File
 
 class FotkyAdapter(private val activity: FotkyActivity) : RecyclerView.Adapter<FotkyAdapter.ViewHolder>() {
@@ -58,7 +58,7 @@ class FotkyAdapter(private val activity: FotkyActivity) : RecyclerView.Adapter<F
         } catch (e: Throwable) {
 
 
-            AlertDialog.Builder(activity).apply {
+            MaterialAlertDialogBuilder(activity).apply {
                 setTitle("Něco se pokazilo!")
 
                 setMessage("Podrobnější informace:\n\n$position\n\n${e.stackTraceToString()}\n\n${activity.filesDir}")

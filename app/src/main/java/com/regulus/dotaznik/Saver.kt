@@ -1,24 +1,28 @@
 package com.regulus.dotaznik
 
 import android.content.Context
+import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.google.gson.Gson
-
 
 class Saver(private val context: Context) {
 
     fun save(stranky: Stranky) {
-        val prefs = context.getSharedPreferences("PREFS_DOTAZNIK", Context.MODE_PRIVATE)
-        val gson = Gson()
 
-        prefs.edit().apply {
-            putString("udaje", gson.toJson(stranky))
+        Thread {
 
-            apply()
-        }
+            val prefs = context.prefs
+            val gson = Gson()
+
+            prefs.edit {
+                putString("udaje", gson.toJson(stranky))
+
+            }
+        }.start()
     }
 
     fun get(): Stranky {
-        val prefs = context.getSharedPreferences("PREFS_DOTAZNIK", Context.MODE_PRIVATE)
+        val prefs = context.prefs
         val gson = Gson()
 
         val json = prefs.getString("udaje", "")
@@ -30,12 +34,21 @@ class Saver(private val context: Context) {
     }
 
     fun delete() {
-        val prefs = context.getSharedPreferences("PREFS_DOTAZNIK", Context.MODE_PRIVATE)
 
-        prefs.edit().apply {
-            putString("udaje", "")
+        Thread {
 
-            apply()
+            val prefs = context.prefs
+
+            prefs.edit {
+                putString("udaje", "")
+
+            }
         }
     }
 }
+
+val Context.saver: Saver
+    get() = Saver(this)
+
+val Context.prefs: SharedPreferences
+    get() = getSharedPreferences("PREFS_DOTAZNIK", Context.MODE_PRIVATE)

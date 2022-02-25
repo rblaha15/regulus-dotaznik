@@ -29,10 +29,8 @@ class SystemFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_system, container, false)
-    }
-
+    ): View? = inflater.inflate(R.layout.fragment_system, container, false)
+    
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -83,8 +81,7 @@ class SystemFragment : Fragment() {
                 position: Int,
                 id: Long
             ) {
-                val saver = Saver(requireActivity())
-                val stranky = saver.get()
+                val stranky = requireContext().saver.get()
 
 
                 when (parent!!.id) {
@@ -99,7 +96,7 @@ class SystemFragment : Fragment() {
                 }
 
 
-                saver.save(stranky)
+                requireContext().saver.save(stranky)
 
                 update()
             }
@@ -123,8 +120,7 @@ class SystemFragment : Fragment() {
         val task = object : TimerTask() {
             override fun run() {
 
-                val saver = Saver(requireActivity())
-                val stranky = saver.get()
+                val stranky = requireContext().saver.get()
 
                 stranky.system.apply {
                     tcTypPos = spTcTyp.selectedItemPosition
@@ -151,7 +147,7 @@ class SystemFragment : Fragment() {
 
                 if (stranky.system == Stranky.System_()) return
 
-                saver.save(stranky)
+                requireContext().saver.save(stranky)
 
 
             }
@@ -160,8 +156,7 @@ class SystemFragment : Fragment() {
 
 
 
-        val saver = Saver(requireActivity())
-        val stranky = saver.get()
+        val stranky = requireContext().saver.get()
 
         //Log.d("bazen", stranky.system.chciBazen.toString())
 
@@ -207,8 +202,7 @@ class SystemFragment : Fragment() {
             else -> adapter5b
         }
 
-        val saver = Saver(requireActivity())
-        val stranky = saver.get()
+        val stranky = requireContext().saver.get()
 
         spTcModel.setSelection(stranky.system.tcModelPos)
         spNadrzTyp2.setSelection(stranky.system.nadrzTyp2Pos)

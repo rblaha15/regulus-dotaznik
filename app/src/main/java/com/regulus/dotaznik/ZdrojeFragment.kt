@@ -85,8 +85,7 @@ class ZdrojeFragment : Fragment() {
         val task = object : TimerTask() {
             override fun run() {
 
-                val saver = Saver(requireActivity())
-                val stranky = saver.get()
+                val stranky = requireContext().saver.get()
 
                 stranky.zdrojeTop.apply {
                     topTopneTeleso = cbTopTopneTeleso.isChecked
@@ -120,15 +119,14 @@ class ZdrojeFragment : Fragment() {
                 if (stranky.zdrojeTop == Stranky.ZdrojeTop()) return
                 if (stranky.zdrojeTv == Stranky.ZdrojeTv()) return
 
-                saver.save(stranky)
+                requireContext().saver.save(stranky)
             }
         }
 
 
 
 
-        val saver = Saver(requireActivity())
-        val stranky = saver.get()
+        val stranky = requireContext().saver.get()
 
 
         requireActivity().runOnUiThread {

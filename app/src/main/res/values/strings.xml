@@ -56,8 +56,8 @@
     <string name="kontakty_ico">Ičo firmy</string>
 
     <string name="detail_objektu_ztrata">Tepelná ztráta</string>
-    <string name="detail_objektu_potreba_vytapeni">Potřeba tepla\nvytápění</string>
-    <string name="detail_objektu_potreba_tv">Potřeba tepla\nteplá voda</string>
+    <string name="detail_objektu_potreba_vytapeni">Potřeba tepla – vytápění</string>
+    <string name="detail_objektu_potreba_tv">Potřeba tepla – teplá voda</string>
     <string name="detail_objektu_plocha">Vytápěná plocha</string>
     <string name="detail_objektu_objem">Vytápěný objem</string>
     <string name="detail_objektu_naklady">Náklady na vytápění</string>
@@ -126,13 +126,9 @@
     <string name="prihlaseni_vyberte">Vyberte svého obchodního zástupce:</string>
     <string name="prihlaseni_vybrany">Vybraný obchodní zástupce: %1$s %2$s</string>
     <string name="prihlaseni_vase_jmeno">Vaše jméno</string>
-    <string name="prihlaseni_sem_jmeno">Sem zadejte své jméno</string>
     <string name="prihlaseni_vase_prijmeni">Vaše příjmení</string>
-    <string name="prihlaseni_sem_prijmeni">Sem zadejte své příjmení</string>
-    <string name="prihlaseni_vase_ico">Vaše IČO</string>
-    <string name="prihlaseni_sem_ico">Sem zadejte své IČO (nepovinné)</string>
+    <string name="prihlaseni_vase_ico">Vaše IČO (nepovinné)</string>
     <string name="prihlaseni_vas_email">Váš email</string>
-    <string name="prihlaseni_sem_email">Sem zadejte svůj email</string>
     <string name="prihlaseni_vyber_se">Vyber se:</string>
     <string name="prihlaseni_vybrany_jmeno_prijmeni">Jméno a příjmení: %1$s %2$s\n</string>
     <string name="prihlaseni_vybrany_email">Email: %s</string>
@@ -144,7 +140,7 @@
 
     <string name="export_odesilani">Odesílání</string>
     <string name="export_email_se_odesila">Email se odesílá</string>
-    <string name="export_email_uspesne_odeslan">Email úspěšně odeslán!</string>
+    <string name="export_email_uspesne_odeslan">Email byl úspěšně odeslán!</string>
     <string name="export_chcete_odeslat">Odeslat?</string>
     <string name="export_opravdu_chcete_odeslat_na">"Opravdu chcete odeslat email na \"%s\"?"</string>
     <string name="export_email_neodeslan">Omlouvám se, ale email se nepodařilo odeslat. %s</string>
@@ -160,4 +156,5 @@
     <string name="odstranit_vse">Odstranit vše</string>
     <string name="podrobnejsi_info">Podrobnější informace</string>
     <string name="export_nejste_pripojeni">Pravděpodobně nejste připojeni k internetu. Zkontrolujte připojení a zkuste to znovu</string>
+    <string name="prihlaseni_doplnit_info">Doplntě, prosím, ještě nějaké informace o Vás:</string>
 </resources>
