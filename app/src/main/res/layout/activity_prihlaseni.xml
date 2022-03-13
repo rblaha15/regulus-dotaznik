@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PrihlaseniActivity">
+    tools:context=".activities.PrihlaseniActivity">
 
     <ScrollView
         android:layout_width="0dp"
@@ -88,6 +88,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
                     android:layout_marginTop="8dp"
+                    android:text="@string/prihlaseni_vybrany_jmeno_prijmeni"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/spZamestnanci" />
@@ -133,7 +134,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:gravity="center_horizontal"
-                    android:text=""
+                    android:text="@string/prihlaseni_vybrany"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/spZastupci" />
@@ -175,7 +176,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:hint="@string/prihlaseni_vase_ico"
-                    android:maxLength="8"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/etPrihlaseniEmail">
@@ -183,7 +183,7 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColorHint="#8D6E63"
+                        android:maxLength="8"
                         android:inputType="number" />
 
                 </com.google.android.material.textfield.TextInputLayout>

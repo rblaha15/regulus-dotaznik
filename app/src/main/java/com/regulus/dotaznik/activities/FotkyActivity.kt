@@ -1,6 +1,7 @@
-package com.regulus.dotaznik
+package com.regulus.dotaznik.activities
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -17,7 +18,9 @@ import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.activity_fotky.*
+import com.regulus.dotaznik.R
+import com.regulus.dotaznik.adapters.FotkyAdapter
+import com.regulus.dotaznik.databinding.ActivityFotkyBinding
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -28,11 +31,16 @@ class FotkyActivity : AppCompatActivity() {
     private lateinit var takePicture: ActivityResultLauncher<Uri>
     private lateinit var getMultipleContents: ActivityResultLauncher<String>
 
+    private lateinit var binding: ActivityFotkyBinding
+
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_fotky)
+        binding = ActivityFotkyBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
-        setSupportActionBar(topAppBarFotky)
+        setSupportActionBar(binding.topAppBarFotky)
 
         title = getString(R.string.fotky_sprava_fotek)
 
@@ -102,7 +110,7 @@ class FotkyActivity : AppCompatActivity() {
         }
 
 
-        fabVyfotit.setOnClickListener {
+        binding.fabVyfotit.setOnClickListener {
 
             val i = sharedPref.getInt("fotky", 0)
 
@@ -136,7 +144,7 @@ class FotkyActivity : AppCompatActivity() {
         }
 
 
-        fabVybrat.setOnClickListener {
+        binding.fabVybrat.setOnClickListener {
 
             val i = sharedPref.getInt("fotky", 0)
 
@@ -149,18 +157,15 @@ class FotkyActivity : AppCompatActivity() {
 
         }
 
-
-
-
         adapter = FotkyAdapter(this)
 
 
-        rvFotky.layoutManager = LinearLayoutManager(this)
-        rvFotky.adapter = adapter
+        binding.rvFotky.layoutManager = LinearLayoutManager(this)
+        binding.rvFotky.adapter = adapter
 
 
         val dividerItemDecoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        rvFotky.addItemDecoration(dividerItemDecoration)
+        binding.rvFotky.addItemDecoration(dividerItemDecoration)
 
     }
 

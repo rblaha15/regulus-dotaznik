@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FirmyActivity">
+    tools:context=".activities.FirmyActivity">
 
     <EditText
         android:id="@+id/etVyhledat"
@@ -14,11 +14,12 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:hint="@string/kontakty_vyhledat_firmu"
+        android:importantForAutofill="no"
         android:inputType="textCapCharacters"
+        android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:importantForAutofill="no" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvFirmy"
@@ -27,7 +28,9 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etVyhledat" />
+        app:layout_constraintTop_toBottomOf="@+id/etVyhledat"
+        tools:itemCount="20"
+        tools:listitem="@layout/firma" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

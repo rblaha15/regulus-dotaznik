@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FotkyActivity">
+    tools:context=".activities.FotkyActivity">
 
 
     <com.google.android.material.appbar.AppBarLayout
@@ -29,7 +29,9 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appBarLayout2" />
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout2"
+        tools:itemCount="5"
+        tools:listitem="@layout/fotka" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabVyfotit"

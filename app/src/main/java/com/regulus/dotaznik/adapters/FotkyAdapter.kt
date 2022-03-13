@@ -1,18 +1,18 @@
-package com.regulus.dotaznik
+package com.regulus.dotaznik.adapters
 
 import android.content.Context
 import android.graphics.ImageDecoder
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
 import android.widget.ImageView
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.regulus.dotaznik.R
+import com.regulus.dotaznik.activities.FotkyActivity
 import java.io.File
 
 class FotkyAdapter(private val activity: FotkyActivity) : RecyclerView.Adapter<FotkyAdapter.ViewHolder>() {
@@ -21,7 +21,6 @@ class FotkyAdapter(private val activity: FotkyActivity) : RecyclerView.Adapter<F
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val ivFotka: ImageView = view.findViewById(R.id.ivFotka)
         val btnOdstranit: Button = view.findViewById(R.id.btnOdstranit)
-
 
     }
 

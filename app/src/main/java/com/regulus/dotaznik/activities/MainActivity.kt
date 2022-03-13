@@ -1,54 +1,35 @@
-package com.regulus.dotaznik
+package com.regulus.dotaznik.activities
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.view.MotionEvent
-import android.view.View
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
+import android.view.*
+import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.activity_main.*
+import com.regulus.dotaznik.*
+import com.regulus.dotaznik.adapters.ViewPagerAdapter
+import com.regulus.dotaznik.databinding.ActivityMainBinding
 import java.io.File
 import java.util.*
 import java.util.concurrent.Executors
 import javax.activation.DataHandler
 import javax.activation.FileDataSource
 import javax.mail.*
-import javax.mail.internet.InternetAddress
-import javax.mail.internet.MimeBodyPart
-import javax.mail.internet.MimeMessage
-import javax.mail.internet.MimeMultipart
-import kotlin.math.abs
+import javax.mail.internet.*
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var toggle: ActionBarDrawerToggle
-    private var debugMode = false
-
-    fun recreateKontaktyFragment() {
-
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment) as NavHostFragment?
-        val navController = navHostFragment!!.navController
-        navController.navigate(R.id.action_kontaktyFragment_self)
-
-        toggle.syncState()
-    }
+    var debugMode = false
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu, menu)
@@ -56,35 +37,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setDrawerOpen() {
-        drawer_layout.openDrawer(GravityCompat.START)
+        binding.drawerLayout.openDrawer(GravityCompat.START)
 
-        val fragment = supportFragmentManager.findFragmentById(R.id.fragment)?.childFragmentManager?.fragments!![0]
-
-        drawer_layout.setDrawerLockMode(when(fragment) {
-            is UvodFragment -> DrawerLayout.LOCK_MODE_LOCKED_OPEN
-            else -> DrawerLayout.LOCK_MODE_UNLOCKED
-        })
+        binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
     }
-
 
     override fun onResume() {
         super.onResume()
 
-
-        val prefsPrihlaseni = this.getSharedPreferences("PREFS_PRIHLASENI", Context.MODE_PRIVATE)
+        val prefsPrihlaseni = getSharedPreferences("PREFS_PRIHLASENI", Context.MODE_PRIVATE)
 
         prefsPrihlaseni.edit {
             putInt("verze", 4200)
         }
 
-        val header = navigationView.getHeaderView(0)
+        val header = binding.navigationView.getHeaderView(0)
 
         val tvNavJmeno = header.findViewById<TextView>(R.id.tvNavJmeno)
         val tvNavEmail = header.findViewById<TextView>(R.id.tvNavEmail)
         val tvNavIco = header.findViewById<TextView>(R.id.tvNavIco)
         val tvNavKod = header.findViewById<TextView>(R.id.tvNavKod)
 
-        tvNavIco.visibility = if (prefsPrihlaseni.getString("ico", "") != "") View.VISIBLE else View.GONE
+        tvNavIco.visibility = if (prefsPrihlaseni.getString("ico","")!!.isNotEmpty()) View.VISIBLE else View.GONE
 
         tvNavJmeno.text = getString(R.string.neco_mezera_neco, getString(R.string.prihlaseni_jmeno_prijmeni), prefsPrihlaseni.getString("jmeno","Error"))
         tvNavEmail.text = getString(R.string.neco_mezera_neco, getString(R.string.prihlaseni_email), prefsPrihlaseni.getString("email","Error"))
@@ -93,12 +67,15 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
-        setSupportActionBar(topAppBar)
+        setSupportActionBar(binding.topAppBar)
 
         if (intent.getBooleanExtra("delete", false)) {
 
@@ -117,54 +94,25 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        toggle = ActionBarDrawerToggle(this, drawer_layout, R.string.otevrit, R.string.zavrit)
+        binding.viewPager.adapter = ViewPagerAdapter(this)
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment) as NavHostFragment?
-        val navController = navHostFragment!!.navController
+        val dividerItemDecoration = DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL)
+        binding.viewPager.addItemDecoration(dividerItemDecoration)
 
-        fabDalsi.visibility = View.GONE
+        toggle = ActionBarDrawerToggle(this, binding.drawerLayout, R.string.otevrit, R.string.zavrit)
 
         setDrawerOpen()
 
-        val menu2 = navigationView.menu
-        val stranky2 = saver.get()
-        val chci2 = stranky2.system.chciBazen
+        binding.drawerLayout.addDrawerListener(toggle)
 
-        menu2.findItem(R.id.bazenFragment).isVisible = chci2
-
-        navigationView.setupWithNavController(navController)
-        val appBarConfiguration = AppBarConfiguration(navController.graph, drawer_layout)
-        setupActionBarWithNavController(navController, appBarConfiguration)
-
-        val listener = object : DrawerLayout.DrawerListener {
+        binding.drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
-            override fun onDrawerOpened(drawerView: View) {
-                val menu = navigationView.menu
-                val stranky = saver.get()
-                val chci = stranky.system.chciBazen
-                menu.findItem(R.id.bazenFragment).isVisible = chci
-            }
-
-            override fun onDrawerClosed(drawerView: View) {
-
-                val fragment = supportFragmentManager.findFragmentById(R.id.fragment)!!.childFragmentManager.fragments[0]
-
-                fabZpet.visibility = if (fragment is KontaktyFragment) View.GONE else View.VISIBLE
-                fabDalsi.visibility = View.VISIBLE
-
-
-                fabDalsi.setImageDrawable(ContextCompat.getDrawable(this@MainActivity,
-                    if (fragment is ZdrojeFragment) R.drawable.ic_baseline_send_24 else R.drawable.next
-                ))
-            }
-
+            override fun onDrawerOpened(drawerView: View) {}
+            override fun onDrawerClosed(drawerView: View) {}
             override fun onDrawerStateChanged(newState: Int) {
                 toggle.syncState()
             }
-        }
-
-        drawer_layout.addDrawerListener(toggle)
-        drawer_layout.addDrawerListener(listener)
+        })
 
         toggle.syncState()
 
@@ -176,143 +124,72 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, PrihlaseniActivity::class.java))
         }
 
-        navigationView.setNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.actionOdeslat -> {
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
 
-                    odeslat()
-                    return@setNavigationItemSelectedListener true
-                }
-                R.id.actionOdstranit -> {
-                    MaterialAlertDialogBuilder(this).apply {
+                binding.navigationView.setCheckedItem(
+                    listOf(
+                        R.id.kontaktyFragment,
+                        R.id.detailObjektuFragment,
+                        R.id.systemFragment,
+                        R.id.bazenFragment,
+                        R.id.zdrojeFragment,
+                    )[position]
+                )
 
-                        setIcon(R.drawable.ic_baseline_delete_24)
-                        setTitle(getString(R.string.export_opravdu_odstranit_data))
-                        setCancelable(false)
-
-                        setPositiveButton(getString(R.string.ano)) { dialog, _ ->
-
-                            val intent = Intent(this@MainActivity, MainActivity::class.java)
-                            intent.putExtra("delete", true)
-                            val fragment = supportFragmentManager.findFragmentById(R.id.fragment)!!
-                            supportFragmentManager.beginTransaction().remove(fragment).commit()
-                            finishAffinity()
-                            startActivity(intent)
-
-                            dialog.cancel()
-                        }
-                        setNegativeButton(getString(R.string.ne)) { dialog, _ ->
-                            dialog.cancel()
-                        }
-
-                        show()
-                    }
-                    return@setNavigationItemSelectedListener true
-                }
-                else -> {
-
-                    navController.navigate(item.itemId)
-                    drawer_layout.closeDrawers()
-                    return@setNavigationItemSelectedListener true
-                }
+                title = binding.navigationView.checkedItem!!.title
             }
-        }
+        })
 
+        binding.navigationView.setNavigationItemSelectedListener { item -> when (item.itemId) {
+            R.id.actionOdeslat -> {
 
-        fabDalsi.setOnLongClickListener {
-
-            val fragment = supportFragmentManager.findFragmentById(R.id.fragment)?.childFragmentManager?.fragments!![0]
-
-            if (fragment is ZdrojeFragment) {
-                debugMode = true
                 odeslat()
+                true
             }
-            return@setOnLongClickListener true
-        }
+            R.id.actionOdstranit -> {
+                MaterialAlertDialogBuilder(this).apply {
 
-        fabDalsi.setOnClickListener {
-            debugMode = false
+                    setIcon(R.drawable.ic_baseline_delete_24)
+                    setTitle(getString(R.string.export_opravdu_odstranit_data))
+                    setCancelable(false)
 
-            val stranky = saver.get()
-            val chci = stranky.system.chciBazen
+                    setPositiveButton(getString(R.string.ano)) { dialog, _ ->
 
-            val id = when (supportFragmentManager.findFragmentById(R.id.fragment)?.childFragmentManager?.fragments!![0]) {
-                is KontaktyFragment -> R.id.action_kontaktyFragment_to_detailObjektuFragment
-                is DetailObjektuFragment -> R.id.action_detailObjektuFragment_to_systemFragment
-                is SystemFragment -> if (chci) R.id.action_systemFragment_to_bazenFragment
-                                     else R.id.action_systemFragment_to_zdrojeFragment
-                is BazenFragment -> R.id.action_bazenFragment_to_zdrojeFragment
-                is ZdrojeFragment -> {odeslat(); R.id.action_zdrojeFragment_self}
-                else -> R.id.uvodFragment
-            }
+                        val intent = Intent(this@MainActivity, MainActivity::class.java)
+                        intent.putExtra("delete", true)
 
-            fabZpet.visibility = View.VISIBLE
-            fabDalsi.visibility = View.VISIBLE
+                        finishAffinity()
+                        startActivity(intent)
 
-            when (supportFragmentManager.findFragmentById(R.id.fragment)?.childFragmentManager?.fragments!![0]) {
-                is BazenFragment -> fabDalsi.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_baseline_send_24))
-                is SystemFragment -> if (!chci) fabDalsi.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_baseline_send_24))
-                else -> fabDalsi.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.next))
-            }
-
-            navController.navigate(id)
-
-            toggle.syncState()
-        }
-
-        fabZpet.setOnClickListener {
-
-            val stranky = saver.get()
-            val chci = stranky.system.chciBazen
-
-            val fragment = supportFragmentManager.findFragmentById(R.id.fragment)?.childFragmentManager?.fragments!![0]
-
-            val id = when (fragment) {
-                is ZdrojeFragment -> if (chci) R.id.action_zdrojeFragment_to_bazenFragment
-                                        else R.id.action_zdrojeFragment_to_systemFragment
-                is BazenFragment -> R.id.action_bazenFragment_to_systemFragment
-                is SystemFragment -> R.id.action_systemFragment_to_detailObjektuFragment
-                is DetailObjektuFragment -> R.id.action_detailObjektuFragment_to_kontaktyFragment
-                else -> R.id.uvodFragment
-            }
-
-            fabDalsi.visibility = View.VISIBLE
-            fabZpet.visibility = if (fragment is DetailObjektuFragment) View.GONE else View.VISIBLE
-
-            fabDalsi.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.next))
-
-            navController.navigate(id)
-
-            toggle.syncState()
-        }
-
-    }
-
-    private var x1: Float = 0F
-    private var x2: Float = 0F
-
-    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
-        when (event.action) {
-            MotionEvent.ACTION_DOWN -> x1 = event.x
-            MotionEvent.ACTION_UP -> {
-                x2 = event.x
-                val deltaX = x2 - x1
-                if (abs(deltaX) > 150) {
-                    if (deltaX > 0) {
-                        // <-
-                        fabZpet.callOnClick()
-                    } else if (deltaX < 0) {
-                        // ->
-                        fabDalsi.callOnClick()
+                        dialog.cancel()
                     }
-                }
-            }
-        }
-        return super.dispatchTouchEvent(event)
-    }
+                    setNegativeButton(getString(R.string.ne)) { dialog, _ ->
+                        dialog.cancel()
+                    }
 
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        return super.onTouchEvent(event)
+                    show()
+                }
+                true
+            }
+            else -> {
+
+                binding.viewPager.currentItem = listOf(
+                    R.id.kontaktyFragment,
+                    R.id.detailObjektuFragment,
+                    R.id.systemFragment,
+                    R.id.bazenFragment,
+                    R.id.zdrojeFragment,
+                ).indexOf(item.itemId)
+
+                binding.drawerLayout.closeDrawers()
+
+                title = binding.navigationView.checkedItem!!.title
+
+                true
+            }
+        }}
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -326,10 +203,12 @@ class MainActivity : AppCompatActivity() {
 
         setDrawerOpen()
 
-        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
-            drawer_layout.closeDrawers()
+        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            binding.drawerLayout.closeDrawers()
         }
+
         return if (toggle.onOptionsItemSelected(item)) true
+
         else super.onOptionsItemSelected(item)
     }
 
@@ -340,7 +219,7 @@ class MainActivity : AppCompatActivity() {
         return super.onSupportNavigateUp()
     }
 
-    private fun odeslat() {
+    fun odeslat() {
 
         val stranky = saver.get()
 
@@ -434,17 +313,17 @@ class MainActivity : AppCompatActivity() {
                         <jiny_zdroj>${if (zdrojeTv.tvJiny) zdrojeTv.tvKtery else "Ne"}</jiny_zdroj>
                     </zdrojeTV>
                     <bazen>
-                        <ohrev>${if (system.chciBazen) "Ano" else "Ne"}</ohrev>
-                        <doba_vyuzivani>${if (system.chciBazen) bazen.doba else ""}</doba_vyuzivani>
-                        <umisteni>${if (system.chciBazen) bazen.umisteni else ""}</umisteni>
-                        <zakryti>${if (system.chciBazen) bazen.zakryti else ""}</zakryti>
-                        <tvar>${if (system.chciBazen) bazen.tvar else ""}</tvar>
+                        <ohrev>${if (bazen.chciBazen) "Ano" else "Ne"}</ohrev>
+                        <doba_vyuzivani>${if (bazen.chciBazen) bazen.doba else ""}</doba_vyuzivani>
+                        <umisteni>${if (bazen.chciBazen) bazen.umisteni else ""}</umisteni>
+                        <zakryti>${if (bazen.chciBazen) bazen.zakryti else ""}</zakryti>
+                        <tvar>${if (bazen.chciBazen) bazen.tvar else ""}</tvar>
                         <sirka>${bazen.sirka}</sirka>
                         <delka>${bazen.delka}</delka>
                         <hloubka>${bazen.hloubka}</hloubka>
                         <prumer>${bazen.prumer}</prumer>
                         <teplota>${bazen.teplota}</teplota>
-                        <voda>${if (system.chciBazen) bazen.druhVody else ""}</voda>
+                        <voda>${if (bazen.chciBazen) bazen.druhVody else ""}</voda>
                     </bazen>
                     <poznamka>
                         <kontakty>${kontakty.poznamka}</kontakty>
@@ -462,7 +341,8 @@ class MainActivity : AppCompatActivity() {
             setIcon(R.drawable.ic_baseline_send_24)
             setTitle(R.string.export_chcete_odeslat)
             setMessage(
-                getString(R.string.export_opravdu_chcete_odeslat_na, when {
+                getString(
+                    R.string.export_opravdu_chcete_odeslat_na, when {
                     debugMode -> prefsPrihlaseni.getString("email", "")
                     Locale.getDefault().language == Locale("sk").language -> "obchod@regulus.sk"
                     else -> "poptavky@regulus.cz"
@@ -568,8 +448,6 @@ class MainActivity : AppCompatActivity() {
 
                         val intent = Intent(this@MainActivity, MainActivity::class.java)
                         intent.putExtra("delete", true)
-                        val fragment = supportFragmentManager.findFragmentById(R.id.fragment)!!
-                        supportFragmentManager.beginTransaction().remove(fragment).commit()
                         finishAffinity()
                         startActivity(intent)
 

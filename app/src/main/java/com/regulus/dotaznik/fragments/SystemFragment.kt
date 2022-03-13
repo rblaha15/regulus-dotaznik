@@ -1,13 +1,12 @@
-package com.regulus.dotaznik
+package com.regulus.dotaznik.fragments
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.fragment_system.*
+import com.regulus.dotaznik.*
+import com.regulus.dotaznik.databinding.FragmentSystemBinding
 import java.util.*
 
 
@@ -25,26 +24,48 @@ class SystemFragment : Fragment() {
         timer.cancel()
         timer = Timer()
     }
-    
+
+    private lateinit var binding: FragmentSystemBinding
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_system, container, false)
-    
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        init()
+    ): View {
+        binding = FragmentSystemBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    private fun init() {
+    private fun update() {
+        binding.spNadrzTyp2.visibility = if (binding.spNadrzTyp1.selectedItemPosition != 0) View.VISIBLE else View.GONE
+        binding.etNadrzObjem.visibility = if (binding.spNadrzTyp1.selectedItemPosition != 0) View.VISIBLE else View.GONE
 
+        binding.etZasobnikObjem.visibility = if (binding.spZasobnikTyp.selectedItemPosition != 0) View.VISIBLE else View.GONE
+
+        binding.spTcModel.adapter = if (binding.spTcTyp.selectedItemPosition != 0) adapter2a else adapter2
+
+
+        binding.spNadrzTyp2.adapter = when (binding.spNadrzTyp1.selectedItemPosition) {
+            1 -> adapter5
+            2 -> adapter5a
+            else -> adapter5b
+        }
+
+        val stranky = requireContext().saver.get()
+
+        binding.spTcModel.setSelection(stranky.system.tcModelPos)
+        binding.spNadrzTyp2.setSelection(stranky.system.nadrzTyp2Pos)
+
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         val adapter1  = ArrayAdapter.createFromResource(requireActivity(), R.array.tcTyp, android.R.layout.simple_spinner_item)
         adapter2  = ArrayAdapter.createFromResource(requireActivity(), R.array.tcModel, android.R.layout.simple_spinner_item)
         adapter2a = ArrayAdapter.createFromResource(requireActivity(), R.array.tcModelA, android.R.layout.simple_spinner_item)
         val adapter3  = ArrayAdapter.createFromResource(requireActivity(), R.array.jednotka, android.R.layout.simple_spinner_item)
-        val adapter4  = ArrayAdapter.createFromResource(requireActivity(), R.array.nadrzTyp1, android.R.layout.simple_spinner_item)
+        val adapter4  = ArrayAdapter.createFromResource(requireActivity(),
+            R.array.nadrzTyp1, android.R.layout.simple_spinner_item)
         adapter5  = ArrayAdapter.createFromResource(requireActivity(), R.array.nadrzTyp2, android.R.layout.simple_spinner_item)
         adapter5a = ArrayAdapter.createFromResource(requireActivity(), R.array.nadrzTyp2A, android.R.layout.simple_spinner_item)
         adapter5b = ArrayAdapter.createFromResource(requireActivity(), R.array.nadrzTyp2B, android.R.layout.simple_spinner_item)
@@ -62,14 +83,13 @@ class SystemFragment : Fragment() {
         adapter6 .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         adapter7 .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
-
-        spTcTyp.adapter = adapter1
-        spTcModel.adapter = adapter2
-        spJednotka.adapter = adapter3
-        spNadrzTyp1.adapter = adapter4
-        spNadrzTyp2.adapter = adapter5
-        spZasobnikTyp.adapter = adapter6
-        spOtopnySystem.adapter = adapter7
+        binding.spTcTyp.adapter = adapter1
+        binding.spTcModel.adapter = adapter2
+        binding.spJednotka.adapter = adapter3
+        binding.spNadrzTyp1.adapter = adapter4
+        binding.spNadrzTyp2.adapter = adapter5
+        binding.spZasobnikTyp.adapter = adapter6
+        binding.spOtopnySystem.adapter = adapter7
 
         var poprve1 = 0
         var poprve2 = 0
@@ -83,7 +103,6 @@ class SystemFragment : Fragment() {
             ) {
                 val stranky = requireContext().saver.get()
 
-
                 when (parent!!.id) {
                     R.id.spTcTyp -> if ((stranky.system.tcModelPos != position) and (poprve1 == 1)) {
                         stranky.system.tcModelPos = 0
@@ -95,7 +114,6 @@ class SystemFragment : Fragment() {
                     } else poprve2 = 1
                 }
 
-
                 requireContext().saver.save(stranky)
 
                 update()
@@ -104,16 +122,9 @@ class SystemFragment : Fragment() {
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
-
-
-
-        spTcTyp.onItemSelectedListener = onClick
-        spNadrzTyp1.onItemSelectedListener = onClick
-        spZasobnikTyp.onItemSelectedListener = onClick
-        cbBazen.setOnClickListener {
-            update()
-        }
-
+        binding.spTcTyp.onItemSelectedListener = onClick
+        binding.spNadrzTyp1.onItemSelectedListener = onClick
+        binding.spZasobnikTyp.onItemSelectedListener = onClick
 
         update()
 
@@ -123,99 +134,51 @@ class SystemFragment : Fragment() {
                 val stranky = requireContext().saver.get()
 
                 stranky.system.apply {
-                    tcTypPos = spTcTyp.selectedItemPosition
-                    tcTyp = spTcTyp.selectedItem.toString()
-                    tcModelPos = spTcModel.selectedItemPosition
-                    tcModel = spTcModel.selectedItem.toString()
-                    jednotkaTypPos = spJednotka.selectedItemPosition
-                    jednotkaTyp = spJednotka.selectedItem.toString()
-                    nadrzTypPos = spNadrzTyp1.selectedItemPosition
-                    nadrzTyp = spNadrzTyp1.selectedItem.toString()
-                    nadrzTyp2Pos = spNadrzTyp2.selectedItemPosition
-                    nadrzTyp2 = spNadrzTyp2.selectedItem.toString()
-                    nadrzObjem = etNadrzObjem.text.toString()
-                    zasobnikTypPos = spZasobnikTyp.selectedItemPosition
-                    zasobnikTyp = spZasobnikTyp.selectedItem.toString()
-                    zasobnikObjem = etZasobnikObjem.text.toString()
-                    osPos = spOtopnySystem.selectedItemPosition
-                    os = spOtopnySystem.selectedItem.toString()
-                    cirkulace = cbCirkulace.isChecked
-                    chciBazen = cbBazen.isChecked
-                    poznamka = etPoznamka3.text.toString()
+                    tcTypPos = binding.spTcTyp.selectedItemPosition
+                    tcTyp = binding.spTcTyp.selectedItem.toString()
+                    tcModelPos = binding.spTcModel.selectedItemPosition
+                    tcModel = binding.spTcModel.selectedItem.toString()
+                    jednotkaTypPos = binding.spJednotka.selectedItemPosition
+                    jednotkaTyp = binding.spJednotka.selectedItem.toString()
+                    nadrzTypPos = binding.spNadrzTyp1.selectedItemPosition
+                    nadrzTyp = binding.spNadrzTyp1.selectedItem.toString()
+                    nadrzTyp2Pos = binding.spNadrzTyp2.selectedItemPosition
+                    nadrzTyp2 = binding.spNadrzTyp2.selectedItem.toString()
+                    nadrzObjem = binding.etNadrzObjem.editText!!.text.toString()
+                    zasobnikTypPos = binding.spZasobnikTyp.selectedItemPosition
+                    zasobnikTyp = binding.spZasobnikTyp.selectedItem.toString()
+                    zasobnikObjem = binding.etZasobnikObjem.editText!!.text.toString()
+                    osPos = binding.spOtopnySystem.selectedItemPosition
+                    os = binding.spOtopnySystem.selectedItem.toString()
+                    cirkulace = binding.cbCirkulace.isChecked
+                    poznamka = binding.etPoznamka3.editText!!.text.toString()
                 }
-
 
                 if (stranky.system == Stranky.System_()) return
 
                 requireContext().saver.save(stranky)
 
-
             }
         }
 
-
-
-
         val stranky = requireContext().saver.get()
-
-        //Log.d("bazen", stranky.system.chciBazen.toString())
-
 
         requireActivity().runOnUiThread {
 
-            spTcTyp.setSelection(stranky.system.tcTypPos)
-            spTcModel.setSelection(stranky.system.tcModelPos)
-            spJednotka.setSelection(stranky.system.jednotkaTypPos)
-            spNadrzTyp1.setSelection(stranky.system.nadrzTypPos)
-            spNadrzTyp2.setSelection(stranky.system.nadrzTyp2Pos)
-            etNadrzObjem.setText(stranky.system.nadrzObjem)
-            spZasobnikTyp.setSelection(stranky.system.zasobnikTypPos)
-            etZasobnikObjem.setText(stranky.system.zasobnikObjem)
-            spOtopnySystem.setSelection(stranky.system.osPos)
-            cbCirkulace.isChecked = stranky.system.cirkulace
-            cbBazen.isChecked = stranky.system.chciBazen
-            etPoznamka3.setText(stranky.system.poznamka)
+            binding.spTcTyp.setSelection(stranky.system.tcTypPos)
+            binding.spTcModel.setSelection(stranky.system.tcModelPos)
+            binding.spJednotka.setSelection(stranky.system.jednotkaTypPos)
+            binding.spNadrzTyp1.setSelection(stranky.system.nadrzTypPos)
+            binding.spNadrzTyp2.setSelection(stranky.system.nadrzTyp2Pos)
+            binding.etNadrzObjem.editText!!.setText(stranky.system.nadrzObjem)
+            binding.spZasobnikTyp.setSelection(stranky.system.zasobnikTypPos)
+            binding.etZasobnikObjem.editText!!.setText(stranky.system.zasobnikObjem)
+            binding.spOtopnySystem.setSelection(stranky.system.osPos)
+            binding.cbCirkulace.isChecked = stranky.system.cirkulace
+            binding.etPoznamka3.editText!!.setText(stranky.system.poznamka)
 
         }
         timer.scheduleAtFixedRate(task, 0, 200)
-
-    }
-
-
-    private fun update() {
-
-
-
-        spNadrzTyp2.visibility = if (spNadrzTyp1.selectedItemPosition != 0) View.VISIBLE else View.GONE
-        etNadrzObjem.visibility = if (spNadrzTyp1.selectedItemPosition != 0) View.VISIBLE else View.GONE
-        tvNadrzObjem.visibility = if (spNadrzTyp1.selectedItemPosition != 0) View.VISIBLE else View.GONE
-
-        etZasobnikObjem.visibility = if (spZasobnikTyp.selectedItemPosition != 0) View.VISIBLE else View.GONE
-        tvZasobnikObjem.visibility = if (spZasobnikTyp.selectedItemPosition != 0) View.VISIBLE else View.GONE
-
-        spTcModel.adapter = if (spTcTyp.selectedItemPosition != 0) adapter2a else adapter2
-
-
-        spNadrzTyp2.adapter = when (spNadrzTyp1.selectedItemPosition) {
-            1 -> adapter5
-            2 -> adapter5a
-            else -> adapter5b
-        }
-
-        val stranky = requireContext().saver.get()
-
-        spTcModel.setSelection(stranky.system.tcModelPos)
-        spNadrzTyp2.setSelection(stranky.system.nadrzTyp2Pos)
-
-        return
-
-    }
-
-
-    override fun onResume() {
-        super.onResume()
-
-        init()
     }
 
 }

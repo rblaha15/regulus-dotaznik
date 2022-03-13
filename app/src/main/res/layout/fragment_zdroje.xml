@@ -4,7 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SystemFragment">
+    tools:context=".fragments.SystemFragment">
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabOdeslat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:contentDescription="@string/dalsi"
+        app:fabSize="normal"
+        app:layout_constraintBottom_toTopOf="@+id/etPoznamka6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_baseline_send_24" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -58,6 +70,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
+                android:minHeight="48dp"
                 app:layout_constraintBottom_toBottomOf="@+id/tvTopTopneTeleso"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/tvTopTopneTeleso" />
@@ -88,6 +101,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
+                android:minHeight="48dp"
                 app:layout_constraintBottom_toBottomOf="@+id/tvTopElektrokotel"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/tvTopElektrokotel" />
@@ -118,6 +132,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
+                android:minHeight="48dp"
                 app:layout_constraintBottom_toBottomOf="@+id/tvTopPlynKotel"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/tvTopPlynKotel" />
@@ -148,6 +163,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
+                android:minHeight="48dp"
                 app:layout_constraintBottom_toBottomOf="@+id/tvTopKrb"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/tvTopKrb" />
@@ -161,31 +177,29 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/etTopJiny" />
 
-            <TextView
-                android:id="@+id/tvTopJiny"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="@string/jiny"
-                app:layout_constraintBottom_toBottomOf="@+id/cbTopJiny"
-                app:layout_constraintStart_toEndOf="@+id/cbTopJiny"
-                app:layout_constraintTop_toTopOf="@+id/cbTopJiny" />
-
-            <EditText
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:id="@+id/etTopJiny"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
-                android:importantForAutofill="no"
-                android:inputType="textCapSentences"
+                android:hint="@string/jiny"
+                android:minHeight="48dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/tvTopJiny"
-                app:layout_constraintTop_toBottomOf="@+id/cbTopKrb"
-                tools:ignore="LabelFor" />
+                app:layout_constraintStart_toEndOf="@+id/cbTopJiny"
+                app:layout_constraintTop_toBottomOf="@+id/cbTopKrb">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapSentences" />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/clTv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -232,6 +246,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
+                    android:minHeight="48dp"
                     app:layout_constraintBottom_toBottomOf="@+id/tvTvTopneTeleso"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/tvTvTopneTeleso" />
@@ -302,62 +317,59 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/etTvJiny" />
 
-                <TextView
-                    android:id="@+id/tvTvJiny"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="@string/jiny"
-                    app:layout_constraintBottom_toBottomOf="@+id/cbTvJiny"
-                    app:layout_constraintStart_toEndOf="@+id/cbTvJiny"
-                    app:layout_constraintTop_toTopOf="@+id/cbTvJiny" />
-
-                <EditText
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/etTvJiny"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="16dp"
-                    android:ems="10"
-                    android:importantForAutofill="no"
-                    android:inputType="textCapSentences"
+                    android:layout_marginBottom="4dp"
+                    android:hint="@string/jiny"
+                    android:minHeight="48dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/tvTvJiny"
-                    app:layout_constraintTop_toBottomOf="@+id/cbTvKrb"
-                    tools:ignore="LabelFor" />
+                    app:layout_constraintStart_toEndOf="@+id/cbTvJiny"
+                    app:layout_constraintTop_toBottomOf="@+id/cbTvKrb">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapSentences" />
+
+                </com.google.android.material.textfield.TextInputLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                app:layout_constraintTop_toBottomOf="@id/clTv" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
 
-    <TextView
-        android:id="@+id/tvPoznamka6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:text="@string/poznamka"
-        app:layout_constraintBottom_toBottomOf="@id/etPoznamka6"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/etPoznamka6" />
-
-    <EditText
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
         android:id="@+id/etPoznamka6"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp"
-        android:ems="10"
-        android:importantForAutofill="no"
-        android:inputType="textCapSentences"
+        android:minHeight="48dp"
+        android:hint="@string/poznamka"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/tvPoznamka6"
-        tools:ignore="LabelFor" />
+        app:layout_constraintStart_toStartOf="parent" >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textCapSentences" />
+
+    </com.google.android.material.textfield.TextInputLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,10 +1,10 @@
-package com.regulus.dotaznik
+package com.regulus.dotaznik.adapters
 
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.regulus.dotaznik.R
+import com.regulus.dotaznik.activities.FirmyActivity
 
 class FirmyAdapter(private val originalDataSet: List<String>, private val activity: FirmyActivity, private val callback: (String) -> Unit) : RecyclerView.Adapter<FirmyAdapter.ViewHolder>() {
 

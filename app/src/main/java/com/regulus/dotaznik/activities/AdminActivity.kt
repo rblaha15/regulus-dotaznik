@@ -1,4 +1,4 @@
-package com.regulus.dotaznik
+package com.regulus.dotaznik.activities
 
 import android.os.Bundle
 import android.util.Log
@@ -9,12 +9,17 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
-import kotlinx.android.synthetic.main.activity_admin.*
+import com.regulus.dotaznik.databinding.ActivityAdminBinding
 
 class AdminActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityAdminBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_admin)
+        binding = ActivityAdminBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
 
         val database = Firebase.database("https://lidi-c74ad-default-rtdb.europe-west1.firebasedatabase.app/")
@@ -24,9 +29,9 @@ class AdminActivity : AppCompatActivity() {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val value = dataSnapshot.getValue<String>()
 
-                etZadat.setText(value)
+                binding.etZadat.setText(value)
 
-                tvZkontrolovat.text = value
+                binding.tvZkontrolovat.text = value
 
             }
 
@@ -37,9 +42,9 @@ class AdminActivity : AppCompatActivity() {
 
 
 
-        btnOdeslat.setOnClickListener {
+        binding.btnOdeslat.setOnClickListener {
 
-            myRef.setValue(etZadat.text.toString())
+            myRef.setValue(binding.etZadat.text.toString())
         }
     }
 }

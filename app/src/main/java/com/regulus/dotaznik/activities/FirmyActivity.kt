@@ -1,19 +1,26 @@
-package com.regulus.dotaznik
+package com.regulus.dotaznik.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.activity_firmy.*
+import com.regulus.dotaznik.R
+import com.regulus.dotaznik.adapters.FirmyAdapter
+import com.regulus.dotaznik.databinding.ActivityFirmyBinding
+import com.regulus.dotaznik.saver
 
 class FirmyActivity : AppCompatActivity() {
 
     private lateinit var adapter: FirmyAdapter
 
+    private lateinit var binding: ActivityFirmyBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_firmy)
+        binding = ActivityFirmyBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
         title = getString(R.string.kontakty_vyberte_firmu)
 
@@ -43,20 +50,17 @@ class FirmyActivity : AppCompatActivity() {
 
         }
 
-
-        rvFirmy.layoutManager = LinearLayoutManager(this)
+        binding.rvFirmy.layoutManager = LinearLayoutManager(this)
 
         adapter = FirmyAdapter(firmy, this, callback)
-        rvFirmy.adapter = adapter
+        binding.rvFirmy.adapter = adapter
 
         val dividerItemDecoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        rvFirmy.addItemDecoration(dividerItemDecoration)
+        binding.rvFirmy.addItemDecoration(dividerItemDecoration)
 
-        etVyhledat.addTextChangedListener {
+        binding.etVyhledat.addTextChangedListener {
             adapter.filter(it.toString())
         }
-
-
     }
 
     override fun onBackPressed() {

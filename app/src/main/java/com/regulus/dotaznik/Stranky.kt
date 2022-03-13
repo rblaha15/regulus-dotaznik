@@ -7,8 +7,6 @@ data class Stranky(
     val bazen: Bazen = Bazen(),
     val zdrojeTop: ZdrojeTop = ZdrojeTop(),
     val zdrojeTv: ZdrojeTv = ZdrojeTv(),
-
-
 ) {
 
     data class Kontakty(
@@ -60,11 +58,11 @@ data class Stranky(
         var osPos: Int = 0,
         var os: String = "",
         var cirkulace: Boolean = false,
-        var chciBazen: Boolean = false,
         var poznamka: String = "",
     )
 
     data class Bazen(
+        var chciBazen: Boolean = false,
         var dobaPos: Int = 0,
         var doba: String = "",
         var umisteniPos: Int = 0,
