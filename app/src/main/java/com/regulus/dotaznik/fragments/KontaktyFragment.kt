@@ -2,11 +2,16 @@ package com.regulus.dotaznik.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import com.regulus.dotaznik.*
+import com.regulus.dotaznik.R
+import com.regulus.dotaznik.Stranky
 import com.regulus.dotaznik.activities.FirmyActivity
 import com.regulus.dotaznik.databinding.FragmentKontaktyBinding
+import com.regulus.dotaznik.saver
 import java.util.*
 
 
@@ -31,15 +36,7 @@ class KontaktyFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        binding.btnVybratFirmu.setOnClickListener {
-            val intent = Intent(requireActivity(), FirmyActivity::class.java)
-
-            startActivity(intent)
-        }
-
+    fun init() {
         val task = object : TimerTask() {
             override fun run() {
 
@@ -58,12 +55,10 @@ class KontaktyFragment : Fragment() {
                     ico = binding.etIco.editText!!.text.toString()
                     poznamka = binding.etPoznamka.editText!!.text.toString()
 
-                    firma = firmy.firstOrNull { it.split(" – ").last() == ico }?.split(" – ")?.first()
-                        ?: ""
+                    firma = firmy.firstOrNull { it.split(" – ").last() == ico }?.split(" – ")?.first() ?: ""
 
                     activity?.runOnUiThread {
-                        binding.btnVybratFirmu.text =
-                            firma.ifEmpty { getString(R.string.kontakty_vybrat_firmu) }
+                        binding.btnVybratFirmu.text = firma.ifEmpty { context?.getString(R.string.kontakty_vybrat_firmu) }
                     }
                 }
 
@@ -93,13 +88,22 @@ class KontaktyFragment : Fragment() {
 
             binding.btnVybratFirmu.text = stranky.kontakty.firma.ifEmpty { "Vyberat firmu" }
         }
-
-
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
+        val activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+
+            init()
+        }
+
+        binding.btnVybratFirmu.setOnClickListener {
+            val intent = Intent(requireActivity(), FirmyActivity::class.java)
+
+            activityResultLauncher.launch(intent)
+        }
+
+        init()
+    }
 }
-
-
-
-

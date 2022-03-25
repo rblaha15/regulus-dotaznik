@@ -1,24 +1,28 @@
 package com.regulus.dotaznik
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import com.google.gson.Gson
+
+
+var neukladat = false
 
 class Saver(private val context: Context) {
 
     fun save(stranky: Stranky) {
 
-        Thread {
+        if (neukladat) return
 
-            val prefs = context.prefs
-            val gson = Gson()
+        val prefs = context.prefs
+        val gson = Gson()
 
-            prefs.edit {
-                putString("udaje", gson.toJson(stranky))
+        prefs.edit {
 
-            }
-        }.start()
+            putString("udaje", gson.toJson(stranky))
+        }
     }
 
     fun get(): Stranky {
@@ -33,22 +37,27 @@ class Saver(private val context: Context) {
             Stranky()
     }
 
-    fun delete() {
+    fun delete(activity: AppCompatActivity) {
 
-        Thread {
+        neukladat = true
 
-            val prefs = context.prefs
+        val prefs = context.prefs
 
-            prefs.edit {
-                putString("udaje", "")
+        activity.finish()
 
-            }
+        prefs.edit {
+
+            clear()
         }
+
+        activity.intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        activity.intent.removeExtra("delete")
+        context.startActivity(activity.intent)
     }
 }
 
-val Context.saver: Saver
-    get() = Saver(this)
+val Context?.saver: Saver
+    get() = Saver(this!!)
 
-val Context.prefs: SharedPreferences
-    get() = getSharedPreferences("PREFS_DOTAZNIK", Context.MODE_PRIVATE)
+val Context?.prefs: SharedPreferences
+    get() = this!!.getSharedPreferences("PREFS_DOTAZNIK", Context.MODE_PRIVATE)

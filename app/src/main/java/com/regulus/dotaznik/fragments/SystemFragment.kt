@@ -1,12 +1,16 @@
 package com.regulus.dotaznik.fragments
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
-import com.regulus.dotaznik.*
+import com.regulus.dotaznik.R
+import com.regulus.dotaznik.Stranky
 import com.regulus.dotaznik.databinding.FragmentSystemBinding
+import com.regulus.dotaznik.saver
 import java.util.*
 
 
@@ -97,7 +101,7 @@ class SystemFragment : Fragment() {
         val onClick = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
-                view: View,
+                view: View?,
                 position: Int,
                 id: Long
             ) {

@@ -4,12 +4,21 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.*
-import android.widget.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.core.view.GravityCompat
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updateMargins
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.viewpager2.widget.ViewPager2
@@ -23,7 +32,10 @@ import java.util.concurrent.Executors
 import javax.activation.DataHandler
 import javax.activation.FileDataSource
 import javax.mail.*
-import javax.mail.internet.*
+import javax.mail.internet.InternetAddress
+import javax.mail.internet.MimeBodyPart
+import javax.mail.internet.MimeMessage
+import javax.mail.internet.MimeMultipart
 
 
 class MainActivity : AppCompatActivity() {
@@ -36,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun setDrawerOpen() {
+    private fun openDrawer() {
         binding.drawerLayout.openDrawer(GravityCompat.START)
 
         binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
@@ -79,11 +91,11 @@ class MainActivity : AppCompatActivity() {
 
         if (intent.getBooleanExtra("delete", false)) {
 
-            val s = prefs.getInt("fotky", 0)
+            saver.delete(this)
 
-            saver.delete()
+            val pocetFotek = prefs.getInt("fotky", 0)
 
-            repeat(s) { i ->
+            repeat(pocetFotek) { i ->
                 val file = File(filesDir, "photo${i + 1}.jpg")
 
                 file.delete()
@@ -92,6 +104,8 @@ class MainActivity : AppCompatActivity() {
             prefs.edit {
                 putInt("fotky", 0)
             }
+
+            return
         }
 
         binding.viewPager.adapter = ViewPagerAdapter(this)
@@ -101,7 +115,7 @@ class MainActivity : AppCompatActivity() {
 
         toggle = ActionBarDrawerToggle(this, binding.drawerLayout, R.string.otevrit, R.string.zavrit)
 
-        setDrawerOpen()
+        openDrawer()
 
         binding.drawerLayout.addDrawerListener(toggle)
 
@@ -121,7 +135,10 @@ class MainActivity : AppCompatActivity() {
         val prefsPrihlaseni = getSharedPreferences("PREFS_PRIHLASENI", Context.MODE_PRIVATE)
 
         if (!prefsPrihlaseni.getBoolean("prihlasen", false)) {
-            startActivity(Intent(this, PrihlaseniActivity::class.java))
+            val registerForActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                recreate()
+            }
+            registerForActivityResult.launch(Intent(this, PrihlaseniActivity::class.java))
         }
 
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -159,6 +176,7 @@ class MainActivity : AppCompatActivity() {
 
                         val intent = Intent(this@MainActivity, MainActivity::class.java)
                         intent.putExtra("delete", true)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
 
                         finishAffinity()
                         startActivity(intent)
@@ -190,6 +208,8 @@ class MainActivity : AppCompatActivity() {
                 true
             }
         }}
+
+        neukladat = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -201,7 +221,7 @@ class MainActivity : AppCompatActivity() {
             return true
         }
 
-        setDrawerOpen()
+        openDrawer()
 
         if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             binding.drawerLayout.closeDrawers()
@@ -214,7 +234,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSupportNavigateUp(): Boolean {
 
-        setDrawerOpen()
+        openDrawer()
 
         return super.onSupportNavigateUp()
     }
@@ -340,14 +360,12 @@ class MainActivity : AppCompatActivity() {
 
             setIcon(R.drawable.ic_baseline_send_24)
             setTitle(R.string.export_chcete_odeslat)
-            setMessage(
-                getString(
+            setMessage(getString(
                     R.string.export_opravdu_chcete_odeslat_na, when {
                     debugMode -> prefsPrihlaseni.getString("email", "")
                     Locale.getDefault().language == Locale("sk").language -> "obchod@regulus.sk"
                     else -> "poptavky@regulus.cz"
-                })
-            )
+                }))
             setCancelable(true)
 
             setPositiveButton(getString(R.string.ano)) { dialog, _ ->
@@ -355,9 +373,7 @@ class MainActivity : AppCompatActivity() {
                 dialog.cancel()
             }
 
-            setNegativeButton(getString(R.string.zrusit)) { dialog, _ ->
-                dialog.cancel()
-            }
+            setNegativeButton(getString(R.string.zrusit)) { dialog, _ -> dialog.cancel() }
 
             show()
         }
@@ -367,7 +383,12 @@ class MainActivity : AppCompatActivity() {
 
         val dialog = MaterialAlertDialogBuilder (this).apply {
             setTitle(R.string.export_odesilani)
-            setView(ProgressBar(context))
+            val pb = ProgressBar(context)
+            pb.layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            pb.updateLayoutParams<LinearLayout.LayoutParams> {
+                updateMargins(top = 8, bottom = 16)
+            }
+            setView(pb)
         }.create()
         dialog.show()
 
@@ -448,6 +469,7 @@ class MainActivity : AppCompatActivity() {
 
                         val intent = Intent(this@MainActivity, MainActivity::class.java)
                         intent.putExtra("delete", true)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         finishAffinity()
                         startActivity(intent)
 
@@ -525,4 +547,3 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
-
