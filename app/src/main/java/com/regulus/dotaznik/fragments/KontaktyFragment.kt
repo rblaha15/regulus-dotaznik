@@ -6,22 +6,44 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import com.regulus.dotaznik.R
 import com.regulus.dotaznik.Stranky
 import com.regulus.dotaznik.activities.FirmyActivity
 import com.regulus.dotaznik.databinding.FragmentKontaktyBinding
+import com.regulus.dotaznik.prefsPrihlaseni
 import com.regulus.dotaznik.saver
-import java.util.*
 
 
 class KontaktyFragment : Fragment() {
 
-    private var timer = Timer()
-    override fun onStop() {
-        super.onStop()
-        timer.cancel()
-        timer = Timer()
+    fun save() {
+
+        val stranky = requireContext().saver.get()
+
+        val firmy = context.prefsPrihlaseni.getString("firmy", "")!!.split("\n")
+
+        stranky.kontakty.apply {
+            prijmeni = binding.etPrijmeni.editText!!.text.toString()
+            jmeno = binding.etJmeno.editText!!.text.toString()
+            ulice = binding.etUlice.editText!!.text.toString()
+            mesto = binding.etMesto.editText!!.text.toString()
+            psc = binding.etPSC.editText!!.text.toString()
+            telefon = binding.etTelefon.editText!!.text.toString()
+            email = binding.etEmail.editText!!.text.toString()
+            ico = binding.etIco.editText!!.text.toString()
+            poznamka = binding.etPoznamka.editText!!.text.toString()
+
+            firma = firmy.firstOrNull { it.split(" – ").last() == ico }?.split(" – ")?.first() ?: ""
+
+            activity?.runOnUiThread {
+                binding.btnVybratFirmu.text = firma.ifEmpty { context?.getString(R.string.kontakty_vybrat_firmu) }
+            }
+        }
+        if (stranky.kontakty == Stranky.Kontakty()) return
+
+        requireContext().saver.save(stranky)
     }
 
     private lateinit var binding: FragmentKontaktyBinding
@@ -36,41 +58,17 @@ class KontaktyFragment : Fragment() {
         return binding.root
     }
 
-    fun init() {
-        val task = object : TimerTask() {
-            override fun run() {
+    private fun init() {
 
-                val stranky = requireContext().saver.get()
-
-                val firmy = resources.getStringArray(R.array.ica)
-
-                stranky.kontakty.apply {
-                    prijmeni = binding.etPrijmeni.editText!!.text.toString()
-                    jmeno = binding.etJmeno.editText!!.text.toString()
-                    ulice = binding.etUlice.editText!!.text.toString()
-                    mesto = binding.etMesto.editText!!.text.toString()
-                    psc = binding.etPSC.editText!!.text.toString()
-                    telefon = binding.etTelefon.editText!!.text.toString()
-                    email = binding.etEmail.editText!!.text.toString()
-                    ico = binding.etIco.editText!!.text.toString()
-                    poznamka = binding.etPoznamka.editText!!.text.toString()
-
-                    firma = firmy.firstOrNull { it.split(" – ").last() == ico }?.split(" – ")?.first() ?: ""
-
-                    activity?.runOnUiThread {
-                        binding.btnVybratFirmu.text = firma.ifEmpty { context?.getString(R.string.kontakty_vybrat_firmu) }
-                    }
-                }
-
-
-                if (stranky.kontakty == Stranky.Kontakty()) return
-
-
-                requireContext().saver.save(stranky)
-            }
-        }
-
-        timer.scheduleAtFixedRate(task, 0, 200)
+        binding.etPrijmeni.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etJmeno.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etUlice.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etMesto.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etPSC.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etTelefon.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etEmail.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etIco.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etPoznamka.editText!!.doOnTextChanged { _, _, _, _ -> save() }
 
         val stranky = requireContext().saver.get()
 
@@ -86,7 +84,7 @@ class KontaktyFragment : Fragment() {
             binding.etIco.editText!!.setText(stranky.kontakty.ico)
             binding.etPoznamka.editText!!.setText(stranky.kontakty.poznamka)
 
-            binding.btnVybratFirmu.text = stranky.kontakty.firma.ifEmpty { "Vyberat firmu" }
+            binding.btnVybratFirmu.text = stranky.kontakty.firma.ifEmpty { context?.getString(R.string.kontakty_vybrat_firmu) }
         }
     }
 
@@ -94,6 +92,8 @@ class KontaktyFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+
+            save()
 
             init()
         }

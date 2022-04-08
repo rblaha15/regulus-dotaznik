@@ -1,21 +1,46 @@
 package com.regulus.dotaznik.fragments
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
-import com.regulus.dotaznik.*
+import com.regulus.dotaznik.R
+import com.regulus.dotaznik.Stranky
 import com.regulus.dotaznik.databinding.FragmentBazenBinding
-import java.util.*
+import com.regulus.dotaznik.saver
 
 class BazenFragment : Fragment() {
 
-    private var timer = Timer()
-    override fun onStop() {
-        super.onStop()
-        timer.cancel()
-        timer = Timer()
+    private fun save() {
+        val stranky = requireContext().saver.get()
+
+        stranky.bazen.apply {
+            chciBazen = binding.cbBazen.isChecked
+            dobaPos = binding.spDoba.selectedItemPosition
+            doba = binding.spDoba.selectedItem.toString()
+            umisteniPos = binding.spUmisteni.selectedItemPosition
+            umisteni = binding.spUmisteni.selectedItem.toString()
+            druhVodyPos = binding.spDruhVody.selectedItemPosition
+            druhVody = binding.spDruhVody.selectedItem.toString()
+            tvarPos = binding.spTvar.selectedItemPosition
+            tvar = binding.spTvar.selectedItem.toString()
+            delka = binding.etDelka.editText!!.text.toString()
+            sirka = binding.etSirka.editText!!.text.toString()
+            prumer = binding.etPrumer.editText!!.text.toString()
+            hloubka = binding.etHloubka.editText!!.text.toString()
+            zakrytiPos = binding.spZakryti.selectedItemPosition
+            zakryti = binding.spZakryti.selectedItem.toString()
+            teplota = binding.etTeplota.editText!!.text.toString()
+            poznamka = binding.etPoznamka4.editText!!.text.toString()
+        }
+
+        if (stranky.bazen == Stranky.Bazen()) return
+
+        requireContext().saver.save(stranky)
     }
 
     private lateinit var binding: FragmentBazenBinding
@@ -64,45 +89,37 @@ class BazenFragment : Fragment() {
         binding.spTvar.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                update()
+                update(); save()
             }
-            override fun onNothingSelected(p0: AdapterView<*>?) {}
-        }
 
-        binding.cbBazen.setOnClickListener {
-            update()
-        }
-
-        val task = object : TimerTask() {
-            override fun run() {
-
-                val stranky = requireContext().saver.get()
-
-                stranky.bazen.apply {
-                    chciBazen = binding.cbBazen.isChecked
-                    dobaPos = binding.spDoba.selectedItemPosition
-                    doba = binding.spDoba.selectedItem.toString()
-                    umisteniPos = binding.spUmisteni.selectedItemPosition
-                    umisteni = binding.spUmisteni.selectedItem.toString()
-                    druhVodyPos = binding.spDruhVody.selectedItemPosition
-                    druhVody = binding.spDruhVody.selectedItem.toString()
-                    tvarPos = binding.spTvar.selectedItemPosition
-                    tvar = binding.spTvar.selectedItem.toString()
-                    delka = binding.etDelka.editText!!.text.toString()
-                    sirka = binding.etSirka.editText!!.text.toString()
-                    prumer = binding.etPrumer.editText!!.text.toString()
-                    hloubka = binding.etHloubka.editText!!.text.toString()
-                    zakrytiPos = binding.spZakryti.selectedItemPosition
-                    zakryti = binding.spZakryti.selectedItem.toString()
-                    teplota = binding.etTeplota.editText!!.text.toString()
-                    poznamka = binding.etPoznamka4.editText!!.text.toString()
-                }
-
-                if (stranky.bazen == Stranky.Bazen()) return
-
-                requireContext().saver.save(stranky)
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+                save()
             }
         }
+
+        binding.cbBazen.setOnClickListener { update(); save() }
+
+        object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                save()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                save()
+            }
+        }.also {
+            binding.spDoba
+            binding.spUmisteni
+            binding.spDruhVody
+            binding.spZakryti
+        }
+
+        binding.etDelka.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etSirka.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etPrumer.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etHloubka.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etTeplota.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etPoznamka4.editText!!.doOnTextChanged { _, _, _, _ -> save() }
 
         val stranky = requireContext().saver.get()
 
@@ -123,7 +140,5 @@ class BazenFragment : Fragment() {
 
             update()
         }
-
-        timer.scheduleAtFixedRate(task, 0, 200)
     }
 }

@@ -7,6 +7,7 @@ data class Stranky(
     val bazen: Bazen = Bazen(),
     val zdrojeTop: ZdrojeTop = ZdrojeTop(),
     val zdrojeTv: ZdrojeTv = ZdrojeTv(),
+    val prislusenstvi: Prislusenstvi = Prislusenstvi(),
 ) {
 
     data class Kontakty(
@@ -82,31 +83,50 @@ data class Stranky(
     )
 
     data class ZdrojeTop(
-        var topTopneTeleso: Boolean = false,
-        var topTopneTelesoTypPos: Int = 0,
-        var topTopneTelesoTyp: String = "",
-        var topElektrokotel: Boolean = false,
-        var topElektrokotelTypPos: Int = 0,
-        var topElektrokotelTyp: String = "",
-        var topPlynKotel: Boolean = false,
-        var topPlynKotelTypPos: Int = 0,
-        var topPlynKotelTyp: String = "",
-        var topKrb: Boolean = false,
-        var topKrbTypPos: Int = 0,
-        var topKrbTyp: String = "",
-        var topJiny: Boolean = false,
-        var topKtery: String = "",
+        var topneTeleso: Boolean = false,
+        var topneTelesoTypPos: Int = 0,
+        var topneTelesoTyp: String = "",
+        var elektrokotel: Boolean = false,
+        var elektrokotelTypPos: Int = 0,
+        var elektrokotelTyp: String = "",
+        var plynKotel: Boolean = false,
+        var plynKotelTypPos: Int = 0,
+        var plynKotelTyp: String = "",
+        var krb: Boolean = false,
+        var krbTypPos: Int = 0,
+        var krbTyp: String = "",
+        var jiny: Boolean = false,
+        var ktery: String = "",
     )
 
     data class ZdrojeTv(
-        var tvTopneTeleso: Boolean = false,
-        var tvTopneTelesoTypPos: Int = 0,
-        var tvTopneTelesoTyp: String = "",
-        var tvElektrokotel: Boolean = false,
-        var tvPlynKotel: Boolean = false,
-        var tvKrb: Boolean = false,
-        var tvJiny: Boolean = false,
-        var tvKtery: String = "",
+        var topneTeleso: Boolean = false,
+        var topneTelesoTypPos: Int = 0,
+        var topneTelesoTyp: String = "",
+        var elektrokotel: Boolean = false,
+        var plynKotel: Boolean = false,
+        var krb: Boolean = false,
+        var jiny: Boolean = false,
+        var ktery: String = "",
+        var poznamka: String = "",
+    )
+
+    data class Prislusenstvi(
+        var hadice: Boolean = false,
+        var hadiceTypPos: Int = 0,
+        var hadiceTyp: String = "",
+        var topnyKabel: Boolean = false,
+        var topnyKabelTypPos: Int = 0,
+        var topnyKabelTyp: String = "",
+        var drzakNaStenu: Boolean = false,
+        var drzakNaStenuTypPos: Int = 0,
+        var drzakNaStenuTyp: String = "",
+        var pokojovaJednotka: Boolean = false,
+        var pokojovaJednotkaTypPos: Int = 0,
+        var pokojovaJednotkaTyp: String = "",
+        var pokojoveCidlo: Boolean = false,
+        var pokojoveCidloTypPos: Int = 0,
+        var pokojoveCidloTyp: String = "",
         var poznamka: String = "",
     )
 }

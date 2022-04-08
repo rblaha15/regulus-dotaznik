@@ -1,22 +1,23 @@
 package com.regulus.dotaznik.activities
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
-import androidx.lifecycle.Lifecycle
-import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import com.regulus.dotaznik.Clovek
 import com.regulus.dotaznik.R
 import com.regulus.dotaznik.databinding.ActivityPrihlaseniBinding
+import com.regulus.dotaznik.prefsPrihlaseni
 import kotlin.system.exitProcess
 
 
@@ -31,6 +32,7 @@ class PrihlaseniActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPrihlaseniBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         super.onCreate(savedInstanceState)
         binding = ActivityPrihlaseniBinding.inflate(layoutInflater)
         val view = binding.root
@@ -38,20 +40,12 @@ class PrihlaseniActivity : AppCompatActivity() {
 
         title = resources.getString(R.string.prihlaseni)
 
-
         val database = Firebase.database("https://lidi-c74ad-default-rtdb.europe-west1.firebasedatabase.app/")
-        val myRef = database.getReference("lidi")
+        val lidiRef = database.getReference("lidi")
 
-        myRef.get().addOnSuccessListener {
+        lidiRef.get().addOnSuccessListener {
 
             val value2 = it.getValue<String>()!!
-
-            Log.d("Firebase", value2)
-
-            /*etZadat!!.setText(value2)
-
-            tvZkontrolovat!!.text = value2*/
-
 
             setAdapters(value2.split("\n"))
         }.addOnFailureListener {
@@ -63,33 +57,16 @@ class PrihlaseniActivity : AppCompatActivity() {
         }
 
 
-        myRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
+        val firmyRef = database.getReference("firmy")
 
-                if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) return
+        firmyRef.get().addOnSuccessListener {
 
-                val value2 = dataSnapshot.getValue<String>()!!
+            val value = it.value as List<*>
 
-
-                Log.d("Firebase", value2)
-
-                /*etZadat?.setText(value2)
-
-                tvZkontrolovat?.text = value2*/
-
-
-                setAdapters(value2.split("\n"))
-
+            prefsPrihlaseni.edit {
+                putString("firmy", value.joinToString("\n"))
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.w("Firebase", "Failed to read value.", error.toException())
-
-
-            }
-        })
-
-
+        }
 
         val l = object : AdapterView.OnItemSelectedListener {
 
@@ -161,9 +138,7 @@ class PrihlaseniActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val sharedPref = this.getSharedPreferences("PREFS_PRIHLASENI", Context.MODE_PRIVATE)
-
-            sharedPref.edit {
+            prefsPrihlaseni.edit {
 
                 if (binding.rbJsem.isChecked) {
                     if (currentSelection == null) return@setOnClickListener

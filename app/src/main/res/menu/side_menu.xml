@@ -13,15 +13,19 @@
         <item
             android:icon="@drawable/ic_baseline_category_24"
             android:id="@+id/systemFragment"
-            android:title="@string/system"/>
+            android:title="@string/system" />
         <item
             android:icon="@drawable/ic_baseline_pool_24"
             android:id="@+id/bazenFragment"
-            android:title="@string/bazen"/>
+            android:title="@string/bazen" />
         <item
             android:icon="@drawable/ic_baseline_ac_unit_24"
             android:id="@+id/zdrojeFragment"
-            android:title="@string/zdroje"/>
+            android:title="@string/zdroje" />
+        <item
+            android:id="@+id/prislusenstviFragment"
+            android:icon="@drawable/ic_baseline_add_shopping_cart_24"
+            android:title="@string/prislusenstvi" />
 
     </group>
 

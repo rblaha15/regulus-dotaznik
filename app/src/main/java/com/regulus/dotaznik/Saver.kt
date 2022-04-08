@@ -8,13 +8,9 @@ import androidx.core.content.edit
 import com.google.gson.Gson
 
 
-var neukladat = false
-
 class Saver(private val context: Context) {
 
     fun save(stranky: Stranky) {
-
-        if (neukladat) return
 
         val prefs = context.prefs
         val gson = Gson()
@@ -39,8 +35,6 @@ class Saver(private val context: Context) {
 
     fun delete(activity: AppCompatActivity) {
 
-        neukladat = true
-
         val prefs = context.prefs
 
         activity.finish()
@@ -61,3 +55,6 @@ val Context?.saver: Saver
 
 val Context?.prefs: SharedPreferences
     get() = this!!.getSharedPreferences("PREFS_DOTAZNIK", Context.MODE_PRIVATE)
+
+val Context?.prefsPrihlaseni: SharedPreferences
+    get() = this!!.getSharedPreferences("PREFS_PRIHLASENI", Context.MODE_PRIVATE)

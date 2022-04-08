@@ -1,7 +1,7 @@
 package com.regulus.dotaznik.activities
 
-import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -40,6 +40,10 @@ import javax.mail.internet.MimeMultipart
 
 class MainActivity : AppCompatActivity() {
 
+    companion object {
+        const val VERZE: Int = 4310
+    }
+
     private lateinit var toggle: ActionBarDrawerToggle
     var debugMode = false
 
@@ -57,10 +61,8 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        val prefsPrihlaseni = getSharedPreferences("PREFS_PRIHLASENI", Context.MODE_PRIVATE)
-
         prefsPrihlaseni.edit {
-            putInt("verze", 4200)
+            putInt("verze", VERZE)
         }
 
         val header = binding.navigationView.getHeaderView(0)
@@ -82,6 +84,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
@@ -132,7 +135,11 @@ class MainActivity : AppCompatActivity() {
 
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        val prefsPrihlaseni = getSharedPreferences("PREFS_PRIHLASENI", Context.MODE_PRIVATE)
+        if (prefsPrihlaseni.getInt("verze", 0) < VERZE) {
+            prefsPrihlaseni.edit {
+                putBoolean("prihlasen", false)
+            }
+        }
 
         if (!prefsPrihlaseni.getBoolean("prihlasen", false)) {
             val registerForActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -152,6 +159,7 @@ class MainActivity : AppCompatActivity() {
                         R.id.systemFragment,
                         R.id.bazenFragment,
                         R.id.zdrojeFragment,
+                        R.id.prislusenstviFragment,
                     )[position]
                 )
 
@@ -199,6 +207,7 @@ class MainActivity : AppCompatActivity() {
                     R.id.systemFragment,
                     R.id.bazenFragment,
                     R.id.zdrojeFragment,
+                    R.id.prislusenstviFragment,
                 ).indexOf(item.itemId)
 
                 binding.drawerLayout.closeDrawers()
@@ -207,9 +216,8 @@ class MainActivity : AppCompatActivity() {
 
                 true
             }
-        }}
-
-        neukladat = false
+        }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -249,6 +257,7 @@ class MainActivity : AppCompatActivity() {
         val bazen = stranky.bazen
         val zdrojeTop = stranky.zdrojeTop
         val zdrojeTv = stranky.zdrojeTv
+        val prislusenstvi = stranky.prislusenstvi
 
 
         if (kontakty.jmeno == "" || kontakty.prijmeni == "") {
@@ -264,14 +273,12 @@ class MainActivity : AppCompatActivity() {
 
         val file = File(this.cacheDir, "dotaznik_app.xml")
 
-        val prefsPrihlaseni = this.getSharedPreferences("PREFS_PRIHLASENI", Context.MODE_PRIVATE)
-
         file.writeText(
             """
                 <?xml version="1.0" encoding="utf-8"?>
                 <?xml-stylesheet type="text/xsl" href="dotaznik_app.xsl"?>
                 
-                <!-- Tento soubor byl vygenerován automaticky aplikací Regulus Dotazník; verze: 2.0.2 -->
+                <!-- Tento soubor byl vygenerován automaticky aplikací Regulus Dotazník; verze: 2.1 -->
                 
                 <xml>
                     <system>
@@ -315,22 +322,22 @@ class MainActivity : AppCompatActivity() {
                         <vnitrni_jednotka>${system.jednotkaTyp}</vnitrni_jednotka>
                     </tc>
                     <zdrojeTop>
-                        <topne_teleso>${if (zdrojeTop.topTopneTeleso) zdrojeTop.topTopneTelesoTyp else "Ne"}</topne_teleso>
-                        <elektrokotel>${if (zdrojeTop.topElektrokotel) zdrojeTop.topElektrokotelTyp else "Ne"}</elektrokotel>
-                        <plyn_kotel>${if (zdrojeTop.topPlynKotel) zdrojeTop.topPlynKotelTyp else "Ne"}</plyn_kotel>
-                        <krb_KTP>${if (zdrojeTop.topKrb) zdrojeTop.topKrbTyp else "Ne"}</krb_KTP>
-                        <jiny_zdroj>${if (zdrojeTop.topJiny) zdrojeTop.topKtery else "Ne"}</jiny_zdroj>
+                        <topne_teleso>${if (zdrojeTop.topneTeleso) zdrojeTop.topneTelesoTyp else "Ne"}</topne_teleso>
+                        <elektrokotel>${if (zdrojeTop.elektrokotel) zdrojeTop.elektrokotelTyp else "Ne"}</elektrokotel>
+                        <plyn_kotel>${if (zdrojeTop.plynKotel) zdrojeTop.plynKotelTyp else "Ne"}</plyn_kotel>
+                        <krb_KTP>${if (zdrojeTop.krb) zdrojeTop.krbTyp else "Ne"}</krb_KTP>
+                        <jiny_zdroj>${if (zdrojeTop.jiny) zdrojeTop.ktery else "Ne"}</jiny_zdroj>
                     </zdrojeTop>
                     <tv>
                         <zasobnik>${system.zasobnikTyp} ${system.zasobnikObjem}</zasobnik>
                         <cirkulace>${if (system.cirkulace) "Ano" else "Ne"}</cirkulace>
                     </tv>
                     <zdrojeTV>
-                        <topne_teleso>${if (zdrojeTv.tvTopneTeleso) zdrojeTv.tvTopneTelesoTyp else "Ne"}</topne_teleso>
-                        <elektrokotel>${if (zdrojeTv.tvElektrokotel) "Ano" else "Ne"}</elektrokotel>
-                        <plyn_kotel>${if (zdrojeTv.tvPlynKotel) "Ano" else "Ne"}</plyn_kotel>
-                        <krb_KTP>${if (zdrojeTv.tvKrb) "Ano" else "Ne"}</krb_KTP>
-                        <jiny_zdroj>${if (zdrojeTv.tvJiny) zdrojeTv.tvKtery else "Ne"}</jiny_zdroj>
+                        <topne_teleso>${if (zdrojeTv.topneTeleso) zdrojeTv.topneTelesoTyp else "Ne"}</topne_teleso>
+                        <elektrokotel>${if (zdrojeTv.elektrokotel) "Ano" else "Ne"}</elektrokotel>
+                        <plyn_kotel>${if (zdrojeTv.plynKotel) "Ano" else "Ne"}</plyn_kotel>
+                        <krb_KTP>${if (zdrojeTv.krb) "Ano" else "Ne"}</krb_KTP>
+                        <jiny_zdroj>${if (zdrojeTv.jiny) zdrojeTv.ktery else "Ne"}</jiny_zdroj>
                     </zdrojeTV>
                     <bazen>
                         <ohrev>${if (bazen.chciBazen) "Ano" else "Ne"}</ohrev>
@@ -345,12 +352,20 @@ class MainActivity : AppCompatActivity() {
                         <teplota>${bazen.teplota}</teplota>
                         <voda>${if (bazen.chciBazen) bazen.druhVody else ""}</voda>
                     </bazen>
+                    <prislusenstvi>
+                        <hadice>${if (prislusenstvi.hadice) prislusenstvi.hadiceTyp else "Ne"}</hadice>
+                        <topny_kabel>${if (prislusenstvi.topnyKabel) prislusenstvi.topnyKabelTyp else "Ne"}</topny_kabel>
+                        <drzak_na_tc>${if (prislusenstvi.drzakNaStenu) prislusenstvi.drzakNaStenuTyp else "Ne"}</drzak_na_tc>
+                        <pokojova_jednotka>${if (prislusenstvi.pokojovaJednotka) prislusenstvi.pokojovaJednotkaTyp else "Ne"}</pokojova_jednotka>
+                        <pokojove_cidlo>${if (prislusenstvi.pokojoveCidlo) prislusenstvi.pokojoveCidloTyp else "Ne"}</pokojove_cidlo>
+                    </prislusenstvi>
                     <poznamka>
                         <kontakty>${kontakty.poznamka}</kontakty>
                         <detail_objektu>${detailObjektu.poznamka}</detail_objektu>
                         <tv_tc_nadrz_a_os>${system.poznamka}</tv_tc_nadrz_a_os>
                         <bazen>${bazen.poznamka}</bazen>
                         <doplnkove_zdroje>${zdrojeTv.poznamka}</doplnkove_zdroje>
+                        <prislusenstvi>${prislusenstvi.poznamka}</prislusenstvi>
                     </poznamka>
                 </xml>
             """.trimIndent()
@@ -360,12 +375,15 @@ class MainActivity : AppCompatActivity() {
 
             setIcon(R.drawable.ic_baseline_send_24)
             setTitle(R.string.export_chcete_odeslat)
-            setMessage(getString(
+            setMessage(
+                getString(
                     R.string.export_opravdu_chcete_odeslat_na, when {
-                    debugMode -> prefsPrihlaseni.getString("email", "")
-                    Locale.getDefault().language == Locale("sk").language -> "obchod@regulus.sk"
-                    else -> "poptavky@regulus.cz"
-                }))
+                        debugMode -> prefsPrihlaseni.getString("email", "")
+                        Locale.getDefault().language == Locale("sk").language -> "obchod@regulus.sk"
+                        else -> "poptavky@regulus.cz"
+                    }
+                )
+            )
             setCancelable(true)
 
             setPositiveButton(getString(R.string.ano)) { dialog, _ ->
@@ -410,19 +428,20 @@ class MainActivity : AppCompatActivity() {
                 })
 
             try {
-                val prefsPrihlaseni = getSharedPreferences("PREFS_PRIHLASENI", Context.MODE_PRIVATE)
 
-                MimeMessage(session).apply MimeMessage@ {
+                MimeMessage(session).apply {
 
                     setFrom(InternetAddress(Credentials.EMAIL))
 
                     addRecipient(
                         Message.RecipientType.TO,
-                        InternetAddress(when {
-                            debugMode -> prefsPrihlaseni.getString("email", "")
-                            Locale.getDefault().language == Locale("sk").language -> "obchod@regulus.sk"
-                            else -> "poptavky@regulus.cz"
-                        })
+                        InternetAddress(
+                            when {
+                                debugMode -> prefsPrihlaseni.getString("email", "")
+                                Locale.getDefault().language == Locale("sk").language -> "obchod@regulus.sk"
+                                else -> "poptavky@regulus.cz"
+                            }
+                        )
                     )
                     if (!debugMode) {
                         addRecipient(
@@ -433,25 +452,25 @@ class MainActivity : AppCompatActivity() {
                     subject = "REGULUS – Apka – OSOBA: $jmeno $prijmeni"
 
 
-                    MimeMultipart().apply Multipart@ {
+                    MimeMultipart().apply {
 
                         MimeBodyPart().apply {
-                            setText("Prosím o přípravu nabídky. Děkuji.\n\n${prefsPrihlaseni.getString("jmeno", "Error")}" )
-                            this@Multipart.addBodyPart(this)
+                            setText("Prosím o přípravu nabídky. Děkuji.\n\n${prefsPrihlaseni.getString("jmeno", "Error")}")
+                            addBodyPart(this)
                         }
                         MimeBodyPart().apply {
                             dataHandler = DataHandler(FileDataSource(xml))
                             fileName = xml.name
-                            this@Multipart.addBodyPart(this)
+                            addBodyPart(this)
                         }
                         repeat(prefs.getInt("fotky", 0)) { i ->
                             MimeBodyPart().apply {
-                                attachFile(File(filesDir, "photo${i+1}.jpg"))
+                                attachFile(File(filesDir, "photo${i + 1}.jpg"))
                                 setHeader("Content-Type", "image/jpg; charset=UTF-8 name=\"fotka $i\"")
-                                this@Multipart.addBodyPart(this)
+                                addBodyPart(this)
                             }
                         }
-                        this@MimeMessage.setContent(this)
+                        setContent(this)
                     }
                     Transport.send(this)
                 }

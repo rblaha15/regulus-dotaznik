@@ -157,4 +157,14 @@
     <string name="podrobnejsi_info">Podrobnější informace</string>
     <string name="export_nejste_pripojeni">Pravděpodobně nejste připojeni k internetu. Zkontrolujte připojení a zkuste to znovu</string>
     <string name="prihlaseni_doplnit_info">Doplntě, prosím, ještě nějaké informace o Vás:</string>
+    <string name="aktualizovat">Aktualizovat</string>
+    <string name="vyberte_firmu">Vyberte firmu:</string>
+    <string name="na_stenu">Na stěnu</string>
+    <string name="na_izolovanou_stenu">Na izolovanou stěnu</string>
+    <string name="prislusenstvi">Příslušenství</string>
+    <string name="hadice">Hadice</string>
+    <string name="topny_kabel">Topný kabel</string>
+    <string name="drzak_pro_tc">Držák pro TČ</string>
+    <string name="pokojova_jednotka">Pokojová jednotka</string>
+    <string name="pokojove_cidlo">Pokojové čidlo</string>
 </resources>

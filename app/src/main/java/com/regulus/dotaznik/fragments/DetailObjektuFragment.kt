@@ -2,21 +2,45 @@ package com.regulus.dotaznik.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
-import com.regulus.dotaznik.*
+import com.regulus.dotaznik.R
+import com.regulus.dotaznik.Stranky
 import com.regulus.dotaznik.activities.PrihlaseniActivity
 import com.regulus.dotaznik.databinding.FragmentDetailObjektuBinding
-import java.util.*
+import com.regulus.dotaznik.saver
 
 class DetailObjektuFragment : Fragment() {
 
-    private var timer = Timer()
-    override fun onStop() {
-        super.onStop()
-        timer.cancel()
-        timer = Timer()
+    private fun save() {
+        val stranky = requireContext().saver.get()
+
+        stranky.detailObjektu.apply {
+            ztrata = binding.etZtrata.editText!!.text.toString()
+            potrebaVytapeni = binding.etPotrebaVytapeni.editText!!.text.toString()
+            potrebaTv = binding.etPotrebaTv.editText!!.text.toString()
+            plocha = binding.etPlocha.editText!!.text.toString()
+            objem = binding.etObjem.editText!!.text.toString()
+            naklady = binding.etNaklady.editText!!.text.toString()
+            druhPaliva = binding.etDruh.editText!!.text.toString()
+            spotreba = binding.etSpotreba.editText!!.text.toString()
+            spotrebaJednotkyPos = binding.spSpotreba.selectedItemPosition
+            spotrebaJednotky = binding.spSpotreba.selectedItem.toString()
+            druhPaliva2 = binding.etDruh2.editText!!.text.toString()
+            spotreba2 = binding.etSpotreba2.editText!!.text.toString()
+            spotrebaJednotky2Pos = binding.spSpotreba2.selectedItemPosition
+            spotrebaJednotky2 = binding.spSpotreba2.selectedItem.toString()
+            poznamka = binding.etPoznamka2.editText!!.text.toString()
+        }
+
+        if (stranky.detailObjektu == Stranky.DetailObjektu()) return
+
+        requireContext().saver.save(stranky)
     }
 
     private lateinit var binding: FragmentDetailObjektuBinding
@@ -47,34 +71,29 @@ class DetailObjektuFragment : Fragment() {
             return@setOnLongClickListener true
         }
 
-        // saving
-        val task = object : TimerTask() {
-            override fun run() {
+        binding.etZtrata.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etPotrebaVytapeni.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etPotrebaTv.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etPlocha.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etObjem.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etNaklady.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etDruh.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etSpotreba.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etDruh2.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etSpotreba2.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etPoznamka2.editText!!.doOnTextChanged { _, _, _, _ -> save() }
 
-                val stranky = requireContext().saver.get()
-
-                stranky.detailObjektu.apply {
-                    ztrata = binding.etZtrata.editText!!.text.toString()
-                    potrebaVytapeni = binding.etPotrebaVytapeni.editText!!.text.toString()
-                    potrebaTv = binding.etPotrebaTv.editText!!.text.toString()
-                    plocha = binding.etPlocha.editText!!.text.toString()
-                    objem = binding.etObjem.editText!!.text.toString()
-                    naklady = binding.etNaklady.editText!!.text.toString()
-                    druhPaliva = binding.etDruh.editText!!.text.toString()
-                    spotreba = binding.etSpotreba.editText!!.text.toString()
-                    spotrebaJednotkyPos = binding.spSpotreba.selectedItemPosition
-                    spotrebaJednotky = binding.spSpotreba.selectedItem.toString()
-                    druhPaliva2 = binding.etDruh2.editText!!.text.toString()
-                    spotreba2 = binding.etSpotreba2.editText!!.text.toString()
-                    spotrebaJednotky2Pos = binding.spSpotreba2.selectedItemPosition
-                    spotrebaJednotky2 = binding.spSpotreba2.selectedItem.toString()
-                    poznamka = binding.etPoznamka2.editText!!.text.toString()
-                }
-
-                if (stranky.detailObjektu == Stranky.DetailObjektu()) return
-
-                requireContext().saver.save(stranky)
+        object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                save()
             }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+                save()
+            }
+        }.also {
+            binding.spSpotreba.onItemSelectedListener = it
+            binding.spSpotreba2.onItemSelectedListener = it
         }
 
         // nacitani
@@ -95,7 +114,5 @@ class DetailObjektuFragment : Fragment() {
             binding.spSpotreba2.setSelection(stranky.detailObjektu.spotrebaJednotky2Pos)
             binding.etPoznamka2.editText!!.setText(stranky.detailObjektu.poznamka)
         }
-
-        timer.scheduleAtFixedRate(task, 0, 200)
     }
 }

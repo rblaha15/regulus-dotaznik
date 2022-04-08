@@ -1,22 +1,57 @@
 package com.regulus.dotaznik.fragments
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
-import com.regulus.dotaznik.*
-import com.regulus.dotaznik.activities.MainActivity
+import com.regulus.dotaznik.R
+import com.regulus.dotaznik.Stranky
 import com.regulus.dotaznik.databinding.FragmentZdrojeBinding
-import java.util.*
+import com.regulus.dotaznik.saver
 
 
 class ZdrojeFragment : Fragment() {
 
-    private var timer = Timer()
-    override fun onStop() {
-        super.onStop()
-        timer.cancel()
-        timer = Timer()
+    private fun save() {
+        val stranky = requireContext().saver.get()
+
+        stranky.zdrojeTop.apply {
+            topneTeleso = binding.cbTopTopneTeleso.isChecked
+            topneTelesoTypPos = binding.spTopTopneTeleso.selectedItemPosition
+            topneTelesoTyp = binding.spTopTopneTeleso.selectedItem.toString()
+            elektrokotel = binding.cbTopElektrokotel.isChecked
+            elektrokotelTypPos = binding.spTopElektrokotel.selectedItemPosition
+            elektrokotelTyp = binding.spTopElektrokotel.selectedItem.toString()
+            plynKotel = binding.cbTopPlynKotel.isChecked
+            plynKotelTypPos = binding.spTopPlynKotel.selectedItemPosition
+            plynKotelTyp = binding.spTopPlynKotel.selectedItem.toString()
+            krb = binding.cbTopKrb.isChecked
+            krbTypPos = binding.spTopKrb.selectedItemPosition
+            krbTyp = binding.spTopKrb.selectedItem.toString()
+            jiny = binding.cbTopJiny.isChecked
+            ktery = binding.etTopJiny.editText!!.text.toString()
+        }
+
+        stranky.zdrojeTv.apply {
+            topneTeleso = binding.cbTvTopneTeleso.isChecked
+            topneTelesoTypPos = binding.spTvTopneTeleso.selectedItemPosition
+            topneTelesoTyp = binding.spTvTopneTeleso.selectedItem.toString()
+            elektrokotel = binding.cbTvElektrokotel.isChecked
+            plynKotel = binding.cbTvPlynKotel.isChecked
+            krb = binding.cbTvKrb.isChecked
+            jiny = binding.cbTvJiny.isChecked
+            ktery = binding.etTvJiny.editText!!.text.toString()
+            poznamka = binding.etPoznamka6.editText!!.text.toString()
+        }
+
+        if (stranky.zdrojeTop == Stranky.ZdrojeTop()) return
+        if (stranky.zdrojeTv == Stranky.ZdrojeTv()) return
+
+        requireContext().saver.save(stranky)
     }
 
     private lateinit var binding: FragmentZdrojeBinding
@@ -65,130 +100,98 @@ class ZdrojeFragment : Fragment() {
 
         update()
 
-        binding.fabOdeslat.setOnLongClickListener {
-
-            (activity as MainActivity).debugMode = true
-            (activity as MainActivity).odeslat()
-            return@setOnLongClickListener true
-        }
-
-        binding.fabOdeslat.setOnClickListener {
-
-            (activity as MainActivity).debugMode = false
-            (activity as MainActivity).odeslat()
-        }
-
-        binding.cbTopTopneTeleso.setOnClickListener { update() }
-        binding.cbTopElektrokotel.setOnClickListener { update() }
-        binding.cbTopPlynKotel.setOnClickListener { update() }
-        binding.cbTopKrb.setOnClickListener { update() }
+        binding.cbTopTopneTeleso.setOnClickListener { update(); save() }
+        binding.cbTopElektrokotel.setOnClickListener { update(); save() }
+        binding.cbTopPlynKotel.setOnClickListener { update(); save() }
+        binding.cbTopKrb.setOnClickListener { update(); save() }
+        binding.cbTopJiny.setOnClickListener { save() }
 
         binding.tvTopTopneTeleso.setOnClickListener {
             binding.cbTopTopneTeleso.isChecked = !binding.cbTopTopneTeleso.isChecked
-            update()
+            update(); save()
         }
         binding.tvTopElektrokotel.setOnClickListener {
             binding.cbTopElektrokotel.isChecked = !binding.cbTopElektrokotel.isChecked
-            update()
+            update(); save()
         }
         binding.tvTopPlynKotel.setOnClickListener {
             binding.cbTopPlynKotel.isChecked = !binding.cbTopPlynKotel.isChecked
-            update()
+            update(); save()
         }
         binding.tvTopKrb.setOnClickListener {
             binding.cbTopKrb.isChecked = !binding.cbTopKrb.isChecked
-            update()
+            update(); save()
         }
 
-        val task = object : TimerTask() {
-            override fun run() {
+        binding.cbTvTopneTeleso.setOnClickListener { update(); save() }
+        binding.cbTvElektrokotel.setOnClickListener { update() }
+        binding.cbTvJiny.setOnClickListener { update() }
+        binding.cbTvKrb.setOnClickListener { update() }
+        binding.cbTvPlynKotel.setOnClickListener { update() }
 
-                val stranky = requireContext().saver.get()
+        binding.tvTvTopneTeleso.setOnClickListener {
+            binding.cbTvTopneTeleso.isChecked = !binding.cbTvTopneTeleso.isChecked
+            update(); save()
+        }
+        binding.tvTvElektrokotel.setOnClickListener {
+            binding.cbTvElektrokotel.isChecked = !binding.cbTvElektrokotel.isChecked
+            update(); save()
+        }
+        binding.tvTvPlynKotel.setOnClickListener {
+            binding.cbTvPlynKotel.isChecked = !binding.cbTvPlynKotel.isChecked
+            update(); save()
+        }
+        binding.tvTvKrb.setOnClickListener {
+            binding.cbTvKrb.isChecked = !binding.cbTvKrb.isChecked
+            update(); save()
+        }
 
-                stranky.zdrojeTop.apply {
-                    topTopneTeleso = binding.cbTopTopneTeleso.isChecked
-                    topTopneTelesoTypPos = binding.spTopTopneTeleso.selectedItemPosition
-                    topTopneTelesoTyp = binding.spTopTopneTeleso.selectedItem.toString()
-                    topElektrokotel = binding.cbTopElektrokotel.isChecked
-                    topElektrokotelTypPos = binding.spTopElektrokotel.selectedItemPosition
-                    topElektrokotelTyp = binding.spTopElektrokotel.selectedItem.toString()
-                    topPlynKotel = binding.cbTopPlynKotel.isChecked
-                    topPlynKotelTypPos = binding.spTopPlynKotel.selectedItemPosition
-                    topPlynKotelTyp = binding.spTopPlynKotel.selectedItem.toString()
-                    topKrb = binding.cbTopKrb.isChecked
-                    topKrbTypPos = binding.spTopKrb.selectedItemPosition
-                    topKrbTyp = binding.spTopKrb.selectedItem.toString()
-                    topJiny = binding.cbTopJiny.isChecked
-                    topKtery = binding.etTopJiny.editText!!.text.toString()
-                }
-
-                stranky.zdrojeTv.apply {
-                    tvTopneTeleso = binding.cbTvTopneTeleso.isChecked
-                    tvTopneTelesoTypPos = binding.spTvTopneTeleso.selectedItemPosition
-                    tvTopneTelesoTyp = binding.spTvTopneTeleso.selectedItem.toString()
-                    tvElektrokotel = binding.cbTvElektrokotel.isChecked
-                    tvPlynKotel = binding.cbTvPlynKotel.isChecked
-                    tvKrb = binding.cbTvKrb.isChecked
-                    tvJiny = binding.cbTvJiny.isChecked
-                    tvKtery = binding.etTvJiny.editText!!.text.toString()
-                    poznamka = binding.etPoznamka6.editText!!.text.toString()
-                }
-
-                if (stranky.zdrojeTop == Stranky.ZdrojeTop()) return
-                if (stranky.zdrojeTv == Stranky.ZdrojeTv()) return
-
-                requireContext().saver.save(stranky)
+        object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                save()
             }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                save()
+            }
+        }.also {
+            binding.spTopTopneTeleso.onItemSelectedListener = it
+            binding.spTopElektrokotel.onItemSelectedListener = it
+            binding.spTopElektrokotel.onItemSelectedListener = it
+            binding.spTopKrb.onItemSelectedListener = it
+            binding.spTvTopneTeleso.onItemSelectedListener = it
         }
+
+        binding.etTopJiny.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etTvJiny.editText!!.doOnTextChanged { _, _, _, _ -> save() }
+        binding.etPoznamka6.editText!!.doOnTextChanged { _, _, _, _ -> save() }
 
         val stranky = requireContext().saver.get()
 
         requireActivity().runOnUiThread {
 
-            binding.cbTopTopneTeleso.isChecked = stranky.zdrojeTop.topTopneTeleso
-            binding.spTopTopneTeleso.setSelection(stranky.zdrojeTop.topTopneTelesoTypPos)
-            binding.cbTopElektrokotel.isChecked = stranky.zdrojeTop.topElektrokotel
-            binding.spTopElektrokotel.setSelection(stranky.zdrojeTop.topElektrokotelTypPos)
-            binding.cbTopPlynKotel.isChecked = stranky.zdrojeTop.topPlynKotel
-            binding.spTopElektrokotel.setSelection(stranky.zdrojeTop.topPlynKotelTypPos)
-            binding.cbTopKrb.isChecked = stranky.zdrojeTop.topKrb
-            binding.spTopKrb.setSelection(stranky.zdrojeTop.topKrbTypPos)
-            binding.cbTopJiny.isChecked = stranky.zdrojeTop.topJiny
-            binding.etTopJiny.editText!!.setText(stranky.zdrojeTop.topKtery)
+            binding.cbTopTopneTeleso.isChecked = stranky.zdrojeTop.topneTeleso
+            binding.spTopTopneTeleso.setSelection(stranky.zdrojeTop.topneTelesoTypPos)
+            binding.cbTopElektrokotel.isChecked = stranky.zdrojeTop.elektrokotel
+            binding.spTopElektrokotel.setSelection(stranky.zdrojeTop.elektrokotelTypPos)
+            binding.cbTopPlynKotel.isChecked = stranky.zdrojeTop.plynKotel
+            binding.spTopElektrokotel.setSelection(stranky.zdrojeTop.plynKotelTypPos)
+            binding.cbTopKrb.isChecked = stranky.zdrojeTop.krb
+            binding.spTopKrb.setSelection(stranky.zdrojeTop.krbTypPos)
+            binding.cbTopJiny.isChecked = stranky.zdrojeTop.jiny
+            binding.etTopJiny.editText!!.setText(stranky.zdrojeTop.ktery)
 
-            binding.cbTvTopneTeleso.isChecked = stranky.zdrojeTv.tvTopneTeleso
-            binding.spTvTopneTeleso.setSelection(stranky.zdrojeTv.tvTopneTelesoTypPos)
-            binding.cbTvElektrokotel.isChecked = stranky.zdrojeTv.tvElektrokotel
-            binding.cbTvPlynKotel.isChecked = stranky.zdrojeTv.tvPlynKotel
-            binding.cbTvKrb.isChecked = stranky.zdrojeTv.tvKrb
-            binding.cbTvJiny.isChecked = stranky.zdrojeTv.tvJiny
-            binding.etTvJiny.editText!!.setText(stranky.zdrojeTv.tvKtery)
+            binding.cbTvTopneTeleso.isChecked = stranky.zdrojeTv.topneTeleso
+            binding.spTvTopneTeleso.setSelection(stranky.zdrojeTv.topneTelesoTypPos)
+            binding.cbTvElektrokotel.isChecked = stranky.zdrojeTv.elektrokotel
+            binding.cbTvPlynKotel.isChecked = stranky.zdrojeTv.plynKotel
+            binding.cbTvKrb.isChecked = stranky.zdrojeTv.krb
+            binding.cbTvJiny.isChecked = stranky.zdrojeTv.jiny
+            binding.etTvJiny.editText!!.setText(stranky.zdrojeTv.ktery)
             binding.etPoznamka6.editText!!.setText(stranky.zdrojeTv.poznamka)
 
             update()
 
-        }
-
-        timer.scheduleAtFixedRate(task, 0, 200)
-
-        binding.cbTvTopneTeleso.setOnClickListener { update() }
-
-
-        binding.tvTvTopneTeleso.setOnClickListener {
-            binding.cbTvTopneTeleso.isChecked = !binding.cbTvTopneTeleso.isChecked
-            update()
-        }
-        binding.tvTvElektrokotel.setOnClickListener {
-            binding.cbTvElektrokotel.isChecked = !binding.cbTvElektrokotel.isChecked
-            update()
-        }
-        binding.tvTvPlynKotel.setOnClickListener {
-            binding.cbTvPlynKotel.isChecked = !binding.cbTvPlynKotel.isChecked
-            update()
-        }
-        binding.tvTvKrb.setOnClickListener {
-            binding.cbTvKrb.isChecked = !binding.cbTvKrb.isChecked
-            update()
         }
     }
 }
