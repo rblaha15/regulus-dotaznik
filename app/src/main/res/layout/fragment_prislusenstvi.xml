@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.PrislusenstviFragment">
+    tools:context=".dotaznik.pages.PrislusenstviFragment">
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -48,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:text="@string/hadice"
+                android:text="@string/prislusenstvi_hadice"
                 app:layout_constraintBottom_toBottomOf="@+id/cbHadice"
                 app:layout_constraintEnd_toStartOf="@+id/spHadice"
                 app:layout_constraintStart_toEndOf="@+id/cbHadice"
@@ -79,7 +79,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:text="@string/topny_kabel"
+                android:text="@string/prislusenstvi_topny_kabel"
                 app:layout_constraintBottom_toBottomOf="@+id/cbTopnyKabel"
                 app:layout_constraintEnd_toStartOf="@+id/spTopnyKabel"
                 app:layout_constraintStart_toEndOf="@+id/cbTopnyKabel"
@@ -110,7 +110,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:text="@string/drzak_pro_tc"
+                android:text="@string/prislusenstvi_drzak_pro_tc"
                 app:layout_constraintBottom_toBottomOf="@+id/cbDrzakNaStenu"
                 app:layout_constraintEnd_toStartOf="@+id/spDrzakNaStenu"
                 app:layout_constraintStart_toEndOf="@+id/cbDrzakNaStenu"
@@ -141,7 +141,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:text="@string/pokojova_jednotka"
+                android:text="@string/prislusenstvi_pokojova_jednotka"
                 app:layout_constraintBottom_toBottomOf="@+id/cbPokojovaJednotka"
                 app:layout_constraintEnd_toStartOf="@+id/spPokojovaJednotka"
                 app:layout_constraintStart_toEndOf="@+id/cbPokojovaJednotka"
@@ -172,7 +172,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:text="@string/pokojove_cidlo"
+                android:text="@string/prislusenstvi_pokojove_cidlo"
                 app:layout_constraintBottom_toBottomOf="@+id/cbPokojoveCidlo"
                 app:layout_constraintEnd_toStartOf="@+id/spPokojoveCidlo"
                 app:layout_constraintStart_toEndOf="@+id/cbPokojoveCidlo"

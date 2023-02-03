@@ -1,9 +1,14 @@
-package com.regulus.dotaznik.adapters
+package com.regulus.dotaznik.dotaznik
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.regulus.dotaznik.fragments.*
+import com.regulus.dotaznik.dotaznik.pages.BazenFragment
+import com.regulus.dotaznik.dotaznik.pages.DetailObjektuFragment
+import com.regulus.dotaznik.dotaznik.pages.KontaktyFragment
+import com.regulus.dotaznik.dotaznik.pages.PrislusenstviFragment
+import com.regulus.dotaznik.dotaznik.pages.SystemFragment
+import com.regulus.dotaznik.dotaznik.pages.ZdrojeFragment
 
 class ViewPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activity) {
     override fun getItemCount(): Int = 6

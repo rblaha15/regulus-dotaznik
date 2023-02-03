@@ -1,7 +1,6 @@
-package com.regulus.dotaznik.activities
+package com.regulus.dotaznik.prihlaseni
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
@@ -14,8 +13,8 @@ import androidx.core.content.edit
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
-import com.regulus.dotaznik.Clovek
 import com.regulus.dotaznik.R
+import com.regulus.dotaznik.Uzivatel
 import com.regulus.dotaznik.databinding.ActivityPrihlaseniBinding
 import com.regulus.dotaznik.prefsPrihlaseni
 import kotlin.system.exitProcess
@@ -23,9 +22,9 @@ import kotlin.system.exitProcess
 
 class PrihlaseniActivity : AppCompatActivity() {
 
-    private var currentSelection: Clovek? = null
-    private lateinit var zamestnanci: List<Clovek>
-    private lateinit var zastupci: List<Clovek>
+    private var currentSelection: Uzivatel? = null
+    private lateinit var zamestnanci: List<Uzivatel>
+    private lateinit var zastupci: List<Uzivatel>
 
     private fun Int.toBoolean() = this == 1
 
@@ -98,9 +97,10 @@ class PrihlaseniActivity : AppCompatActivity() {
                 currentSelection = lidi[position - 1]
 
                 if (binding.rbJsem.isChecked) {
-                    binding.tvInfo.text = getString(R.string.prihlaseni_vybrany_jmeno_prijmeni, currentSelection!!.jmeno, currentSelection!!.prijmeni) +
-                            getString(R.string.prihlaseni_vybrany_kod, currentSelection!!.cislo_ko) +
-                            getString(R.string.prihlaseni_vybrany_email, currentSelection!!.email)
+                    binding.tvInfo.text =
+                        getString(R.string.prihlaseni_vybrany_jmeno_prijmeni, currentSelection!!.jmeno, currentSelection!!.prijmeni) +
+                                getString(R.string.prihlaseni_vybrany_kod, currentSelection!!.cisloKo) +
+                                getString(R.string.prihlaseni_vybrany_email, currentSelection!!.email)
                 } else {
                     binding.tvInfo2.text = getString(R.string.prihlaseni_vybrany, currentSelection!!.jmeno, currentSelection!!.prijmeni)
                 }
@@ -144,7 +144,7 @@ class PrihlaseniActivity : AppCompatActivity() {
                     if (currentSelection == null) return@setOnClickListener
 
                     putString("jmeno", currentSelection!!.jmeno + " " + currentSelection!!.prijmeni)
-                    putString("kod", currentSelection!!.cislo_ko)
+                    putString("kod", currentSelection!!.cisloKo)
                     putString("email", currentSelection!!.email)
                     putString("ico", "")
 
@@ -160,7 +160,7 @@ class PrihlaseniActivity : AppCompatActivity() {
                     if (binding.etPrihlaseniPrijmeni.editText!!.text.toString() == "") { Toast.makeText(this@PrihlaseniActivity,
                         R.string.je_potreba_zadat_prijmeni, Toast.LENGTH_SHORT).show(); return@setOnClickListener }
 
-                    putString("kod", currentSelection!!.cislo_ko)
+                    putString("kod", currentSelection!!.cisloKo)
                     putString("ico", binding.etPrihlaseniIco.editText!!.text.toString())
                     putString("email", binding.etPrihlaseniEmail.editText!!.text.toString())
                     putString("jmeno", binding.etPrihlaseniJmeno.editText!!.text.toString() + " " + binding.etPrihlaseniPrijmeni.editText!!.text.toString())
@@ -181,11 +181,11 @@ class PrihlaseniActivity : AppCompatActivity() {
 
     private fun setAdapters(stringy: List<String>) {
         zamestnanci = stringy.map {
-            Clovek(
+            Uzivatel(
                 email = it.split(";")[3],
                 jmeno = it.split(";")[2],
                 prijmeni = it.split(";")[1],
-                cislo_ko = it.split(";")[0],
+                cisloKo = it.split(";")[0],
                 jeZastupce = it.split(";")[4].toInt().toBoolean()
             )
         }
@@ -208,8 +208,6 @@ class PrihlaseniActivity : AppCompatActivity() {
 
     private fun admin() {
 
-        val intent = Intent(this, AdminActivity::class.java)
-        startActivity(intent)
     }
 
 }

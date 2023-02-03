@@ -1,4 +1,4 @@
-package com.regulus.dotaznik.activities
+package com.regulus.dotaznik.vybiratorFirem
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.regulus.dotaznik.R
-import com.regulus.dotaznik.adapters.FirmyAdapter
 import com.regulus.dotaznik.databinding.ActivityFirmyBinding
 import com.regulus.dotaznik.prefsPrihlaseni
 import com.regulus.dotaznik.saver

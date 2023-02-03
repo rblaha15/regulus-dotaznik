@@ -1,4 +1,4 @@
-package com.regulus.dotaznik.fragments
+package com.regulus.dotaznik.dotaznik.pages
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,7 +9,7 @@ import android.widget.ArrayAdapter
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import com.regulus.dotaznik.R
-import com.regulus.dotaznik.Stranky
+import com.regulus.dotaznik.Stranka
 import com.regulus.dotaznik.databinding.FragmentBazenBinding
 import com.regulus.dotaznik.saver
 
@@ -38,7 +38,7 @@ class BazenFragment : Fragment() {
             poznamka = binding.etPoznamka4.editText!!.text.toString()
         }
 
-        if (stranky.bazen == Stranky.Bazen()) return
+        if (stranky.bazen == Stranka.Bazen()) return
 
         requireContext().saver.save(stranky)
     }

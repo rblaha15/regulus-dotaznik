@@ -22,16 +22,17 @@
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
         <activity
-            android:name=".activities.FirmyActivity"
+            android:name=".vybiratorFirem.FirmyActivity"
             android:exported="false" />
-        <activity android:name=".activities.FotkyActivity"
-            android:exported="false"  />
-        <activity android:name=".activities.AdminActivity"
-            android:exported="false"  />
-        <activity android:name=".activities.PrihlaseniActivity"
-            android:exported="false"  />
-        <activity android:name=".activities.MainActivity"
-            android:exported="true" >
+        <activity
+            android:name=".spravaFotek.FotkyActivity"
+            android:exported="false" />
+        <activity
+            android:name=".prihlaseni.PrihlaseniActivity"
+            android:exported="false" />
+        <activity
+            android:name=".dotaznik.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

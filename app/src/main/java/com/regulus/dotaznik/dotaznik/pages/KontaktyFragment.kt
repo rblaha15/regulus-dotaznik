@@ -1,4 +1,4 @@
-package com.regulus.dotaznik.fragments
+package com.regulus.dotaznik.dotaznik.pages
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,11 +9,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import com.regulus.dotaznik.R
-import com.regulus.dotaznik.Stranky
-import com.regulus.dotaznik.activities.FirmyActivity
+import com.regulus.dotaznik.Stranka
 import com.regulus.dotaznik.databinding.FragmentKontaktyBinding
 import com.regulus.dotaznik.prefsPrihlaseni
 import com.regulus.dotaznik.saver
+import com.regulus.dotaznik.vybiratorFirem.FirmyActivity
 
 
 class KontaktyFragment : Fragment() {
@@ -41,7 +41,7 @@ class KontaktyFragment : Fragment() {
                 binding.btnVybratFirmu.text = firma.ifEmpty { context?.getString(R.string.kontakty_vybrat_firmu) }
             }
         }
-        if (stranky.kontakty == Stranky.Kontakty()) return
+        if (stranky.kontakty == Stranka.Kontakty()) return
 
         requireContext().saver.save(stranky)
     }

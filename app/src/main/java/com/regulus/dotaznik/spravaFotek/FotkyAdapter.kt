@@ -1,18 +1,19 @@
-package com.regulus.dotaznik.adapters
+package com.regulus.dotaznik.spravaFotek
 
 import android.content.Context
 import android.graphics.ImageDecoder
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.regulus.dotaznik.R
-import com.regulus.dotaznik.activities.FotkyActivity
 import java.io.File
 
 class FotkyAdapter(private val activity: FotkyActivity) : RecyclerView.Adapter<FotkyAdapter.ViewHolder>() {

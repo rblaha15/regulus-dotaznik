@@ -1,4 +1,4 @@
-package com.regulus.dotaznik.activities
+package com.regulus.dotaznik.spravaFotek
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.regulus.dotaznik.R
-import com.regulus.dotaznik.adapters.FotkyAdapter
 import com.regulus.dotaznik.databinding.ActivityFotkyBinding
 import java.io.File
 import java.io.FileNotFoundException

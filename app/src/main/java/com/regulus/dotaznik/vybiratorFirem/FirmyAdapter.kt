@@ -1,4 +1,4 @@
-package com.regulus.dotaznik.adapters
+package com.regulus.dotaznik.vybiratorFirem
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.regulus.dotaznik.R
-import com.regulus.dotaznik.activities.FirmyActivity
 import com.regulus.dotaznik.prefsPrihlaseni
 
 class FirmyAdapter(private val activity: FirmyActivity, private val callback: (String) -> Unit) :

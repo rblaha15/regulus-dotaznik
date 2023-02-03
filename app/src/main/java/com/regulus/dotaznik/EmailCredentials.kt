@@ -1,6 +1,6 @@
 package com.regulus.dotaznik
 
-object Credentials {
+object EmailCredentials {
     const val EMAIL = "aplikace.regulus@gmail.com"
     const val PASSWORD = "guikxjybjapwrwmy"
 }

@@ -1,4 +1,4 @@
-package com.regulus.dotaznik.activities
+package com.regulus.dotaznik.dotaznik
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -24,8 +24,9 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.regulus.dotaznik.*
-import com.regulus.dotaznik.adapters.ViewPagerAdapter
 import com.regulus.dotaznik.databinding.ActivityMainBinding
+import com.regulus.dotaznik.prihlaseni.PrihlaseniActivity
+import com.regulus.dotaznik.spravaFotek.FotkyActivity
 import java.io.File
 import java.util.*
 import java.util.concurrent.Executors
@@ -421,9 +422,9 @@ class MainActivity : AppCompatActivity() {
             props["mail.smtp.port"] = "465"
 
             val session = Session.getInstance(props,
-                object : javax.mail.Authenticator() {
+                object : Authenticator() {
                     override fun getPasswordAuthentication(): PasswordAuthentication {
-                        return PasswordAuthentication(Credentials.EMAIL, Credentials.PASSWORD)
+                        return PasswordAuthentication(EmailCredentials.EMAIL, EmailCredentials.PASSWORD)
                     }
                 })
 
@@ -431,7 +432,7 @@ class MainActivity : AppCompatActivity() {
 
                 MimeMessage(session).apply {
 
-                    setFrom(InternetAddress(Credentials.EMAIL))
+                    setFrom(InternetAddress(EmailCredentials.EMAIL))
 
                     addRecipient(
                         Message.RecipientType.TO,

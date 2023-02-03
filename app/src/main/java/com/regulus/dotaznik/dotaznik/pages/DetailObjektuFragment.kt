@@ -1,4 +1,4 @@
-package com.regulus.dotaznik.fragments
+package com.regulus.dotaznik.dotaznik.pages
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,9 +10,9 @@ import android.widget.ArrayAdapter
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import com.regulus.dotaznik.R
-import com.regulus.dotaznik.Stranky
-import com.regulus.dotaznik.activities.PrihlaseniActivity
+import com.regulus.dotaznik.Stranka
 import com.regulus.dotaznik.databinding.FragmentDetailObjektuBinding
+import com.regulus.dotaznik.prihlaseni.PrihlaseniActivity
 import com.regulus.dotaznik.saver
 
 class DetailObjektuFragment : Fragment() {
@@ -38,7 +38,7 @@ class DetailObjektuFragment : Fragment() {
             poznamka = binding.etPoznamka2.editText!!.text.toString()
         }
 
-        if (stranky.detailObjektu == Stranky.DetailObjektu()) return
+        if (stranky.detailObjektu == Stranka.DetailObjektu()) return
 
         requireContext().saver.save(stranky)
     }

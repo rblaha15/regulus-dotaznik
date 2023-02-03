@@ -1,4 +1,4 @@
-package com.regulus.dotaznik.fragments
+package com.regulus.dotaznik.dotaznik.pages
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,7 +9,7 @@ import android.widget.ArrayAdapter
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import com.regulus.dotaznik.R
-import com.regulus.dotaznik.Stranky
+import com.regulus.dotaznik.Stranka
 import com.regulus.dotaznik.databinding.FragmentZdrojeBinding
 import com.regulus.dotaznik.saver
 
@@ -48,8 +48,8 @@ class ZdrojeFragment : Fragment() {
             poznamka = binding.etPoznamka6.editText!!.text.toString()
         }
 
-        if (stranky.zdrojeTop == Stranky.ZdrojeTop()) return
-        if (stranky.zdrojeTv == Stranky.ZdrojeTv()) return
+        if (stranky.zdrojeTop == Stranka.ZdrojeTop()) return
+        if (stranky.zdrojeTv == Stranka.ZdrojeTv()) return
 
         requireContext().saver.save(stranky)
     }
