@@ -1,5 +1,13 @@
 package com.regulus.dotaznik
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AcUnit
+import androidx.compose.material.icons.filled.AddShoppingCart
+import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Pool
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.regulus.dotaznik.Stranky.Stranka.Vec.Nadpis
 import com.regulus.dotaznik.Stranky.Stranka.Vec.Spacer
 import com.regulus.dotaznik.Text.Companion.text
@@ -20,6 +28,7 @@ data class Stranky(
 
     sealed class Stranka(
         val nazev: Text,
+        val icon: ImageVector,
         val veci: List<List<Vec>>,
     ) {
 
@@ -142,6 +151,7 @@ data class Stranky(
             val poznamka: Vec.Pisatko = Vec.Pisatko(Strings.poznamka.text),
         ) : Stranka(
             nazev = Strings.kontakty.text,
+            icon = Icons.Default.Person,
             veci = listOf(
                 listOf(prijmeni, jmeno, ulice, mesto, psc, telefon, email),
                 listOf(Vec.Jine.MontazniFirma, icoMontazniFirmy),
@@ -169,6 +179,7 @@ data class Stranky(
             val poznamka: Vec.Pisatko = Vec.Pisatko(Strings.poznamka.text),
         ) : Stranka(
             nazev = Strings.detail_objektu.text,
+            icon = Icons.Default.Home,
             veci = listOf(
                 listOf(tepelnaZtrata),
                 listOf(potrbaTeplaNaVytapeni, potrebaTeplaNaTeplouVodu),
@@ -313,7 +324,8 @@ data class Stranky(
             val cirkulaceTepleVody: Vec.Zaskrtavatko = Vec.Zaskrtavatko(Strings.system_cirkulace.text),
             val poznamka: Vec.Pisatko = Vec.Pisatko(Strings.poznamka.text),
         ) : Stranka(
-            nazev = Strings.detail_objektu.text,
+            nazev = Strings.system.text,
+            icon = Icons.Default.Category,
             veci = listOf(
                 listOf(typTC, modelTC),
                 listOf(typVnitrniJednotky),
@@ -397,7 +409,8 @@ data class Stranky(
             ),
             val poznamka: Vec.Pisatko = Vec.Pisatko(Strings.poznamka.text),
         ) : Stranka(
-            nazev = Strings.detail_objektu.text,
+            nazev = Strings.bazen.text,
+            icon = Icons.Default.Pool,
             veci = listOf(
                 listOf(
                     chciBazen,
@@ -450,7 +463,8 @@ data class Stranky(
             val jinyTeplaVoda: Vec.Pisatko = Vec.Pisatko(Strings.jiny.text),
             val poznamka: Vec.Pisatko = Vec.Pisatko(Strings.poznamka.text),
         ) : Stranka(
-            nazev = Strings.detail_objektu.text,
+            nazev = Strings.zdroje.text,
+            icon = Icons.Default.AcUnit,
             veci = listOf(
                 listOf(
                     Nadpis(R.string.zdroje_top.text),
@@ -487,7 +501,8 @@ data class Stranky(
             ),
             val poznamka: Vec.Pisatko = Vec.Pisatko(Strings.poznamka.text),
         ) : Stranka(
-            nazev = Strings.detail_objektu.text,
+            nazev = Strings.prislusenstvi.text,
+            icon = Icons.Default.AddShoppingCart,
             veci = listOf(
                 listOf(hadice, topnyKabel, drzakNaStenu, pokojovaJednotka, pokojoveCidlo, Spacer, poznamka),
             )
