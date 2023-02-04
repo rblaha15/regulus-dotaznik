@@ -151,9 +151,10 @@
     <string name="na_stenu">Na stěnu</string>
     <string name="na_izolovanou_stenu">Na izolovanou stěnu</string>
     <string name="prislusenstvi">Příslušenství</string>
-    <string name="hadice">Hadice</string>
-    <string name="drzak_pro_tc">Držák pro TČ</string>
-    <string name="pokojova_jednotka">Pokojová jednotka</string>
-    <string name="topny_kabel">Topný kabel</string>
-    <string name="pokojove_cidlo">Pokojové čidlo</string>
+    <string name="prislusenstvi_hadice">Hadice</string>
+    <string name="prislusenstvi_drzak_pro_tc">Držák pro TČ</string>
+    <string name="prislusenstvi_pokojova_jednotka">Pokojová jednotka</string>
+    <string name="prislusenstvi_topny_kabel">Topný kabel</string>
+    <string name="prislusenstvi_pokojove_cidlo">Pokojové čidlo</string>
+    <string name="mena">€</string>
 </resources>

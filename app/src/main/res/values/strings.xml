@@ -25,9 +25,10 @@
     <string name="kW" translatable="false">kW</string>
     <string name="kWh" translatable="false">kWh</string>
     <string name="m2" translatable="false">m²</string>
-    <string name="Kc" translatable="false">Kč</string>
+    <string name="mena">€</string>
     <string name="q" translatable="false">q</string>
     <string name="m3" translatable="false">m³</string>
+    <string name="dm3" translatable="false">dm³</string>
     <string name="m" translatable="false">m</string>
     <string name="stupen_c" translatable="false">°C</string>
 
@@ -162,9 +163,9 @@
     <string name="na_stenu">Na stěnu</string>
     <string name="na_izolovanou_stenu">Na izolovanou stěnu</string>
     <string name="prislusenstvi">Příslušenství</string>
-    <string name="hadice">Hadice</string>
-    <string name="topny_kabel">Topný kabel</string>
-    <string name="drzak_pro_tc">Držák pro TČ</string>
-    <string name="pokojova_jednotka">Pokojová jednotka</string>
-    <string name="pokojove_cidlo">Pokojové čidlo</string>
+    <string name="prislusenstvi_hadice">Hadice</string>
+    <string name="prislusenstvi_topny_kabel">Topný kabel</string>
+    <string name="prislusenstvi_drzak_pro_tc">Držák pro TČ</string>
+    <string name="prislusenstvi_pokojova_jednotka">Pokojová jednotka</string>
+    <string name="prislusenstvi_pokojove_cidlo">Pokojové čidlo</string>
 </resources>
