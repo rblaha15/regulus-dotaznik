@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.regulus.dotaznik">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
@@ -22,16 +21,16 @@
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
         <activity
-            android:name=".vybiratorFirem.FirmyActivity"
+            android:name="cz.regulus.dotaznik.vybiratorFirem.FirmyActivity"
             android:exported="false" />
         <activity
-            android:name=".spravaFotek.FotkyActivity"
+            android:name="cz.regulus.dotaznik.spravaFotek.FotkyActivity"
             android:exported="false" />
         <activity
-            android:name=".prihlaseni.PrihlaseniActivity"
+            android:name="cz.regulus.dotaznik.prihlaseni.PrihlaseniActivity"
             android:exported="false" />
         <activity
-            android:name=".dotaznik.MainActivity"
+            android:name="cz.regulus.dotaznik.dotaznik.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

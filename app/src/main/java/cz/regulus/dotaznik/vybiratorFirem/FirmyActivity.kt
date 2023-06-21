@@ -1,4 +1,4 @@
-package com.regulus.dotaznik.vybiratorFirem
+package cz.regulus.dotaznik.vybiratorFirem
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
@@ -13,8 +13,8 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.regulus.dotaznik.R
 import com.regulus.dotaznik.databinding.ActivityFirmyBinding
-import com.regulus.dotaznik.prefsPrihlaseni
-import com.regulus.dotaznik.saver
+import cz.regulus.dotaznik.prefsPrihlaseni
+import cz.regulus.dotaznik.saver
 
 class FirmyActivity : AppCompatActivity() {
 
@@ -35,25 +35,27 @@ class FirmyActivity : AppCompatActivity() {
 
         binding.rvFirmy.adapter = FirmyAdapter(this) {
 
-            val stranky = saver.get()
+            var stranky = saver.get()
 
-            stranky.kontakty.ico =
-                if (it.isEmpty())
-                    ""
-                else
-                    it.split(" – ")[1]
-            stranky.kontakty.firma =
-                if (it.isEmpty())
-                    ""
-                else
-                    it.split(" – ")[0]
+            stranky = stranky.copy(
+                kontakty = stranky.kontakty.copy(
+                    icoMontazniFirmy = stranky.kontakty.icoMontazniFirmy.copy(
+                        text = if (it.isEmpty())
+                            ""
+                        else
+                            it.split(" – ")[1]
+                    )
+                )
+            )
 
+//            stranky.kontakty.firma =
+//                if (it.isEmpty())
+//                    ""
+//                else
+//                    it.split(" – ")[0]
 
             saver.save(stranky)
-
-
             finish()
-
         }
 
         val dividerItemDecoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
@@ -99,10 +101,15 @@ class FirmyActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
 
-        val stranky = saver.get()
+        var stranky = saver.get()
 
-        stranky.kontakty.firma = ""
-        stranky.kontakty.ico = ""
+        stranky = stranky.copy(
+            kontakty = stranky.kontakty.copy(
+                icoMontazniFirmy = stranky.kontakty.icoMontazniFirmy.copy(
+                    text = ""
+                )
+            )
+        )
 
         saver.save(stranky)
     }

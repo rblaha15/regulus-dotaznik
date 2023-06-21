@@ -1,4 +1,4 @@
-package com.regulus.dotaznik.spravaFotek
+package cz.regulus.dotaznik.spravaFotek
 
 import android.Manifest
 import android.annotation.SuppressLint

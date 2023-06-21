@@ -1,36 +1,35 @@
-package com.regulus.dotaznik
+package cz.regulus.dotaznik
 
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
-import com.google.gson.Gson
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 
 class Saver(private val context: Context) {
 
-    fun save(stranky: Stranky) {
+    fun save(stranky: cz.regulus.dotaznik.Stranky) {
 
         val prefs = context.prefs
-        val gson = Gson()
 
         prefs.edit {
 
-            putString("udaje", gson.toJson(stranky))
+            putString("udaje", Json.encodeToString(stranky))
         }
     }
 
-    fun get(): Stranky {
+    fun get(): cz.regulus.dotaznik.Stranky {
         val prefs = context.prefs
-        val gson = Gson()
 
-        val json = prefs.getString("udaje", "")
+        val json = prefs.getString("udaje", "") ?: ""
 
-        return if (json != "")
-            gson.fromJson(json, Stranky::class.java)
+        return if (json.isNotBlank())
+            Json.decodeFromString(json)
         else
-            Stranky()
+            cz.regulus.dotaznik.Stranky()
     }
 
     fun delete(activity: AppCompatActivity) {
@@ -50,8 +49,8 @@ class Saver(private val context: Context) {
     }
 }
 
-val Context?.saver: Saver
-    get() = Saver(this!!)
+val Context?.saver: cz.regulus.dotaznik.Saver
+    get() = cz.regulus.dotaznik.Saver(this!!)
 
 val Context?.prefs: SharedPreferences
     get() = this!!.getSharedPreferences("PREFS_DOTAZNIK", Context.MODE_PRIVATE)

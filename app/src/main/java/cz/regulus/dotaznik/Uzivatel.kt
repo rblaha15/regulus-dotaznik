@@ -1,4 +1,4 @@
-package com.regulus.dotaznik
+package cz.regulus.dotaznik
 
 data class Uzivatel(
     var email: String = "",

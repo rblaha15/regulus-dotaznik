@@ -1,4 +1,4 @@
-package com.regulus.dotaznik.prihlaseni
+package cz.regulus.dotaznik.prihlaseni
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
@@ -14,9 +14,9 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import com.regulus.dotaznik.R
-import com.regulus.dotaznik.Uzivatel
+import cz.regulus.dotaznik.Uzivatel
 import com.regulus.dotaznik.databinding.ActivityPrihlaseniBinding
-import com.regulus.dotaznik.prefsPrihlaseni
+import cz.regulus.dotaznik.prefsPrihlaseni
 import kotlin.system.exitProcess
 
 
@@ -44,9 +44,9 @@ class PrihlaseniActivity : AppCompatActivity() {
 
         lidiRef.get().addOnSuccessListener {
 
-            val value2 = it.getValue<String>()!!
+            val value2 = it.getValue<List<String>>()!!
 
-            setAdapters(value2.split("\n"))
+            setAdapters(value2)
         }.addOnFailureListener {
             Log.e("Firebase", "Failed to read value.", it)
 

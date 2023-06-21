@@ -1,4 +1,4 @@
-package com.regulus.dotaznik.spravaFotek
+package cz.regulus.dotaznik.spravaFotek
 
 import android.content.Context
 import android.graphics.ImageDecoder
