@@ -15,6 +15,7 @@
         android:windowSoftInputMode="stateHidden|adjustResize"
         android:allowBackup="true"
         android:icon="@mipmap/ic_r"
+        android:name="cz.regulus.dotaznik.App"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_r_round"
         android:supportsRtl="true"
@@ -25,9 +26,6 @@
             android:exported="false" />
         <activity
             android:name="cz.regulus.dotaznik.spravaFotek.FotkyActivity"
-            android:exported="false" />
-        <activity
-            android:name="cz.regulus.dotaznik.prihlaseni.PrihlaseniActivity"
             android:exported="false" />
         <activity
             android:name="cz.regulus.dotaznik.dotaznik.MainActivity"

@@ -9,10 +9,10 @@ import androidx.core.content.edit
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.regulus.dotaznik.R
 import com.regulus.dotaznik.databinding.ActivityFirmyBinding
+import cz.regulus.dotaznik.Stranky
 import cz.regulus.dotaznik.prefsPrihlaseni
 import cz.regulus.dotaznik.saver
 
@@ -38,8 +38,8 @@ class FirmyActivity : AppCompatActivity() {
             var stranky = saver.get()
 
             stranky = stranky.copy(
-                kontakty = stranky.kontakty.copy(
-                    icoMontazniFirmy = stranky.kontakty.icoMontazniFirmy.copy(
+                kontakty = (stranky.kontakty as Stranky.Stranka.Kontakty).copy(
+                    icoMontazniFirmy = ((stranky.kontakty as Stranky.Stranka.Kontakty).icoMontazniFirmy as Stranky.Stranka.Kontakty.IcoMontazniFirmy).copy(
                         text = if (it.isEmpty())
                             ""
                         else
@@ -73,28 +73,6 @@ class FirmyActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        when (item.itemId) {
-            R.id.actionAktualizovat -> {
-
-                val database = Firebase.database("https://lidi-c74ad-default-rtdb.europe-west1.firebasedatabase.app/")
-                val myRef = database.getReference("firmy")
-
-                myRef.get().addOnSuccessListener {
-
-                    val value = it.value as List<*>
-
-                    prefsPrihlaseni.edit {
-                        putString("firmy", value.joinToString("\n"))
-                    }
-
-                    (binding.rvFirmy.adapter as FirmyAdapter).aktualizovat()
-
-                    (binding.rvFirmy.adapter as FirmyAdapter).filter(binding.etVyhledat.text.toString())
-                }
-                return true
-            }
-        }
-
         return super.onOptionsItemSelected(item)
     }
 
@@ -104,8 +82,8 @@ class FirmyActivity : AppCompatActivity() {
         var stranky = saver.get()
 
         stranky = stranky.copy(
-            kontakty = stranky.kontakty.copy(
-                icoMontazniFirmy = stranky.kontakty.icoMontazniFirmy.copy(
+            kontakty = (stranky.kontakty as Stranky.Stranka.Kontakty).copy(
+                icoMontazniFirmy = ((stranky.kontakty as Stranky.Stranka.Kontakty).icoMontazniFirmy as Stranky.Stranka.Kontakty.IcoMontazniFirmy).copy(
                     text = ""
                 )
             )
