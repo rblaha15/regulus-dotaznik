@@ -3,13 +3,13 @@ package cz.regulus.dotaznik
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Clovek(
-    val cislo: String,
+data class Uzivatel(
     val jmeno: String,
     val prijmeni: String,
     val email: String,
-    val zastupce: Boolean,
     val ico: String = "",
+    val cisloKo: String,
+    val jeZamestnanec: Boolean,
 ) {
     val celeJmeno get() = "$jmeno $prijmeni"
 }

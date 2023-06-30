@@ -1,6 +1,7 @@
 package cz.regulus.dotaznik
 
 import android.content.Context
+import android.content.res.Resources
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.material.icons.filled.AddShoppingCart
@@ -11,7 +12,6 @@ import androidx.compose.material.icons.filled.Pool
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.regulus.dotaznik.R
 import cz.regulus.dotaznik.Stranky.Stranka.Vec.*
-import cz.regulus.dotaznik.Text.Companion.text
 import cz.regulus.dotaznik.Text.*
 import kotlinx.serialization.Serializable
 import com.regulus.dotaznik.R.string as Strings
@@ -25,8 +25,10 @@ data class Stranky(
     val doplnkoveZdroje: Stranka.DoplnkoveZdroje = Stranka.DoplnkoveZdroje(),
     val prislusenstvi: Stranka.Prislusenstvi = Stranka.Prislusenstvi(),
 ) {
-    context(Context)
-    fun createXml() = """
+    context(Resources)
+    fun createXml(
+        uzivatel: Uzivatel,
+    ) = """
         <?xml version="1.0" encoding="utf-8"?>
         <?xml-stylesheet type="text/xsl" href="dotaznik_app.xsl"?>
         
@@ -35,9 +37,9 @@ data class Stranky(
         <xml>
             <system>
                 <resi_tc>Ano</resi_tc>
-                <cislo_ko>${prefsPrihlaseni.getString("kod", "Error")}</cislo_ko>
-                <odesilatel>${prefsPrihlaseni.getString("email", "Error")}</odesilatel>
-                <odberatel_ico>${prefsPrihlaseni.getString("ico", "")}</odberatel_ico>
+                <cislo_ko>${uzivatel.cisloKo}</cislo_ko>
+                <odesilatel>${uzivatel.email}</odesilatel>
+                <odberatel_ico>${uzivatel.ico}</odberatel_ico>
             </system>
             <kontakt>
                 <jmeno>${kontakty.jmeno}</jmeno>
@@ -50,7 +52,7 @@ data class Stranky(
         else kontakty.psc.text.substring(0, 3) + " " + kontakty.psc.text.substring(3, 5)
     }</psc>
                 <mesto>${kontakty.mesto}</mesto>
-                <partner_ico>${kontakty.icoMontazniFirmy.text}</partner_ico>
+                <partner_ico>${kontakty.montazniFirma.ico}</partner_ico>
             </kontakt>
             <detailobjektu>
                 <os_popis>${system.otopnySystem.vybrano.asString()}</os_popis>
@@ -150,7 +152,7 @@ data class Stranky(
             @Serializable
             sealed interface Pisatko : Vec {
                 val popis: Text
-                val suffix: Text get() = Plain("")
+                val suffix: Text get() = "".toText()
                 val text: String get() = ""
                 override val zobrazit: (Stranka) -> Boolean get() = { true }
 
@@ -209,18 +211,15 @@ data class Stranky(
                 val zaskrtnuto: Boolean get() = false
                 override val zobrazit: (Stranka) -> Boolean get() = { true }
 
-                val text get() = if (zaskrtnuto) vybrano else Plain("Ne")
+                val text get() = if (zaskrtnuto) vybrano else "Ne".toText()
 
                 fun zaskrtnuto(zaskrtnuto: Boolean): ZaskrtavatkoSVybiratkem
                 fun vybrano(vybrano: Text): ZaskrtavatkoSVybiratkem
             }
 
             @Serializable
-            sealed class Jine(
-                override val zobrazit: (Stranka) -> Boolean = { true },
-            ) : Vec {
-                @Serializable
-                object MontazniFirma : Jine()
+            sealed interface Jine : Vec {
+                override val zobrazit: (Stranka) -> Boolean get() = { true }
             }
 
             @Serializable
@@ -241,12 +240,12 @@ data class Stranky(
             val psc: Psc = Psc(),
             val telefon: Telefon = Telefon(),
             val email: Email = Email(),
-            val icoMontazniFirmy: IcoMontazniFirmy = IcoMontazniFirmy(),
+            val montazniFirma: MontazniFirma = MontazniFirma(),
             val poznamka: Poznamka = Poznamka(),
         ) : Stranka {
             override fun kopirovatVec(novaVec: Vec) = when (novaVec) {
                 is Email -> copy(email = novaVec)
-                is IcoMontazniFirmy -> copy(icoMontazniFirmy = novaVec)
+                is MontazniFirma -> copy(montazniFirma = novaVec)
                 is Jmeno -> copy(jmeno = novaVec)
                 is Mesto -> copy(mesto = novaVec)
                 is Poznamka -> copy(poznamka = novaVec)
@@ -262,7 +261,7 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.kontakty_prijmeni.text
+                override val popis get() = Strings.kontakty_prijmeni.toText()
             }
 
             @Serializable
@@ -270,7 +269,7 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.kontakty_jmeno.text
+                override val popis get() = Strings.kontakty_jmeno.toText()
             }
 
             @Serializable
@@ -278,7 +277,7 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.kontakty_ulice.text
+                override val popis get() = Strings.kontakty_ulice.toText()
             }
 
             @Serializable
@@ -286,7 +285,7 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.kontakty_mesto.text
+                override val popis get() = Strings.kontakty_mesto.toText()
             }
 
             @Serializable
@@ -294,7 +293,7 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.kontakty_psc.text
+                override val popis get() = Strings.kontakty_psc.toText()
             }
 
             @Serializable
@@ -302,7 +301,7 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.kontakty_telefon.text
+                override val popis get() = Strings.kontakty_telefon.toText()
             }
 
             @Serializable
@@ -310,15 +309,14 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.kontakty_email.text
+                override val popis get() = Strings.kontakty_email.toText()
             }
 
             @Serializable
-            data class IcoMontazniFirmy(
-                override val text: String = "",
-            ) : Pisatko {
-                override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.kontakty_ico.text
+            data class MontazniFirma(
+                val ico: String = "",
+            ) : Jine {
+                fun ico(ico: String) = copy(ico = ico)
             }
 
             @Serializable
@@ -326,15 +324,15 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.poznamka.text
+                override val popis get() = Strings.poznamka.toText()
             }
 
-            override val nazev get() = Strings.kontakty.text
+            override val nazev get() = Strings.kontakty.toText()
             override val icon get() = Icons.Default.Person
             override val veci
                 get() = listOf(
                     listOf(prijmeni, jmeno, ulice, mesto, psc, telefon, email),
-                    listOf(Jine.MontazniFirma, icoMontazniFirmy),
+                    listOf(montazniFirma),
                     listOf(poznamka),
                 )
         }
@@ -373,8 +371,8 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.detail_objektu_ztrata.text
-                override val suffix get() = Strings.kW.text
+                override val popis get() = Strings.detail_objektu_ztrata.toText()
+                override val suffix get() = Strings.kW.toText()
             }
 
             @Serializable
@@ -382,8 +380,8 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.detail_objektu_potreba_vytapeni.text
-                override val suffix get() = Strings.kWh.text
+                override val popis get() = Strings.detail_objektu_potreba_vytapeni.toText()
+                override val suffix get() = Strings.kWh.toText()
             }
 
             @Serializable
@@ -391,8 +389,8 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.detail_objektu_potreba_tv.text
-                override val suffix get() = Strings.kWh.text
+                override val popis get() = Strings.detail_objektu_potreba_tv.toText()
+                override val suffix get() = Strings.kWh.toText()
             }
 
             @Serializable
@@ -400,8 +398,8 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.detail_objektu_plocha.text
-                override val suffix get() = Strings.m2.text
+                override val popis get() = Strings.detail_objektu_plocha.toText()
+                override val suffix get() = Strings.m2.toText()
             }
 
             @Serializable
@@ -409,8 +407,8 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.detail_objektu_objem.text
-                override val suffix get() = Strings.m3.text
+                override val popis get() = Strings.detail_objektu_objem.toText()
+                override val suffix get() = Strings.m3.toText()
             }
 
             @Serializable
@@ -418,8 +416,8 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.detail_objektu_naklady.text
-                override val suffix get() = Strings.mena.text
+                override val popis get() = Strings.detail_objektu_naklady.toText()
+                override val suffix get() = Strings.mena.toText()
             }
 
             @Serializable
@@ -427,18 +425,18 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.detail_objektu_druh.text
+                override val popis get() = Strings.detail_objektu_druh.toText()
             }
 
             @Serializable
             data class SpotrebaPaliva(
                 override val text: String = "",
-                override val vybraneJednotky: Text = Strings.q.text,
+                override val vybraneJednotky: Text = Strings.q.toText(),
             ) : PisatkoSJednotkama {
                 override fun text(text: String) = copy(text = text)
                 override fun vybraneJednotky(vybraneJednotky: Text) = copy(vybraneJednotky = vybraneJednotky)
-                override val popis get() = Strings.detail_objektu_spotreba.text
-                override val jednotky get() = listOf(Strings.q.text, Strings.m3.text, Strings.kWh.text)
+                override val popis get() = Strings.detail_objektu_spotreba.toText()
+                override val jednotky get() = listOf(Strings.q.toText(), Strings.m3.toText(), Strings.kWh.toText())
             }
 
             @Serializable
@@ -446,18 +444,18 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.detail_objektu_druh2.text
+                override val popis get() = Strings.detail_objektu_druh2.toText()
             }
 
             @Serializable
             data class SpotrebaPaliva2(
                 override val text: String = "",
-                override val vybraneJednotky: Text = Strings.q.text,
+                override val vybraneJednotky: Text = Strings.q.toText(),
             ) : PisatkoSJednotkama {
                 override fun vybraneJednotky(vybraneJednotky: Text) = copy(vybraneJednotky = vybraneJednotky)
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.detail_objektu_spotreba2.text
-                override val jednotky get() = listOf(Strings.q.text, Strings.m3.text, Strings.kWh.text)
+                override val popis get() = Strings.detail_objektu_spotreba2.toText()
+                override val jednotky get() = listOf(Strings.q.toText(), Strings.m3.toText(), Strings.kWh.toText())
             }
 
             @Serializable
@@ -465,10 +463,10 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.poznamka.text
+                override val popis get() = Strings.poznamka.toText()
             }
 
-            override val nazev get() = Strings.detail_objektu.text
+            override val nazev get() = Strings.detail_objektu.toText()
             override val icon get() = Icons.Default.Home
             override val veci
                 get() = listOf(
@@ -509,56 +507,56 @@ data class Stranky(
 
             @Serializable
             data class TypTC(
-                override val vybrano: Text = Strings.vzduch_voda.text,
+                override val vybrano: Text = Strings.vzduch_voda.toText(),
             ) : Vybiratko {
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.system_tc_typ.text
+                override val popis get() = Strings.system_tc_typ.toText()
                 override val moznosti
                     get() = { _: Stranka ->
-                        listOf(Strings.vzduch_voda.text, Strings.zeme_voda.text)
+                        listOf(Strings.vzduch_voda.toText(), Strings.zeme_voda.toText())
                     }
             }
 
             @Serializable
             data class ModelTC(
-                override val vybrano: Text = Strings.vyberte.text,
+                override val vybrano: Text = Strings.vyberte.toText(),
             ) : Vybiratko {
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.system_tc_model.text
+                override val popis get() = Strings.system_tc_model.toText()
                 override val moznosti
                     get() = { it: Stranka ->
                         when ((it as System).typTC.vybrano) {
-                            Strings.vzduch_voda.text -> listOf(
-                                Strings.vyberte.text,
-                                Plain("ECOAIR 400"),
-                                Plain("ECOAIR 600"),
-                                Plain("RTC 6i"),
-                                Plain("RTC 12i"),
-                                Plain("ECOAIR 614M"),
-                                Plain("ECOAIR 622M"),
-                                Plain("ECOAIR 510M"),
-                                Plain("ECOAIR 406"),
-                                Plain("ECOAIR 408"),
-                                Plain("ECOAIR 410"),
-                                Plain("ECOAIR 415"),
-                                Plain("ECOAIR 420"),
+                            Strings.vzduch_voda.toText() -> listOf(
+                                Strings.vyberte.toText(),
+                                "ECOAIR 400".toText(),
+                                "ECOAIR 600".toText(),
+                                "RTC 6i".toText(),
+                                "RTC 12i".toText(),
+                                "ECOAIR 614M".toText(),
+                                "ECOAIR 622M".toText(),
+                                "ECOAIR 510M".toText(),
+                                "ECOAIR 406".toText(),
+                                "ECOAIR 408".toText(),
+                                "ECOAIR 410".toText(),
+                                "ECOAIR 415".toText(),
+                                "ECOAIR 420".toText(),
                             )
 
-                            Strings.zeme_voda.text -> listOf(
-                                Strings.vyberte.text,
-                                Plain("ECOPART"),
-                                Plain("ECOHEAT"),
-                                Plain("ECOPART 406"),
-                                Plain("ECOPART 408"),
-                                Plain("ECOPART 410"),
-                                Plain("ECOPART 412"),
-                                Plain("ECOPART 414"),
-                                Plain("ECOPART 417"),
-                                Plain("ECOPART 435"),
-                                Plain("ECOHEAT 406"),
-                                Plain("ECOHEAT 408"),
-                                Plain("ECOHEAT 410"),
-                                Plain("ECOHEAT 412"),
+                            Strings.zeme_voda.toText() -> listOf(
+                                Strings.vyberte.toText(),
+                                "ECOPART".toText(),
+                                "ECOHEAT".toText(),
+                                "ECOPART 406".toText(),
+                                "ECOPART 408".toText(),
+                                "ECOPART 410".toText(),
+                                "ECOPART 412".toText(),
+                                "ECOPART 414".toText(),
+                                "ECOPART 417".toText(),
+                                "ECOPART 435".toText(),
+                                "ECOHEAT 406".toText(),
+                                "ECOHEAT 408".toText(),
+                                "ECOHEAT 410".toText(),
+                                "ECOHEAT 412".toText(),
                             )
 
                             else -> throw IllegalArgumentException()
@@ -568,61 +566,61 @@ data class Stranky(
 
             @Serializable
             data class TypVnitrniJednotky(
-                override val vybrano: Text = Strings.zadna.text,
+                override val vybrano: Text = Strings.zadna.toText(),
             ) : Vybiratko {
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.system_typ_jednotky.text
+                override val popis get() = Strings.system_typ_jednotky.toText()
                 override val moznosti
                     get() = { _: Stranka ->
                         listOf(
-                            Strings.zadna.text,
-                            Plain("RegulusBOX"),
-                            Plain("EcoZenith i360"),
-                            Plain("EcoZenith i250"),
+                            Strings.zadna.toText(),
+                            "RegulusBOX".toText(),
+                            "EcoZenith i360".toText(),
+                            "EcoZenith i250".toText(),
                         )
                     }
             }
 
             @Serializable
             data class TypNadrze(
-                override val vybrano1: Text = Strings.zadna.text,
-                override val vybrano2: Text = Plain(""),
+                override val vybrano1: Text = Strings.zadna.toText(),
+                override val vybrano2: Text = "".toText(),
             ) : DvojVybiratko {
-                override val popis get() = Strings.system_nadrz_typ.text
+                override val popis get() = Strings.system_nadrz_typ.toText()
                 override val moznosti1
                     get() = { _: Stranka ->
                         listOf(
-                            Strings.zadna.text,
-                            Plain("DUO"),
-                            Plain("HSK"),
-                            Plain("PS"),
+                            Strings.zadna.toText(),
+                            "DUO".toText(),
+                            "HSK".toText(),
+                            "PS".toText(),
                         )
                     }
                 override val moznosti2
                     get() = { it: Stranka ->
                         when ((it as System).typNadrze.vybrano1) {
-                            Plain("DUO") -> listOf(
-                                Plain("-"),
-                                Plain("P"),
-                                Plain("PR"),
-                                Plain("K"),
-                                Plain("K P"),
-                                Plain("K PR"),
+                            "DUO".toText() -> listOf(
+                                "-".toText(),
+                                "P".toText(),
+                                "PR".toText(),
+                                "K".toText(),
+                                "K P".toText(),
+                                "K PR".toText(),
                             )
 
-                            Plain("HSK") -> listOf(
-                                Plain("P"),
-                                Plain("PR"),
-                                Plain("PV"),
+                            "HSK".toText() -> listOf(
+                                "P".toText(),
+                                "PR".toText(),
+                                "PV".toText(),
                             )
 
-                            Plain("PS") -> listOf(
-                                Plain("E+"),
-                                Plain("ES+"),
-                                Plain("N+"),
-                                Plain("K+"),
-                                Plain("2F"),
-                                Plain("WF"),
+                            "PS".toText() -> listOf(
+                                "E+".toText(),
+                                "ES+".toText(),
+                                "N+".toText(),
+                                "K+".toText(),
+                                "2F".toText(),
+                                "WF".toText(),
                             )
 
                             else -> emptyList()
@@ -638,32 +636,32 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.system_nadrz_objem.text
-                override val suffix get() = Strings.dm3.text
+                override val popis get() = Strings.system_nadrz_objem.toText()
+                override val suffix get() = Strings.dm3.toText()
                 override val zobrazit
                     get() = { it: Stranka ->
-                        (it as System).typNadrze.vybrano1 != Strings.zadna.text
+                        (it as System).typNadrze.vybrano1 != Strings.zadna.toText()
                     }
             }
 
             @Serializable
             data class TypZasobniku(
-                override val vybrano: Text = Strings.zadny.text,
+                override val vybrano: Text = Strings.zadny.toText(),
             ) : Vybiratko {
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.system_zasobnik_typ.text
+                override val popis get() = Strings.system_zasobnik_typ.toText()
                 override val moznosti
                     get() = { _: Stranka ->
                         listOf(
-                            Strings.zadny.text,
-                            Plain("RDC"),
-                            Plain("R2DC"),
-                            Plain("R0BC"),
-                            Plain("RBC"),
-                            Plain("RBC HP"),
-                            Plain("R2BC"),
-                            Plain("NBC"),
-                            Plain("RGC"),
+                            Strings.zadny.toText(),
+                            "RDC".toText(),
+                            "R2DC".toText(),
+                            "R0BC".toText(),
+                            "RBC".toText(),
+                            "RBC HP".toText(),
+                            "R2BC".toText(),
+                            "NBC".toText(),
+                            "RGC".toText(),
                         )
                     }
             }
@@ -673,27 +671,27 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.sytem_zasobnik_objem.text
-                override val suffix get() = Strings.dm3.text
+                override val popis get() = Strings.sytem_zasobnik_objem.toText()
+                override val suffix get() = Strings.dm3.toText()
                 override val zobrazit
                     get() = { it: Stranka ->
-                        (it as System).typZasobniku.vybrano != Strings.zadny.text
+                        (it as System).typZasobniku.vybrano != Strings.zadny.toText()
                     }
             }
 
             @Serializable
             data class OtopnySystem(
-                override val vybrano: Text = Strings.system_os_1okruh.text,
+                override val vybrano: Text = Strings.system_os_1okruh.toText(),
             ) : Vybiratko {
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.system_otopny_system.text
+                override val popis get() = Strings.system_otopny_system.toText()
                 override val moznosti
                     get() = { _: Stranka ->
                         listOf(
-                            Strings.system_os_1okruh.text,
-                            Strings.system_os_2okruhy.text,
-                            Strings.system_os_invertor.text,
-                            Strings.jiny.text,
+                            Strings.system_os_1okruh.toText(),
+                            Strings.system_os_2okruhy.toText(),
+                            Strings.system_os_invertor.toText(),
+                            Strings.jiny.toText(),
                         )
                     }
             }
@@ -703,7 +701,7 @@ data class Stranky(
                 override val zaskrtnuto: Boolean = false,
             ) : Zaskrtavatko {
                 override fun zaskrtnuto(zaskrtnuto: Boolean) = copy(zaskrtnuto = zaskrtnuto)
-                override val popis: Text get() = Strings.system_cirkulace.text
+                override val popis: Text get() = Strings.system_cirkulace.toText()
             }
 
             @Serializable
@@ -711,10 +709,10 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.poznamka.text
+                override val popis get() = Strings.poznamka.toText()
             }
 
-            override val nazev get() = Strings.system.text
+            override val nazev get() = Strings.system.toText()
             override val icon get() = Icons.Default.Category
             override val veci
                 get() = listOf(
@@ -764,20 +762,20 @@ data class Stranky(
                 override val zaskrtnuto: Boolean = false,
             ) : Zaskrtavatko {
                 override fun zaskrtnuto(zaskrtnuto: Boolean) = copy(zaskrtnuto = zaskrtnuto)
-                override val popis: Text get() = Strings.system_ohrev_bazenu.text
+                override val popis: Text get() = Strings.system_ohrev_bazenu.toText()
             }
 
             @Serializable
             data class DobaVyuzivani(
-                override val vybrano: Text = Strings.bazen_doba_celorocni.text,
+                override val vybrano: Text = Strings.bazen_doba_celorocni.toText(),
             ) : Vybiratko {
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.bazen_doba_uzivani.text
+                override val popis get() = Strings.bazen_doba_uzivani.toText()
                 override val moznosti
                     get() = { _: Stranka ->
                         listOf(
-                            Strings.bazen_doba_celorocni.text,
-                            Strings.bazen_doba_sezonni.text,
+                            Strings.bazen_doba_celorocni.toText(),
+                            Strings.bazen_doba_sezonni.toText(),
                         )
                     }
                 override val zobrazit get() = { it: Stranka -> (it as Bazen).chciBazen.zaskrtnuto }
@@ -785,15 +783,15 @@ data class Stranky(
 
             @Serializable
             data class Umisteni(
-                override val vybrano: Text = Strings.bazen_umisteni_venkovni.text,
+                override val vybrano: Text = Strings.bazen_umisteni_venkovni.toText(),
             ) : Vybiratko {
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.bazen_umisteni.text
+                override val popis get() = Strings.bazen_umisteni.toText()
                 override val moznosti
                     get() = { _: Stranka ->
                         listOf(
-                            Strings.bazen_umisteni_venkovni.text,
-                            Strings.bazen_umisteni_vnitrni.text,
+                            Strings.bazen_umisteni_venkovni.toText(),
+                            Strings.bazen_umisteni_vnitrni.toText(),
                         )
                     }
                 override val zobrazit get() = { it: Stranka -> (it as Bazen).chciBazen.zaskrtnuto }
@@ -801,15 +799,15 @@ data class Stranky(
 
             @Serializable
             data class DruhVody(
-                override val vybrano: Text = Strings.bazen_druh_sladka.text,
+                override val vybrano: Text = Strings.bazen_druh_sladka.toText(),
             ) : Vybiratko {
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.bazen_druh_vody.text
+                override val popis get() = Strings.bazen_druh_vody.toText()
                 override val moznosti
                     get() = { _: Stranka ->
                         listOf(
-                            Strings.bazen_druh_sladka.text,
-                            Strings.bazen_druh_slana.text,
+                            Strings.bazen_druh_sladka.toText(),
+                            Strings.bazen_druh_slana.toText(),
                         )
                     }
                 override val zobrazit get() = { it: Stranka -> (it as Bazen).chciBazen.zaskrtnuto }
@@ -817,16 +815,16 @@ data class Stranky(
 
             @Serializable
             data class Tvar(
-                override val vybrano: Text = Strings.bazen_tvar_obdelnikovy.text,
+                override val vybrano: Text = Strings.bazen_tvar_obdelnikovy.toText(),
             ) : Vybiratko {
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.bazen_tvar.text
+                override val popis get() = Strings.bazen_tvar.toText()
                 override val moznosti
                     get() = { _: Stranka ->
                         listOf(
-                            Strings.bazen_tvar_obdelnikovy.text,
-                            Strings.bazen_tvar_ovalny.text,
-                            Strings.bazen_tvar_kruhovy.text,
+                            Strings.bazen_tvar_obdelnikovy.toText(),
+                            Strings.bazen_tvar_ovalny.toText(),
+                            Strings.bazen_tvar_kruhovy.toText(),
                         )
                     }
                 override val zobrazit get() = { it: Stranka -> (it as Bazen).chciBazen.zaskrtnuto }
@@ -837,11 +835,11 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.bazen_delka.text
-                override val suffix get() = Strings.m.text
+                override val popis get() = Strings.bazen_delka.toText()
+                override val suffix get() = Strings.m.toText()
                 override val zobrazit
                     get() = { it: Stranka ->
-                        (it as Bazen).chciBazen.zaskrtnuto && it.tvar.vybrano != R.string.bazen_tvar_kruhovy.text
+                        (it as Bazen).chciBazen.zaskrtnuto && it.tvar.vybrano != R.string.bazen_tvar_kruhovy.toText()
                     }
             }
 
@@ -850,11 +848,11 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.bazen_sirka.text
-                override val suffix get() = Strings.m.text
+                override val popis get() = Strings.bazen_sirka.toText()
+                override val suffix get() = Strings.m.toText()
                 override val zobrazit
                     get() = { it: Stranka ->
-                        (it as Bazen).chciBazen.zaskrtnuto && it.tvar.vybrano != R.string.bazen_tvar_kruhovy.text
+                        (it as Bazen).chciBazen.zaskrtnuto && it.tvar.vybrano != R.string.bazen_tvar_kruhovy.toText()
                     }
             }
 
@@ -863,11 +861,11 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.bazen_radius.text
-                override val suffix get() = Strings.m.text
+                override val popis get() = Strings.bazen_radius.toText()
+                override val suffix get() = Strings.m.toText()
                 override val zobrazit
                     get() = { it: Stranka ->
-                        (it as Bazen).chciBazen.zaskrtnuto && it.tvar.vybrano == R.string.bazen_tvar_kruhovy.text
+                        (it as Bazen).chciBazen.zaskrtnuto && it.tvar.vybrano == R.string.bazen_tvar_kruhovy.toText()
                     }
             }
 
@@ -876,24 +874,24 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.bazen_hloubka.text
-                override val suffix get() = Strings.m.text
+                override val popis get() = Strings.bazen_hloubka.toText()
+                override val suffix get() = Strings.m.toText()
                 override val zobrazit get() = { it: Stranka -> (it as Bazen).chciBazen.zaskrtnuto }
             }
 
             @Serializable
             data class Zakryti(
-                override val vybrano: Text = Strings.zadne.text,
+                override val vybrano: Text = Strings.zadne.toText(),
             ) : Vybiratko {
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.bazen_zakryti.text
+                override val popis get() = Strings.bazen_zakryti.toText()
                 override val moznosti
                     get() = { _: Stranka ->
                         listOf(
-                            Strings.zadne.text,
-                            Strings.bazen_zakryti_pevna.text,
-                            Strings.bazen_zakryti_polykarbonat.text,
-                            Strings.jine.text,
+                            Strings.zadne.toText(),
+                            Strings.bazen_zakryti_pevna.toText(),
+                            Strings.bazen_zakryti_polykarbonat.toText(),
+                            Strings.jine.toText(),
                         )
                     }
                 override val zobrazit get() = { it: Stranka -> (it as Bazen).chciBazen.zaskrtnuto }
@@ -904,8 +902,8 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis = Strings.bazen_teplota.text
-                override val suffix = Strings.stupen_c.text
+                override val popis = Strings.bazen_teplota.toText()
+                override val suffix = Strings.stupen_c.toText()
                 override val zobrazit get() = { it: Stranka -> (it as Bazen).chciBazen.zaskrtnuto }
             }
 
@@ -914,10 +912,10 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.poznamka.text
+                override val popis get() = Strings.poznamka.toText()
             }
 
-            override val nazev get() = Strings.bazen.text
+            override val nazev get() = Strings.bazen.toText()
             override val icon get() = Icons.Default.Pool
             override val veci
                 get() = listOf(
@@ -974,56 +972,56 @@ data class Stranky(
             @Serializable
             data class TopneTelesoVNadrziTopeni(
                 override val zaskrtnuto: Boolean = false,
-                override val vybrano: Text = Strings.zdroje_stavajici.text,
+                override val vybrano: Text = Strings.zdroje_stavajici.toText(),
             ) : ZaskrtavatkoSVybiratkem {
                 override fun zaskrtnuto(zaskrtnuto: Boolean) = copy(zaskrtnuto = zaskrtnuto)
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.zdroje_topne_teleso.text
+                override val popis get() = Strings.zdroje_topne_teleso.toText()
                 override val moznosti
                     get() = { _: Stranka ->
-                        listOf(Strings.zdroje_stavajici.text, Strings.zdroje_nove.text)
+                        listOf(Strings.zdroje_stavajici.toText(), Strings.zdroje_nove.toText())
                     }
             }
 
             @Serializable
             data class ElektrokotelTopeni(
                 override val zaskrtnuto: Boolean = false,
-                override val vybrano: Text = Strings.zdroje_stavajici.text,
+                override val vybrano: Text = Strings.zdroje_stavajici.toText(),
             ) : ZaskrtavatkoSVybiratkem {
                 override fun zaskrtnuto(zaskrtnuto: Boolean) = copy(zaskrtnuto = zaskrtnuto)
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.zdroje_elektrokotel.text
+                override val popis get() = Strings.zdroje_elektrokotel.toText()
                 override val moznosti
                     get() = { _: Stranka ->
-                        listOf(Strings.zdroje_stavajici.text, Strings.zdroje_novy.text)
+                        listOf(Strings.zdroje_stavajici.toText(), Strings.zdroje_novy.toText())
                     }
             }
 
             @Serializable
             data class PlynovyKotelTopeni(
                 override val zaskrtnuto: Boolean = false,
-                override val vybrano: Text = Strings.zdroje_stavajici.text,
+                override val vybrano: Text = Strings.zdroje_stavajici.toText(),
             ) : ZaskrtavatkoSVybiratkem {
                 override fun zaskrtnuto(zaskrtnuto: Boolean) = copy(zaskrtnuto = zaskrtnuto)
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.zdroje_plyn_kotel.text
+                override val popis get() = Strings.zdroje_plyn_kotel.toText()
                 override val moznosti
                     get() = { _: Stranka ->
-                        listOf(Strings.zdroje_stavajici.text, Strings.zdroje_novy.text)
+                        listOf(Strings.zdroje_stavajici.toText(), Strings.zdroje_novy.toText())
                     }
             }
 
             @Serializable
             data class KrbTopeni(
                 override val zaskrtnuto: Boolean = false,
-                override val vybrano: Text = Strings.zdroje_stavajici.text,
+                override val vybrano: Text = Strings.zdroje_stavajici.toText(),
             ) : ZaskrtavatkoSVybiratkem {
                 override fun zaskrtnuto(zaskrtnuto: Boolean) = copy(zaskrtnuto = zaskrtnuto)
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.zdroje_krb.text
+                override val popis get() = Strings.zdroje_krb.toText()
                 override val moznosti
                     get() = { _: Stranka ->
-                        listOf(Strings.zdroje_stavajici.text, Strings.zdroje_novy.text)
+                        listOf(Strings.zdroje_stavajici.toText(), Strings.zdroje_novy.toText())
                     }
             }
 
@@ -1032,20 +1030,20 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.jiny.text
+                override val popis get() = Strings.jiny.toText()
             }
 
             @Serializable
             data class TopneTelesoVNadrziTeplaVoda(
                 override val zaskrtnuto: Boolean = false,
-                override val vybrano: Text = Strings.zdroje_tv_do_zasuvky.text,
+                override val vybrano: Text = Strings.zdroje_tv_do_zasuvky.toText(),
             ) : ZaskrtavatkoSVybiratkem {
                 override fun zaskrtnuto(zaskrtnuto: Boolean) = copy(zaskrtnuto = zaskrtnuto)
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.zdroje_topne_teleso.text
+                override val popis get() = Strings.zdroje_topne_teleso.toText()
                 override val moznosti
                     get() = { _: Stranka ->
-                        listOf(Strings.zdroje_tv_do_zasuvky.text, Strings.zdroje_tv_z_regulace.text)
+                        listOf(Strings.zdroje_tv_do_zasuvky.toText(), Strings.zdroje_tv_z_regulace.toText())
                     }
             }
 
@@ -1054,7 +1052,7 @@ data class Stranky(
                 override val zaskrtnuto: Boolean = false,
             ) : Zaskrtavatko {
                 override fun zaskrtnuto(zaskrtnuto: Boolean) = copy(zaskrtnuto = zaskrtnuto)
-                override val popis get() = Strings.zdroje_elektrokotel.text
+                override val popis get() = Strings.zdroje_elektrokotel.toText()
             }
 
             @Serializable
@@ -1062,7 +1060,7 @@ data class Stranky(
                 override val zaskrtnuto: Boolean = false,
             ) : Zaskrtavatko {
                 override fun zaskrtnuto(zaskrtnuto: Boolean) = copy(zaskrtnuto = zaskrtnuto)
-                override val popis get() = Strings.zdroje_plyn_kotel.text
+                override val popis get() = Strings.zdroje_plyn_kotel.toText()
             }
 
             @Serializable
@@ -1070,7 +1068,7 @@ data class Stranky(
                 override val zaskrtnuto: Boolean = false,
             ) : Zaskrtavatko {
                 override fun zaskrtnuto(zaskrtnuto: Boolean) = copy(zaskrtnuto = zaskrtnuto)
-                override val popis get() = Strings.zdroje_krb.text
+                override val popis get() = Strings.zdroje_krb.toText()
             }
 
             @Serializable
@@ -1078,7 +1076,7 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.jiny.text
+                override val popis get() = Strings.jiny.toText()
             }
 
             @Serializable
@@ -1086,15 +1084,15 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.poznamka.text
+                override val popis get() = Strings.poznamka.toText()
             }
 
-            override val nazev get() = Strings.zdroje.text
+            override val nazev get() = Strings.zdroje.toText()
             override val icon get() = Icons.Default.AcUnit
             override val veci
                 get() = listOf(
                     listOf(
-                        Nadpis(R.string.zdroje_top.text),
+                        Nadpis(R.string.zdroje_top.toText()),
                         topneTelesoVNadrziTopeni,
                         elektrokotelTopeni,
                         plynovyKotelTopeni,
@@ -1102,7 +1100,7 @@ data class Stranky(
                         jinyTopeni
                     ),
                     listOf(
-                        Nadpis(R.string.zdroje_tv.text),
+                        Nadpis(R.string.zdroje_tv.toText()),
                         topneTelesoVNadrziTeplaVoda,
                         elektrokotelTeplaVoda,
                         plynovyKotelTeplaVoda,
@@ -1135,70 +1133,70 @@ data class Stranky(
             @Serializable
             data class Hadice(
                 override val zaskrtnuto: Boolean = false,
-                override val vybrano: Text = Plain("300 mm"),
+                override val vybrano: Text = "300 mm".toText(),
             ) : ZaskrtavatkoSVybiratkem {
                 override fun zaskrtnuto(zaskrtnuto: Boolean) = copy(zaskrtnuto = zaskrtnuto)
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.prislusenstvi_hadice.text
+                override val popis get() = Strings.prislusenstvi_hadice.toText()
                 override val moznosti
                     get() = { _: Stranka ->
-                        listOf(Plain("300 mm"), Plain("500 mm"), Plain("700 mm"), Plain("1000 mm"))
+                        listOf("300 mm".toText(), "500 mm".toText(), "700 mm".toText(), "1000 mm".toText())
                     }
             }
 
             @Serializable
             data class TopnyKabel(
                 override val zaskrtnuto: Boolean = false,
-                override val vybrano: Text = Plain("3,5 m"),
+                override val vybrano: Text = "3,5 m".toText(),
             ) : ZaskrtavatkoSVybiratkem {
                 override fun zaskrtnuto(zaskrtnuto: Boolean) = copy(zaskrtnuto = zaskrtnuto)
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.prislusenstvi_topny_kabel.text
+                override val popis get() = Strings.prislusenstvi_topny_kabel.toText()
                 override val moznosti
                     get() = { _: Stranka ->
-                        listOf(Plain("3,5 m"), Plain("5 m"))
+                        listOf("3,5 m".toText(), "5 m".toText())
                     }
             }
 
             @Serializable
             data class DrzakNaStenu(
                 override val zaskrtnuto: Boolean = false,
-                override val vybrano: Text = Strings.na_stenu.text,
+                override val vybrano: Text = Strings.na_stenu.toText(),
             ) : ZaskrtavatkoSVybiratkem {
                 override fun zaskrtnuto(zaskrtnuto: Boolean) = copy(zaskrtnuto = zaskrtnuto)
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.prislusenstvi_drzak_pro_tc.text
+                override val popis get() = Strings.prislusenstvi_drzak_pro_tc.toText()
                 override val moznosti
                     get() = { _: Stranka ->
-                        listOf(Strings.na_stenu.text, Strings.na_izolovanou_stenu.text)
+                        listOf(Strings.na_stenu.toText(), Strings.na_izolovanou_stenu.toText())
                     }
             }
 
             @Serializable
             data class PokojovaJednotka(
                 override val zaskrtnuto: Boolean = false,
-                override val vybrano: Text = Plain("RCD"),
+                override val vybrano: Text = "RCD".toText(),
             ) : ZaskrtavatkoSVybiratkem {
                 override fun zaskrtnuto(zaskrtnuto: Boolean) = copy(zaskrtnuto = zaskrtnuto)
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.prislusenstvi_pokojova_jednotka.text
+                override val popis get() = Strings.prislusenstvi_pokojova_jednotka.toText()
                 override val moznosti
                     get() = { _: Stranka ->
-                        listOf(Plain("RCD"), Plain("RC 25"))
+                        listOf("RCD".toText(), "RC 25".toText())
                     }
             }
 
             @Serializable
             data class PokojoveCidlo(
                 override val zaskrtnuto: Boolean = false,
-                override val vybrano: Text = Plain("RS 10"),
+                override val vybrano: Text = "RS 10".toText(),
             ) : ZaskrtavatkoSVybiratkem {
                 override fun zaskrtnuto(zaskrtnuto: Boolean) = copy(zaskrtnuto = zaskrtnuto)
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
-                override val popis get() = Strings.prislusenstvi_pokojove_cidlo.text
+                override val popis get() = Strings.prislusenstvi_pokojove_cidlo.toText()
                 override val moznosti
                     get() = { _: Stranka ->
-                        listOf(Plain("RS 10"), Plain("RSW 30"))
+                        listOf("RS 10".toText(), "RSW 30".toText())
                     }
             }
 
@@ -1207,10 +1205,10 @@ data class Stranky(
                 override val text: String = "",
             ) : Pisatko {
                 override fun text(text: String) = copy(text = text)
-                override val popis get() = Strings.poznamka.text
+                override val popis get() = Strings.poznamka.toText()
             }
 
-            override val nazev get() = Strings.prislusenstvi.text
+            override val nazev get() = Strings.prislusenstvi.toText()
             override val icon get() = Icons.Default.AddShoppingCart
             override val veci
                 get() = listOf(

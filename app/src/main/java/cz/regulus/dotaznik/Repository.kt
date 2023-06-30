@@ -51,7 +51,7 @@ class Repository(
 
     val lidi = remoteConfigLoaded.map {
         println(it)
-        Json.decodeFromString<List<Clovek>>(remoteConfig["lidi"].asString()).also { println(it) }
+        Json.decodeFromString<List<Zamestnanec>>(remoteConfig["lidi"].asString()).also { println(it) }
     }
     val firmy = remoteConfigLoaded.map {
         Json.decodeFromString<List<Firma>>(remoteConfig["firmy"].asString())
@@ -65,7 +65,7 @@ class Repository(
         preferences[KEY_PRIHLASEN]?.let { Json.decodeFromString<PrihlasenState>(it) } ?: PrihlasenState.Odhasen
     }
 
-    suspend fun prihlasit(uzivatel: Clovek) {
+    suspend fun prihlasit(uzivatel: Uzivatel) {
         prefs.edit {
             it[KEY_PRIHLASEN] = Json.encodeToString<PrihlasenState>(PrihlasenState.Prihlasen(uzivatel))
         }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -47,7 +48,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import cz.regulus.dotaznik.Clovek
+import cz.regulus.dotaznik.Uzivatel
+import cz.regulus.dotaznik.Zamestnanec
+import cz.regulus.dotaznik.vytvoritUzivatele
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -82,17 +85,22 @@ fun PrihlaseniSceen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun Prihlaseni(
-    zastupci: List<Clovek>,
-    zamestnanci: List<Clovek>,
+    zastupci: List<Zamestnanec>,
+    zamestnanci: List<Zamestnanec>,
     zamestanec: Boolean,
     zmenitJsemZamestnanec: (Boolean) -> Unit,
-    novyClovek: Clovek?,
-    upravitCloveka: ((Clovek?) -> Clovek?) -> Unit,
+    novyClovek: Uzivatel?,
+    upravitCloveka: ((Uzivatel?) -> Uzivatel?) -> Unit,
     potvrdit: (chyba: (Int) -> Unit) -> Unit,
     zrusit: () -> Unit,
 ) {
     val snackbarState = remember { SnackbarHostState() }
+    val resources = LocalContext.current.resources
+    val scope = rememberCoroutineScope()
     Scaffold(
+        Modifier
+            .imePadding()
+            .navigationBarsPadding(),
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -103,251 +111,9 @@ fun Prihlaseni(
         snackbarHost = {
             SnackbarHost(snackbarState)
         },
-    ) { paddingValues ->
-        if (zamestnanci.isEmpty()) LinearProgressIndicator(
-            Modifier
-                .fillMaxWidth()
-                .padding(paddingValues)
-        )
-        else Column(
-            Modifier
-                .padding(paddingValues)
-                .padding(all = 16.dp)
-                .fillMaxSize()
-                .imePadding(),
-        ) {
-            val resources = LocalContext.current.resources
-            val scope = rememberCoroutineScope()
-            Column(
-                Modifier
-                    .verticalScroll(rememberScrollState())
-                    .weight(1F)
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Surface(
-                    onClick = {
-                        zmenitJsemZamestnanec(true)
-                    },
-                    shape = CircleShape,
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = zamestanec,
-                            onClick = {
-                                zmenitJsemZamestnanec(true)
-                            },
-                        )
-                        Text(text = "Jsem zaměstnanec Regulusu")
-                    }
-                }
-                Surface(
-                    onClick = {
-                        zmenitJsemZamestnanec(false)
-                    },
-                    shape = CircleShape,
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = !zamestanec,
-                            onClick = {
-                                zmenitJsemZamestnanec(false)
-                            },
-                        )
-                        Text(text = "Nejsem zaměstnanec Regulusu")
-                    }
-                }
-                if (zamestanec) {
-                    val seznam = remember {
-                        listOf("") + zamestnanci.map { it.celeJmeno }
-                    }
-                    var expanded by rememberSaveable { mutableStateOf(false) }
-                    var vybrano by rememberSaveable { mutableStateOf(seznam.first()) }
-
-                    ExposedDropdownMenuBox(
-                        expanded = expanded,
-                        onExpandedChange = { expanded = !expanded },
-                        Modifier.padding(top = 8.dp),
-                    ) {
-                        OutlinedTextField(
-                            modifier = Modifier.menuAnchor(),
-                            readOnly = true,
-                            value = vybrano,
-                            onValueChange = {},
-                            label = { Text("Vyberte se") },
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                        )
-                        ExposedDropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false },
-                        ) {
-                            seznam.drop(1).forEach { moznost ->
-                                DropdownMenuItem(
-                                    text = { Text(moznost) },
-                                    onClick = {
-                                        upravitCloveka { clovek ->
-                                            zamestnanci.find { it.celeJmeno == moznost } ?: return@upravitCloveka clovek
-                                        }
-                                        vybrano = moznost
-                                        expanded = false
-                                    },
-                                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                                )
-                            }
-                        }
-                    }
-                    if (novyClovek != null) {
-                        Text(text = "Jméno a příjmení: ${novyClovek.celeJmeno}", Modifier.padding(top = 8.dp))
-                        Text(text = "Číslo KO: ${novyClovek.cislo}")
-                        Text(text = "Email: ${novyClovek.email}")
-                    }
-                } else {
-                    val seznam = remember {
-                        listOf("") + zastupci.map { it.celeJmeno }
-                    }
-                    var expanded by rememberSaveable { mutableStateOf(false) }
-                    var vybrano by rememberSaveable { mutableStateOf(seznam.first()) }
-
-                    ExposedDropdownMenuBox(
-                        expanded = expanded,
-                        onExpandedChange = { expanded = !expanded },
-                        Modifier.padding(top = 8.dp),
-                    ) {
-                        OutlinedTextField(
-                            modifier = Modifier.menuAnchor(),
-                            readOnly = true,
-                            value = vybrano,
-                            onValueChange = {},
-                            label = { Text("Váš obchodní zástupce") },
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                        )
-                        ExposedDropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false },
-                        ) {
-                            seznam.drop(1).forEach { moznost ->
-                                DropdownMenuItem(
-                                    text = { Text(moznost) },
-                                    onClick = {
-                                        upravitCloveka { clovek ->
-                                            zamestnanci.find { it.celeJmeno == moznost }?.copy(jmeno = "", prijmeni = "", email = "")
-                                                ?: clovek
-                                        }
-                                        vybrano = moznost
-                                        expanded = false
-                                    },
-                                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                                )
-                            }
-                        }
-                    }
-                    if (novyClovek != null) {
-                        Text(text = "Doplňte, prosím, ještě nějaké informace o Vás:", Modifier.padding(top = 8.dp))
-                        val focusManager = LocalFocusManager.current
-                        OutlinedTextField(
-                            value = novyClovek.jmeno,
-                            onValueChange = {
-                                upravitCloveka { clovek ->
-                                    clovek?.copy(jmeno = it)
-                                }
-                            },
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp),
-                            label = {
-                                Text(text = "Vaše jméno")
-                            },
-                            keyboardActions = KeyboardActions {
-                                focusManager.moveFocus(FocusDirection.Down)
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                imeAction = ImeAction.Next,
-                                keyboardType = KeyboardType.Text,
-                            ),
-                        )
-                        OutlinedTextField(
-                            value = novyClovek.prijmeni,
-                            onValueChange = {
-                                upravitCloveka { clovek ->
-                                    clovek?.copy(prijmeni = it)
-                                }
-                            },
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp),
-                            label = {
-                                Text(text = "Vaše příjmení")
-                            },
-                            keyboardActions = KeyboardActions {
-                                focusManager.moveFocus(FocusDirection.Down)
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                imeAction = ImeAction.Next,
-                                keyboardType = KeyboardType.Text,
-                            ),
-                        )
-                        OutlinedTextField(
-                            value = novyClovek.email,
-                            onValueChange = {
-                                upravitCloveka { clovek ->
-                                    clovek?.copy(email = it)
-                                }
-                            },
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp),
-                            label = {
-                                Text(text = "Váš email")
-                            },
-                            keyboardActions = KeyboardActions {
-                                focusManager.moveFocus(FocusDirection.Down)
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                imeAction = ImeAction.Next,
-                                keyboardType = KeyboardType.Email,
-                            ),
-                        )
-                        val keyboardController = LocalSoftwareKeyboardController.current
-                        OutlinedTextField(
-                            value = novyClovek.ico,
-                            onValueChange = {
-                                if (it.isBlank()) return@OutlinedTextField
-                                it.toIntOrNull() ?: return@OutlinedTextField
-                                upravitCloveka { clovek ->
-                                    clovek?.copy(ico = it.substring(0, it.length.coerceAtMost(8)))
-                                }
-                            },
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp),
-                            label = {
-                                Text(text = "Vaše IČO (nepovinné)")
-                            },
-                            keyboardActions = KeyboardActions {
-                                focusManager.clearFocus()
-                                keyboardController?.hide()
-                                potvrdit {
-                                    scope.launch {
-                                        snackbarState.showSnackbar(resources.getString(it))
-                                    }
-                                }
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                imeAction = ImeAction.Done,
-                                keyboardType = KeyboardType.Number,
-                            ),
-                        )
-                    }
-                }
-            }
+        bottomBar = {
             Row(
-                Modifier.fillMaxWidth()
+                Modifier.fillMaxWidth().padding(all = 8.dp)
             ) {
                 TextButton(
                     onClick = {
@@ -367,6 +133,240 @@ fun Prihlaseni(
                     }
                 ) {
                     Text(text = "OK")
+                }
+            }
+        }
+    ) { paddingValues ->
+        if (zamestnanci.isEmpty()) LinearProgressIndicator(
+            Modifier
+                .fillMaxWidth()
+                .padding(paddingValues)
+        )
+        else Column(
+            Modifier
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState())
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Surface(
+                onClick = {
+                    zmenitJsemZamestnanec(true)
+                },
+                shape = CircleShape,
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = zamestanec,
+                        onClick = {
+                            zmenitJsemZamestnanec(true)
+                        },
+                    )
+                    Text(text = "Jsem zaměstnanec Regulusu")
+                }
+            }
+            Surface(
+                onClick = {
+                    zmenitJsemZamestnanec(false)
+                },
+                shape = CircleShape,
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = !zamestanec,
+                        onClick = {
+                            zmenitJsemZamestnanec(false)
+                        },
+                    )
+                    Text(text = "Nejsem zaměstnanec Regulusu")
+                }
+            }
+            if (zamestanec) {
+                val seznam = remember {
+                    listOf("") + zamestnanci.map { it.celeJmeno }
+                }
+                var expanded by rememberSaveable { mutableStateOf(false) }
+                var vybrano by rememberSaveable { mutableStateOf(seznam.first()) }
+
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded },
+                    Modifier.padding(top = 8.dp),
+                ) {
+                    OutlinedTextField(
+                        modifier = Modifier.menuAnchor(),
+                        readOnly = true,
+                        value = vybrano,
+                        onValueChange = {},
+                        label = { Text("Vyberte se") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                    ) {
+                        seznam.drop(1).forEach { moznost ->
+                            DropdownMenuItem(
+                                text = { Text(moznost) },
+                                onClick = {
+                                    upravitCloveka { clovek ->
+                                        zamestnanci.find { it.celeJmeno == moznost }?.vytvoritUzivatele(true) ?: clovek
+                                    }
+                                    vybrano = moznost
+                                    expanded = false
+                                },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                            )
+                        }
+                    }
+                }
+                if (novyClovek != null) {
+                    Text(text = "Jméno a příjmení: ${novyClovek.celeJmeno}", Modifier.padding(top = 8.dp))
+                    Text(text = "Číslo KO: ${novyClovek.cisloKo}")
+                    Text(text = "Email: ${novyClovek.email}")
+                }
+            } else {
+                val seznam = remember {
+                    listOf("") + zastupci.map { it.celeJmeno }
+                }
+                var expanded by rememberSaveable { mutableStateOf(false) }
+                var vybrano by rememberSaveable { mutableStateOf(seznam.first()) }
+
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded },
+                    Modifier.padding(top = 8.dp),
+                ) {
+                    OutlinedTextField(
+                        modifier = Modifier.menuAnchor(),
+                        readOnly = true,
+                        value = vybrano,
+                        onValueChange = {},
+                        label = { Text("Váš obchodní zástupce") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                    ) {
+                        seznam.drop(1).forEach { moznost ->
+                            DropdownMenuItem(
+                                text = { Text(moznost) },
+                                onClick = {
+                                    upravitCloveka { clovek ->
+                                        zamestnanci.find { it.celeJmeno == moznost }?.vytvoritUzivatele(false) ?: clovek
+                                    }
+                                    vybrano = moznost
+                                    expanded = false
+                                },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                            )
+                        }
+                    }
+                }
+                if (novyClovek != null) {
+                    Text(text = "Doplňte, prosím, ještě nějaké informace o Vás:", Modifier.padding(top = 8.dp))
+                    val focusManager = LocalFocusManager.current
+                    OutlinedTextField(
+                        value = novyClovek.jmeno,
+                        onValueChange = {
+                            upravitCloveka { clovek ->
+                                clovek?.copy(jmeno = it)
+                            }
+                        },
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        label = {
+                            Text(text = "Vaše jméno")
+                        },
+                        keyboardActions = KeyboardActions {
+                            focusManager.moveFocus(FocusDirection.Down)
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Next,
+                            keyboardType = KeyboardType.Text,
+                        ),
+                    )
+                    OutlinedTextField(
+                        value = novyClovek.prijmeni,
+                        onValueChange = {
+                            upravitCloveka { clovek ->
+                                clovek?.copy(prijmeni = it)
+                            }
+                        },
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        label = {
+                            Text(text = "Vaše příjmení")
+                        },
+                        keyboardActions = KeyboardActions {
+                            focusManager.moveFocus(FocusDirection.Down)
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Next,
+                            keyboardType = KeyboardType.Text,
+                        ),
+                    )
+                    OutlinedTextField(
+                        value = novyClovek.email,
+                        onValueChange = {
+                            upravitCloveka { clovek ->
+                                clovek?.copy(email = it)
+                            }
+                        },
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        label = {
+                            Text(text = "Váš email")
+                        },
+                        keyboardActions = KeyboardActions {
+                            focusManager.moveFocus(FocusDirection.Down)
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Next,
+                            keyboardType = KeyboardType.Email,
+                        ),
+                    )
+                    val keyboardController = LocalSoftwareKeyboardController.current
+                    OutlinedTextField(
+                        value = novyClovek.ico,
+                        onValueChange = {
+                            if (it.isBlank()) return@OutlinedTextField
+                            it.toIntOrNull() ?: return@OutlinedTextField
+                            upravitCloveka { clovek ->
+                                clovek?.copy(ico = it.substring(0, it.length.coerceAtMost(8)))
+                            }
+                        },
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        label = {
+                            Text(text = "Vaše IČO (nepovinné)")
+                        },
+                        keyboardActions = KeyboardActions {
+                            focusManager.clearFocus()
+                            keyboardController?.hide()
+                            potvrdit {
+                                scope.launch {
+                                    snackbarState.showSnackbar(resources.getString(it))
+                                }
+                            }
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Number,
+                        ),
+                    )
                 }
             }
         }

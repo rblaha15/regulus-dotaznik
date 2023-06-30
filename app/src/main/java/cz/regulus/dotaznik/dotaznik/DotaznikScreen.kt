@@ -1,42 +1,75 @@
 package cz.regulus.dotaznik.dotaznik
 
+import android.animation.TimeInterpolator
+import android.view.animation.AnticipateOvershootInterpolator
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FloatTweenSpec
+import androidx.compose.animation.core.VectorizedFloatAnimationSpec
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.WifiOff
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,15 +80,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.regulus.dotaznik.R
+import cz.regulus.dotaznik.Firma
 import cz.regulus.dotaznik.Stranky
+import cz.regulus.dotaznik.composeString
+import cz.regulus.dotaznik.toText
+import cz.regulus.dotaznik.Text.Mix
+import cz.regulus.dotaznik.Text.Plain
+import cz.regulus.dotaznik.Uzivatel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import java.text.Normalizer
 
 @Composable
 @Destination
@@ -64,10 +111,18 @@ fun DotaznikScreen() {
     val viewModel = koinViewModel<DotaznikViewModel>()
 
     val stranky by viewModel.stranky.collectAsStateWithLifecycle()
+    val firmy by viewModel.firmy.collectAsStateWithLifecycle()
+    val prihlasen by viewModel.prihlasen.collectAsStateWithLifecycle()
+    val odesilaniState by viewModel.odesilaniState.collectAsStateWithLifecycle()
 
     Dotaznik(
         stranky = stranky,
+        firmy = firmy,
         upravitStranky = viewModel::upravitStranky,
+        odhlasit = viewModel::odhlasit,
+        uzivatel = prihlasen,
+        odesilaniState = odesilaniState,
+        zmenitState = viewModel::zmenitState,
     )
 }
 
@@ -75,7 +130,12 @@ fun DotaznikScreen() {
 @Composable
 fun Dotaznik(
     stranky: Stranky,
+    firmy: List<Firma>,
     upravitStranky: (Stranky) -> Unit,
+    odhlasit: () -> Unit,
+    uzivatel: Uzivatel?,
+    odesilaniState: OdesilaniState,
+    zmenitState: (positive: Boolean) -> Unit,
 ) {
     val pagerState = rememberPagerState()
     val drawerState = rememberDrawerState(DrawerValue.Open)
@@ -83,34 +143,244 @@ fun Dotaznik(
     ModalNavigationDrawer(
         drawerContent = {
             ModalDrawerSheet {
-                stranky.vse.forEachIndexed { i, stranka ->
+                if (uzivatel == null) {
+                    Text(R.string.nejste_prihlaseni.toText().composeString(), Modifier.padding(all = 8.dp))
+                } else {
+                    Text(
+                        text = Mix(R.string.prihlaseni_jmeno_prijmeni.toText(), " ".toText(), uzivatel.celeJmeno.toText()).composeString(),
+                        Modifier
+                            .padding(horizontal = 8.dp)
+                            .padding(top = 8.dp)
+                    )
+                    Text(
+                        text = Mix(R.string.prihlaseni_email.toText(), " ".toText(), uzivatel.email.toText()).composeString(),
+                        Modifier
+                            .padding(horizontal = 8.dp)
+                            .padding(top = 8.dp)
+                    )
+                    if (uzivatel.ico.isNotBlank()) Text(
+                        text = Mix(R.string.prihlaseni_ico.toText(), " ".toText(), uzivatel.ico.toText()).composeString(),
+                        Modifier
+                            .padding(horizontal = 8.dp)
+                            .padding(top = 8.dp)
+                    )
+                    Text(
+                        text = Mix(R.string.prihlaseni_kod.toText(), " ".toText(), uzivatel.cisloKo.toText()).composeString(),
+                        Modifier
+                            .padding(horizontal = 8.dp)
+                            .padding(vertical = 8.dp)
+                    )
+
+                    Divider(Modifier.fillMaxWidth())
+
+                    stranky.vse.forEachIndexed { i, stranka ->
+                        NavigationDrawerItem(
+                            label = {
+                                Text(stranka.nazev.composeString())
+                            },
+                            selected = pagerState.currentPage == i,
+                            onClick = {
+                                scope.launch {
+                                    drawerState.close()
+                                    pagerState.animateScrollToPage(i)
+                                }
+                            },
+                            Modifier.padding(all = 8.dp),
+                            icon = {
+                                Icon(stranka.icon, stranka.nazev.composeString())
+                            },
+                        )
+                    }
+
+                    Divider(Modifier.fillMaxWidth())
+
+                    val posun = remember {
+                        Animatable(0F)
+                    }
+
                     NavigationDrawerItem(
                         label = {
-                            Text(stranka.nazev.asString())
+                            Text(R.string.odeslat.toText().composeString(), Modifier.padding(ButtonDefaults.ButtonWithIconContentPadding))
                         },
-                        selected = pagerState.currentPage == i,
+                        selected = false,
                         onClick = {
                             scope.launch {
+                                posun.animateTo(2500F, FloatTweenSpec(400, 0, FastOutLinearInEasing))
                                 drawerState.close()
-                                pagerState.animateScrollToPage(i)
+                                posun.snapTo(0F)
                             }
+                            zmenitState(true)
                         },
                         Modifier.padding(all = 8.dp),
                         icon = {
-                            Icon(stranka.icon, stranka.nazev.asString())
+                            Icon(Icons.Default.Send, null, Modifier.offset {
+                                IntOffset(x = posun.value.toDp().value.toInt(), y = 0)
+                            })
                         },
+                        colors = NavigationDrawerItemDefaults.colors(
+                            unselectedContainerColor = MaterialTheme.colorScheme.primary,
+                            unselectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
                     )
+
+                    TextButton(
+                        onClick = {
+                            odhlasit()
+                        },
+                        Modifier.padding(all = 8.dp),
+                    ) {
+                        Text(R.string.odhlasit_se.toText().composeString())
+                    }
                 }
             }
         },
         drawerState = drawerState,
     ) {
+        when(odesilaniState) {
+            OdesilaniState.Nic -> Unit
+            is OdesilaniState.OpravduOdeslat -> AlertDialog(
+                onDismissRequest = {
+                    zmenitState(false)
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            zmenitState(true)
+                        }
+                    ) {
+                        Text(R.string.ano.toText().composeString())
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            zmenitState(false)
+                        }
+                    ) {
+                        Text(R.string.ne.toText().composeString())
+                    }
+                },
+                title = {
+                    Text(text = R.string.export_chcete_odeslat.toText().composeString())
+                },
+                icon = {
+                    Icon(Icons.Default.Send, null)
+                },
+                text = {
+                    Text(text = R.string.export_opravdu_chcete_odeslat_na.toText(odesilaniState.email).composeString())
+                },
+            )
+            OdesilaniState.Odesilani -> AlertDialog(
+                onDismissRequest = {},
+                confirmButton = {},
+                dismissButton = {},
+                title = {
+                    Text(text = R.string.export_odesilani.toText().composeString())
+                },
+                icon = {},
+                text = {
+                    CircularProgressIndicator()
+                },
+            )
+            OdesilaniState.UspechAOdstranitData -> AlertDialog(
+                onDismissRequest = {
+                    zmenitState(false)
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            zmenitState(true)
+                        }
+                    ) {
+                        Text(R.string.ano.toText().composeString())
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            zmenitState(false)
+                        }
+                    ) {
+                        Text(R.string.ne.toText().composeString())
+                    }
+                },
+                title = {
+                    Text(text = R.string.export_email_uspesne_odeslan.toText().composeString())
+                },
+                icon = {
+                    Icon(Icons.Default.Check, null)
+                },
+                text = {
+                    Text(text = R.string.export_opravdu_odstranit_data.toText().composeString())
+                },
+            )
+            OdesilaniState.Error.Offline -> AlertDialog(
+                onDismissRequest = {
+                    zmenitState(false)
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            zmenitState(false)
+                        }
+                    ) {
+                        Text(R.string.ok.toText().composeString())
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            zmenitState(true)
+                        }
+                    ) {
+                        Text(R.string.podrobnejsi_info.toText().composeString())
+                    }
+                },
+                title = {
+                    Text(text = R.string.export_email_neodeslan.toText("").composeString())
+                },
+                icon = {
+                    Icon(Icons.Default.WifiOff, null)
+                },
+                text = {
+                    Text(text = R.string.export_nejste_pripojeni.toText().composeString())
+                },
+            )
+            is OdesilaniState.Error.Podrobne -> AlertDialog(
+                onDismissRequest = {
+                    zmenitState(false)
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            zmenitState(false)
+                        }
+                    ) {
+                        Text(R.string.ok.toText().composeString())
+                    }
+                },
+                title = {
+                    Text(text = R.string.export_email_neodeslan.toText(R.string.toto_je_chyba.toText().composeString()).composeString())
+                },
+                icon = {
+                    Icon(Icons.Default.ErrorOutline, null)
+                },
+                text = {
+                    Text(text = odesilaniState.error)
+                },
+            )
+        }
+
         val aktualniStranka = remember(pagerState.currentPage) { stranky.vse[pagerState.currentPage] }
         Scaffold(
+            Modifier
+                .imePadding()
+                .navigationBarsPadding(),
             topBar = {
                 CenterAlignedTopAppBar(
                     title = {
-                        Text(aktualniStranka.nazev.asString())
+                        Text(aktualniStranka.nazev.composeString())
                     },
                     navigationIcon = {
                         IconButton(
@@ -124,67 +394,94 @@ fun Dotaznik(
                         }
                     }
                 )
-            }
+            },
         ) { paddingValues ->
             HorizontalPager(
                 pageCount = stranky.vse.size,
-                Modifier.padding(paddingValues)
-                    .imePadding(),
+                Modifier
+                    .padding(paddingValues),
                 state = pagerState
             ) { i ->
-                Stranka(
-                    stranka = stranky.vse[i],
-                    upravitStranku = { novaStranka ->
-                        upravitStranky(stranky.kopirovatStranku(novaStranka))
-                    }
-                )
-            }
-        }
-    }
-}
+                Scaffold(
+                    floatingActionButton = {
+                        val posun = remember {
+                            Animatable(0F)
+                        }
+                        if (i == stranky.vse.lastIndex) {
+                            FloatingActionButton(
+                                onClick = {
+                                    scope.launch {
+                                        posun.animateTo(500F, FloatTweenSpec(800, 0, AnticipateOvershootInterpolator().toEasing()))
+                                        pagerState.animateScrollToPage(0)
+                                        posun.snapTo(0F)
+                                    }
+                                    zmenitState(true)
+                                },
+                                Modifier
+                                    .offset {
+                                        IntOffset(x = posun.value.toDp().value.toInt(), y = 0)
+                                    }
+                                    .padding(bottom = OutlinedTextFieldDefaults.MinHeight),
+                            ) {
+                                Icon(Icons.Default.Send, R.string.odeslat.toText().composeString())
+                            }
+                        }
+                    },
+                ) { paddingValues1 ->
+                    Column(
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues1)
+                    ) {
+                        val stranka by remember(stranky.vse, i) {
+                            derivedStateOf {
+                                stranky.vse[i]
+                            }
+                        }
+                        Column(
+                            Modifier
+                                .weight(1F)
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            stranka.veci.dropLast(1).forEachIndexed { i, veci ->
+                                veci.forEach { vec ->
+                                    Surface(
+                                        Modifier.fillMaxWidth(),
+                                        color = if (i % 2 == 0) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant,
+                                    ) {
+                                        Vec(
+                                            stranka = stranka,
+                                            firmy = firmy,
+                                            vec = vec,
+                                            upravitVec = { novaVec ->
+                                                upravitStranky(stranky.kopirovatStranku(stranka.kopirovatVec(novaVec)))
+                                            },
+                                        )
+                                    }
+                                }
+                            }
+                        }
 
-@Composable
-fun Stranka(
-    stranka: Stranky.Stranka,
-    upravitStranku: (Stranky.Stranka) -> Unit,
-) = Column(
-    Modifier
-        .fillMaxSize()
-) {
-    LazyColumn(
-        Modifier
-            .weight(1F),
-    ) {
-        stranka.veci.dropLast(1).forEachIndexed { i, veci ->
-            items(veci) {vec ->
-                Surface(
-                    Modifier.fillMaxWidth(),
-                    color = if (i % 2 == 0) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant,
-                ) {
-                    Vec(
-                        stranka = stranka,
-                        vec = vec,
-                        upravitVec = { novaVec ->
-                            upravitStranku(stranka.kopirovatVec(novaVec))
-                        },
-                    )
+                        Vec(
+                            stranka = stranka,
+                            firmy = firmy,
+                            vec = stranka.veci.last().last(),
+                            upravitVec = { novaVec ->
+                                upravitStranky(stranky.kopirovatStranku(stranka.kopirovatVec(novaVec)))
+                            },
+                        )
+                    }
                 }
             }
         }
     }
-    Vec(
-        stranka = stranka,
-        vec = stranka.veci.last().last(),
-        upravitVec = { novaVec ->
-            upravitStranku(stranka.kopirovatVec(novaVec))
-        },
-    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Vec(
     stranka: Stranky.Stranka,
+    firmy: List<Firma>,
     vec: Stranky.Stranka.Vec,
     upravitVec: (Stranky.Stranka.Vec) -> Unit,
 ) {
@@ -193,7 +490,7 @@ fun Vec(
     if (zobrazit) when (vec) {
         is Stranky.Stranka.Vec.Nadpis -> {
             Text(
-                text = vec.text.asString(),
+                text = vec.text.composeString(),
                 Modifier.padding(all = 8.dp),
                 style = MaterialTheme.typography.headlineSmall,
             )
@@ -211,10 +508,10 @@ fun Vec(
                     .fillMaxWidth()
                     .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
                 label = {
-                    Text(vec.popis.asString())
+                    Text(vec.popis.composeString())
                 },
                 trailingIcon = {
-                    Text(text = vec.suffix.asString())
+                    Text(text = vec.suffix.composeString())
                 },
                 singleLine = true,
                 keyboardActions = KeyboardActions {
@@ -238,7 +535,7 @@ fun Vec(
                     .fillMaxWidth()
                     .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
                 label = {
-                    Text(vec.popis.asString())
+                    Text(vec.popis.composeString())
                 },
                 trailingIcon = {
                     var expanded by remember { mutableStateOf(false) }
@@ -252,7 +549,7 @@ fun Vec(
                         vec.jednotky.forEach {
                             DropdownMenuItem(
                                 text = {
-                                    Text(it.asString())
+                                    Text(it.composeString())
                                 },
                                 onClick = {
                                     upravitVec(vec.vybraneJednotky(it))
@@ -272,7 +569,7 @@ fun Vec(
                         Row(
                             Modifier,
                         ) {
-                            Text(vec.vybraneJednotky.asString())
+                            Text(vec.vybraneJednotky.composeString())
                             Icon(Icons.Default.ArrowDropDown, "Vybrat jednotky")
                         }
                     }
@@ -302,11 +599,14 @@ fun Vec(
                         .fillMaxWidth()
                         .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
                     readOnly = true,
-                    value = vec.vybrano.asString(),
+                    value = vec.vybrano.composeString(),
                     onValueChange = {},
-                    label = { Text(vec.popis.asString()) },
+                    label = { Text(vec.popis.composeString()) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    keyboardActions = KeyboardActions {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    },
                 )
                 ExposedDropdownMenu(
                     expanded = expanded,
@@ -314,7 +614,7 @@ fun Vec(
                 ) {
                     seznam.forEach { moznost ->
                         DropdownMenuItem(
-                            text = { Text(moznost.asString()) },
+                            text = { Text(moznost.composeString()) },
                             onClick = {
                                 upravitVec(vec.vybrano(moznost))
                                 expanded = false
@@ -345,11 +645,14 @@ fun Vec(
                         .fillMaxWidth()
                         .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
                     readOnly = true,
-                    value = vec.vybrano1.asString(),
+                    value = vec.vybrano1.composeString(),
                     onValueChange = {},
-                    label = { Text(vec.popis.asString()) },
+                    label = { Text(vec.popis.composeString()) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded1) },
                     colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    keyboardActions = KeyboardActions {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    },
                 )
                 ExposedDropdownMenu(
                     expanded = expanded1,
@@ -357,7 +660,7 @@ fun Vec(
                 ) {
                     seznam1.forEach { moznost ->
                         DropdownMenuItem(
-                            text = { Text(moznost.asString()) },
+                            text = { Text(moznost.composeString()) },
                             onClick = {
                                 upravitVec(vec.vybrano1(moznost))
                                 expanded1 = false
@@ -379,11 +682,14 @@ fun Vec(
                         .fillMaxWidth()
                         .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
                     readOnly = true,
-                    value = vec.vybrano2.asString(),
+                    value = vec.vybrano2.composeString(),
                     onValueChange = {},
-                    label = { Text(vec.popis.asString()) },
+                    label = { Text(vec.popis.composeString()) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded2) },
                     colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    keyboardActions = KeyboardActions {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    },
                 )
                 ExposedDropdownMenu(
                     expanded = expanded2,
@@ -391,7 +697,7 @@ fun Vec(
                 ) {
                     seznam2.forEach { moznost ->
                         DropdownMenuItem(
-                            text = { Text(moznost.asString()) },
+                            text = { Text(moznost.composeString()) },
                             onClick = {
                                 upravitVec(vec.vybrano2(moznost))
                                 expanded2 = false
@@ -421,7 +727,7 @@ fun Vec(
                             upravitVec(vec.zaskrtnuto(!vec.zaskrtnuto))
                         },
                     )
-                    Text(text = vec.popis.asString())
+                    Text(text = vec.popis.composeString())
                 }
             }
         }
@@ -454,14 +760,17 @@ fun Vec(
                         .fillMaxWidth()
                         .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
                     readOnly = true,
-                    value = if (!vec.zaskrtnuto) "" else vec.vybrano.asString(),
+                    value = if (!vec.zaskrtnuto) "" else vec.vybrano.composeString(),
                     onValueChange = {},
-                    label = { Text(vec.popis.asString()) },
+                    label = { Text(vec.popis.composeString()) },
                     trailingIcon = { if (vec.zaskrtnuto) ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded && vec.zaskrtnuto) },
                     colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
                         disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
                     enabled = vec.zaskrtnuto,
+                    keyboardActions = KeyboardActions {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    },
                 )
                 ExposedDropdownMenu(
                     expanded = expanded && vec.zaskrtnuto,
@@ -469,7 +778,7 @@ fun Vec(
                 ) {
                     seznam.forEach { moznost ->
                         DropdownMenuItem(
-                            text = { Text(moznost.asString()) },
+                            text = { Text(moznost.composeString()) },
                             onClick = {
                                 upravitVec(vec.vybrano(moznost))
                                 expanded = false
@@ -481,8 +790,98 @@ fun Vec(
             }
         }
 
-        Stranky.Stranka.Vec.Jine.MontazniFirma -> {
+        is Stranky.Stranka.Kontakty.MontazniFirma -> {
 
+            var expanded by rememberSaveable { mutableStateOf(false) }
+            val vybranaFirma by remember(vec) {
+                derivedStateOf {
+                    firmy.find { it.ico == vec.ico }
+                }
+            }
+            var text by remember { mutableStateOf(TextFieldValue(vec.ico)) }
+            val filtrovaneFirmy by remember(firmy, text) {
+                derivedStateOf {
+                    firmy.filter { firma ->
+                        text.text.upravit().split(" ").all { slovoTextu ->
+                            firma.jmeno.upravit().split(" ").any { slovoFirmy ->
+                                slovoFirmy.startsWith(slovoTextu)
+                            }
+                        } || firma.ico.startsWith(text.text)
+                    }
+                }
+            }
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = {
+                    expanded = !expanded
+                },
+                Modifier
+                    .fillMaxWidth(),
+            ) {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
+                        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+                    value = text,
+                    onValueChange = {
+                        text = it
+                        expanded = it.text.toIntOrNull()?.toString()?.length != 8
+                        if (it.text.toIntOrNull()?.toString()?.length == 8)
+                            upravitVec(vec.ico(it.text))
+                        else
+                            upravitVec(vec.ico(""))
+                    },
+                    label = { Text(R.string.kontakty_ico.toText().composeString()) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    supportingText = {
+                        if (text.text.isBlank()) {
+                            Text(text = "Můžete zadat název firmy pro vyhledávání")
+                        } else if (vybranaFirma != null) {
+                            Text(text = "Detekováno: ${vybranaFirma!!.jmeno}")
+                        } else if (text.text.toIntOrNull()?.toString()?.length != 8) {
+                            Text(text = "Pozor! Nejedná se o IČO, hodnota nebude uložena")
+                        } else {
+                            Text(text = "Validní IČO")
+                        }
+                    },
+                    singleLine = true,
+                    keyboardActions = KeyboardActions {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                    ),
+                    isError = text.text.toIntOrNull()?.toString()?.length != 8 && text.text.isNotBlank()
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded && filtrovaneFirmy.isNotEmpty(),
+                    onDismissRequest = { expanded = false },
+                ) {
+                    filtrovaneFirmy
+                        .forEach { moznost ->
+                            DropdownMenuItem(
+                                text = { Text("${moznost.jmeno} - ${moznost.ico}") },
+                                onClick = {
+                                    text = TextFieldValue(
+                                        text = moznost.ico,
+                                        selection = TextRange(8)
+                                    )
+                                    upravitVec(vec.ico(moznost.ico))
+                                    expanded = false
+                                },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                            )
+                        }
+                }
+            }
         }
     }
 }
+
+fun TimeInterpolator.toEasing() = Easing { x -> getInterpolation(x) }
+
+private fun String.normalize() = Normalizer.normalize(this, Normalizer.Form.NFD)!!
+
+private fun String.upravit() = uppercase().normalize().replace("\\p{Mn}+".toRegex(), "")

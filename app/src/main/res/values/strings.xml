@@ -54,7 +54,7 @@
     <string name="kontakty_vybrat_firmu">Vybrat firmu</string>
     <string name="kontakty_vyberte_firmu">Vyberte montážní firmu</string>
     <string name="kontakty_vyhledat_firmu">Vyhledat firmu</string>
-    <string name="kontakty_ico">Ičo firmy</string>
+    <string name="kontakty_ico">Ičo montážní firmy</string>
 
     <string name="detail_objektu_ztrata">Tepelná ztráta</string>
     <string name="detail_objektu_potreba_vytapeni">Potřeba tepla – vytápění</string>
@@ -168,4 +168,6 @@
     <string name="prislusenstvi_drzak_pro_tc">Držák pro TČ</string>
     <string name="prislusenstvi_pokojova_jednotka">Pokojová jednotka</string>
     <string name="prislusenstvi_pokojove_cidlo">Pokojové čidlo</string>
+    <string name="nejste_prihlaseni">Nejste přihlášeni!</string>
+    <string name="odhlasit_se">Odhlásit se</string>
 </resources>

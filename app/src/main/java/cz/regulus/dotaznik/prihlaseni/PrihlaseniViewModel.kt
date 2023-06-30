@@ -3,8 +3,8 @@ package cz.regulus.dotaznik.prihlaseni
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.regulus.dotaznik.R
-import cz.regulus.dotaznik.Clovek
 import cz.regulus.dotaznik.Repository
+import cz.regulus.dotaznik.Uzivatel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -34,10 +34,10 @@ class PrihlaseniViewModel(
     }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), emptyList())
 
-    private val _novyClovek = MutableStateFlow(null as Clovek?)
+    private val _novyClovek = MutableStateFlow(null as Uzivatel?)
     val novyClovek = _novyClovek.asStateFlow()
 
-    fun upravitNovehoCloveka(upravit: (Clovek?) -> Clovek?) {
+    fun upravitNovehoCloveka(upravit: (Uzivatel?) -> Uzivatel?) {
         _novyClovek.value = upravit(_novyClovek.value)
     }
 

@@ -157,4 +157,6 @@
     <string name="prislusenstvi_topny_kabel">Topný kabel</string>
     <string name="prislusenstvi_pokojove_cidlo">Pokojové čidlo</string>
     <string name="mena">€</string>
+    <string name="nejste_prihlaseni">" TODO"</string>
+    <string name="odhlasit_se">TODO</string>
 </resources>

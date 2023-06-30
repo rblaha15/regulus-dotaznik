@@ -12,7 +12,6 @@
         android:required="true" />
 
     <application
-        android:windowSoftInputMode="stateHidden|adjustResize"
         android:allowBackup="true"
         android:icon="@mipmap/ic_r"
         android:name="cz.regulus.dotaznik.App"
@@ -22,12 +21,10 @@
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
         <activity
-            android:name="cz.regulus.dotaznik.vybiratorFirem.FirmyActivity"
-            android:exported="false" />
-        <activity
             android:name="cz.regulus.dotaznik.spravaFotek.FotkyActivity"
             android:exported="false" />
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name="cz.regulus.dotaznik.dotaznik.MainActivity"
             android:exported="true">
             <intent-filter>
