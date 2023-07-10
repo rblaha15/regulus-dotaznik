@@ -1,6 +1,5 @@
-package cz.regulus.dotaznik
+package cz.regulus.dotaznik.dotaznik
 
-import android.content.Context
 import android.content.res.Resources
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AcUnit
@@ -11,8 +10,17 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Pool
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.regulus.dotaznik.R
-import cz.regulus.dotaznik.Stranky.Stranka.Vec.*
-import cz.regulus.dotaznik.Text.*
+import cz.regulus.dotaznik.Text
+import cz.regulus.dotaznik.Uzivatel
+import cz.regulus.dotaznik.dotaznik.Stranky.Stranka.Vec.DvojVybiratko
+import cz.regulus.dotaznik.dotaznik.Stranky.Stranka.Vec.Jine
+import cz.regulus.dotaznik.dotaznik.Stranky.Stranka.Vec.Nadpis
+import cz.regulus.dotaznik.dotaznik.Stranky.Stranka.Vec.Pisatko
+import cz.regulus.dotaznik.dotaznik.Stranky.Stranka.Vec.PisatkoSJednotkama
+import cz.regulus.dotaznik.dotaznik.Stranky.Stranka.Vec.Vybiratko
+import cz.regulus.dotaznik.dotaznik.Stranky.Stranka.Vec.Zaskrtavatko
+import cz.regulus.dotaznik.dotaznik.Stranky.Stranka.Vec.ZaskrtavatkoSVybiratkem
+import cz.regulus.dotaznik.toText
 import kotlinx.serialization.Serializable
 import com.regulus.dotaznik.R.string as Strings
 
@@ -530,8 +538,10 @@ data class Stranky(
                                 Strings.vyberte.toText(),
                                 "ECOAIR 400".toText(),
                                 "ECOAIR 600".toText(),
+                                "RTC".toText(),
                                 "RTC 6i".toText(),
-                                "RTC 12i".toText(),
+                                "RTC 13e".toText(),
+                                "RTC 20e".toText(),
                                 "ECOAIR 614M".toText(),
                                 "ECOAIR 622M".toText(),
                                 "ECOAIR 510M".toText(),
@@ -544,8 +554,7 @@ data class Stranky(
 
                             Strings.zeme_voda.toText() -> listOf(
                                 Strings.vyberte.toText(),
-                                "ECOPART".toText(),
-                                "ECOHEAT".toText(),
+                                "ECOPART 400".toText(),
                                 "ECOPART 406".toText(),
                                 "ECOPART 408".toText(),
                                 "ECOPART 410".toText(),
@@ -553,6 +562,10 @@ data class Stranky(
                                 "ECOPART 414".toText(),
                                 "ECOPART 417".toText(),
                                 "ECOPART 435".toText(),
+                                "ECOPART 600M".toText(),
+                                "ECOPART 612M".toText(),
+                                "ECOPART 616M".toText(),
+                                "ECOHEAT".toText(),
                                 "ECOHEAT 406".toText(),
                                 "ECOHEAT 408".toText(),
                                 "ECOHEAT 410".toText(),
@@ -575,8 +588,8 @@ data class Stranky(
                         listOf(
                             Strings.zadna.toText(),
                             "RegulusBOX".toText(),
-                            "EcoZenith i360".toText(),
-                            "EcoZenith i250".toText(),
+                            "RegulusHBOX 112".toText(),
+                            "RegulusHBOX 212".toText(),
                         )
                     }
             }
@@ -610,7 +623,9 @@ data class Stranky(
 
                             "HSK".toText() -> listOf(
                                 "P".toText(),
+                                "P+".toText(),
                                 "PR".toText(),
+                                "PR+".toText(),
                                 "PV".toText(),
                             )
 

@@ -1,4 +1,4 @@
-package cz.regulus.dotaznik
+package cz.regulus.dotaznik.dotaznik
 
 import kotlinx.serialization.Serializable
 

@@ -1,5 +1,6 @@
-package cz.regulus.dotaznik
+package cz.regulus.dotaznik.prihlaseni
 
+import cz.regulus.dotaznik.Uzivatel
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -49,8 +49,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import cz.regulus.dotaznik.Uzivatel
-import cz.regulus.dotaznik.Zamestnanec
-import cz.regulus.dotaznik.vytvoritUzivatele
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf

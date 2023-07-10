@@ -1,24 +1,12 @@
 package cz.regulus.dotaznik.dotaznik
 
-import android.content.Context
-import android.content.Intent
 import android.content.res.Resources
 import android.util.Log
-import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.ProgressBar
-import android.widget.Toast
-import androidx.core.view.updateLayoutParams
-import androidx.core.view.updateMargins
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.regulus.dotaznik.BuildConfig
-import com.regulus.dotaznik.R
-import cz.regulus.dotaznik.EmailCredentials
 import cz.regulus.dotaznik.PrihlasenState
 import cz.regulus.dotaznik.Repository
-import cz.regulus.dotaznik.Stranky
 import cz.regulus.dotaznik.uzivatel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -30,11 +18,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.Named
 import java.io.File
 import java.util.Locale
-import java.util.concurrent.Executors
 import javax.activation.DataHandler
 import javax.activation.FileDataSource
 import javax.mail.Authenticator
@@ -53,8 +41,11 @@ import kotlin.time.Duration.Companion.seconds
 class DotaznikViewModel(
     private val repo: Repository,
     private val res: Resources,
-    private val cacheDir: File,
+    @Named("cache") private val cacheDir: File,
+    @InjectedParam private val reset: () -> Unit
 ) : ViewModel() {
+    val debug = BuildConfig.DEBUG || '-' in BuildConfig.VERSION_NAME
+
     val stranky = repo.stranky
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), Stranky())
 
@@ -92,13 +83,14 @@ class DotaznikViewModel(
                 OdesilaniState.UspechAOdstranitData -> odstranitData()
                 OdesilaniState.Error.Offline -> zobrazitChybu()
                 is OdesilaniState.Error.Podrobne -> Unit
+                OdesilaniState.OdstranitData -> odstranitData()
             }
         }
         else _odeslaniState.value = OdesilaniState.Nic
     }
 
     private suspend fun emailDoruceni() = when {
-        BuildConfig.DEBUG -> repo.prihlasenState.first().uzivatel!!.email
+        debug -> repo.prihlasenState.first().uzivatel!!.email
         Locale.getDefault().language == Locale("sk").language -> "obchod@regulus.sk"
         else -> "poptavky@regulus.cz"
     }
@@ -145,7 +137,7 @@ class DotaznikViewModel(
 
         try {
             Transport.send(MimeMessage(session).apply {
-                setFrom(InternetAddress(EmailCredentials.EMAIL))
+                setFrom(InternetAddress(EmailCredentials.EMAIL, "Aplikace Regulus"))
 
                 subject = "REGULUS – Apka – OSOBA: $jmeno $prijmeni"
 
@@ -153,7 +145,7 @@ class DotaznikViewModel(
                     Message.RecipientType.TO,
                     InternetAddress(emailDoruceni())
                 )
-                if (!BuildConfig.DEBUG) {
+                if (!debug) {
                     addRecipient(
                         Message.RecipientType.CC,
                         InternetAddress(uzivatel.email)
@@ -171,13 +163,13 @@ class DotaznikViewModel(
                         fileName = file.name
                     })
 
-//                        repeat(prefs.getInt("fotky", 0)) { i ->
-//                            MimeBodyPart().apply {
-//                                attachFile(File(filesDir, "photo${i + 1}.jpg"))
-//                                setHeader("Content-Type", "image/jpg; charset=UTF-8 name=\"fotka $i\"")
-//                                addBodyPart(this)
-//                            }
-//                        }
+                    repo.pripravitFotkyNaExport()
+                    repo.fotky.first().forEachIndexed { i, (_, file) ->
+                        addBodyPart(MimeBodyPart().apply {
+                            attachFile(file)
+                            setHeader("Content-Type", "image/jpg; charset=UTF-8 name=\"fotka ${i + 1}\"")
+                        })
+                    }
                 })
             })
 
@@ -203,22 +195,18 @@ class DotaznikViewModel(
 
         repo.upravitStranky(Stranky())
 
+        repo.odstranitVsechnyFotky()
 
-
-//            val pocetFotek = prefs.getInt("fotky", 0)
-//
-//            repeat(pocetFotek) { i ->
-//                val file = File(filesDir, "photo${i + 1}.jpg")
-//
-//                file.delete()
-//            }
-//
-//            prefs.edit {
-//                putInt("fotky", 0)
-//            }
+        viewModelScope.launch(Dispatchers.Main) {
+            reset()
+        }
     }
 
     private fun zobrazitChybu() {
         _odeslaniState.value = OdesilaniState.Error.Podrobne(chyba)
+    }
+
+    fun odstranitVse() {
+        _odeslaniState.value = OdesilaniState.OdstranitData
     }
 }

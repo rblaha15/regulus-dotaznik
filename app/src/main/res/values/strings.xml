@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Regulus dotazník</string>
+    <string name="app_name">Regulus dotazník</string>
     <string name="kontakty">Kontakty a místo realizace</string>
     <string name="detail_objektu">Detail objektu</string>
     <string name="system">Systém</string>
@@ -10,22 +10,18 @@
 
     <string name="poznamka">Poznámka</string>
 
-    <string name="dalsi">Další stránka</string>
-    <string name="zpet">Předchozí stránka</string>
-    <string name="otevrit">Otevřít</string>
-    <string name="zavrit">Zavřít</string>
+    <string name="otevrit">Otevřít menu</string>
+    <string name="zavrit">Zavřít menu</string>
     <string name="ok">OK</string>
     <string name="ano">Ano</string>
     <string name="ne">Ne</string>
     <string name="zrusit">Zrušit</string>
     <string name="odeslat">Odeslat</string>
     <string name="odstranit">Odstranit</string>
-    <string name="neco_mezera_neco" translatable="false">%1$s %2$s</string>
 
     <string name="kW" translatable="false">kW</string>
     <string name="kWh" translatable="false">kWh</string>
     <string name="m2" translatable="false">m²</string>
-    <string name="mena">€</string>
     <string name="q" translatable="false">q</string>
     <string name="m3" translatable="false">m³</string>
     <string name="dm3" translatable="false">dm³</string>
@@ -36,7 +32,6 @@
     <string name="zadny">Žádný</string>
     <string name="zadne">Žádné</string>
     <string name="vyberte">Vyberte</string>
-    <string name="nevim">Nevím</string>
     <string name="jine">Jiné</string>
     <string name="jiny">Jiný</string>
 
@@ -50,11 +45,11 @@
     <string name="kontakty_psc">PSČ</string>
     <string name="kontakty_telefon">Telefon</string>
     <string name="kontakty_email">Email</string>
-    <string name="kontakty_m_firma">Montážní firma</string>
+    <string name="kontakty_vyberte_montazni_firmu">Vyberte montážní firmu</string>
     <string name="kontakty_vybrat_firmu">Vybrat firmu</string>
     <string name="kontakty_vyberte_firmu">Vyberte montážní firmu</string>
     <string name="kontakty_vyhledat_firmu">Vyhledat firmu</string>
-    <string name="kontakty_ico">Ičo montážní firmy</string>
+    <string name="kontakty_ico">Ičo firmy</string>
 
     <string name="detail_objektu_ztrata">Tepelná ztráta</string>
     <string name="detail_objektu_potreba_vytapeni">Potřeba tepla – vytápění</string>
@@ -145,16 +140,18 @@
     <string name="export_chcete_odeslat">Odeslat?</string>
     <string name="export_opravdu_chcete_odeslat_na">"Opravdu chcete odeslat email na \"%s\"?"</string>
     <string name="export_email_neodeslan">Omlouvám se, ale email se nepodařilo odeslat. %s</string>
-    <string name="toto_je_chyba">Toto je chyba:</string>
     <string name="export_opravdu_odstranit_data">Chcete odstranit všechna data?</string>
 
     <string name="fotky_sprava_fotek">Správa fotek</string>
     <string name="fotky_vyfotit">Vyfotit</string>
     <string name="fotky_vybrat_z_galerie">Vybrat z galerie</string>
     <string name="fotky_fotka">Fotka</string>
+    <string name="fotky_pridat">Přidat fotku</string>
     <string name="fotky_maximalne_fotek">Můžete přidat maximálně 5 fotek</string>
+    <string name="fotky_maximalne_fotek_presazeno">Protože můžete přidat maximálně 5 fotek, nebyly všechny vybrané fotky vloženy</string>
 
     <string name="odstranit_vse">Odstranit vše</string>
+    <string name="toto_je_chyba">Toto je chyba:</string>
     <string name="podrobnejsi_info">Podrobnější informace</string>
     <string name="export_nejste_pripojeni">Pravděpodobně nejste připojeni k internetu. Zkontrolujte připojení a zkuste to znovu</string>
     <string name="prihlaseni_doplnit_info">Doplntě, prosím, ještě nějaké informace o Vás:</string>
@@ -164,10 +161,12 @@
     <string name="na_izolovanou_stenu">Na izolovanou stěnu</string>
     <string name="prislusenstvi">Příslušenství</string>
     <string name="prislusenstvi_hadice">Hadice</string>
-    <string name="prislusenstvi_topny_kabel">Topný kabel</string>
     <string name="prislusenstvi_drzak_pro_tc">Držák pro TČ</string>
     <string name="prislusenstvi_pokojova_jednotka">Pokojová jednotka</string>
+    <string name="prislusenstvi_topny_kabel">Topný kabel</string>
     <string name="prislusenstvi_pokojove_cidlo">Pokojové čidlo</string>
+    <string name="mena">€</string>
     <string name="nejste_prihlaseni">Nejste přihlášeni!</string>
     <string name="odhlasit_se">Odhlásit se</string>
+    <string name="fotky_zadne_fotky">Zatím jste nepřidali žádné fotky</string>
 </resources>

@@ -2,28 +2,19 @@ package cz.regulus.dotaznik.dotaznik
 
 import android.animation.TimeInterpolator
 import android.view.animation.AnticipateOvershootInterpolator
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FloatTweenSpec
-import androidx.compose.animation.core.VectorizedFloatAnimationSpec
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -34,12 +25,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
@@ -51,7 +43,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -60,13 +51,13 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -80,35 +71,41 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.regulus.dotaznik.BuildConfig
 import com.regulus.dotaznik.R
-import cz.regulus.dotaznik.Firma
-import cz.regulus.dotaznik.Stranky
-import cz.regulus.dotaznik.composeString
-import cz.regulus.dotaznik.toText
 import cz.regulus.dotaznik.Text.Mix
-import cz.regulus.dotaznik.Text.Plain
 import cz.regulus.dotaznik.Uzivatel
-import kotlinx.coroutines.delay
+import cz.regulus.dotaznik.composeString
+import cz.regulus.dotaznik.destinations.FotkyScreenDestination
+import cz.regulus.dotaznik.destinations.ResetScreenDestination
+import cz.regulus.dotaznik.toText
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 import java.text.Normalizer
 
 @Composable
 @Destination
 @RootNavGraph(start = true)
-fun DotaznikScreen() {
-    val viewModel = koinViewModel<DotaznikViewModel>()
+fun DotaznikScreen(
+    navigator: DestinationsNavigator,
+) {
+    val viewModel = koinViewModel<DotaznikViewModel> {
+        parametersOf({
+            navigator.navigate(ResetScreenDestination)
+        })
+    }
 
     val stranky by viewModel.stranky.collectAsStateWithLifecycle()
     val firmy by viewModel.firmy.collectAsStateWithLifecycle()
@@ -123,6 +120,11 @@ fun DotaznikScreen() {
         uzivatel = prihlasen,
         odesilaniState = odesilaniState,
         zmenitState = viewModel::zmenitState,
+        jitNaFotky = {
+            navigator.navigate(FotkyScreenDestination)
+        },
+        odstranitVse = viewModel::odstranitVse,
+        debug = viewModel.debug
     )
 }
 
@@ -136,8 +138,13 @@ fun Dotaznik(
     uzivatel: Uzivatel?,
     odesilaniState: OdesilaniState,
     zmenitState: (positive: Boolean) -> Unit,
+    jitNaFotky: () -> Unit,
+    odstranitVse: () -> Unit,
+    debug: Boolean,
 ) {
-    val pagerState = rememberPagerState()
+    val pagerState = rememberPagerState(pageCount = {
+        stranky.vse.size
+    })
     val drawerState = rememberDrawerState(DrawerValue.Open)
     val scope = rememberCoroutineScope()
     ModalNavigationDrawer(
@@ -224,6 +231,15 @@ fun Dotaznik(
                         ),
                     )
 
+                    OutlinedButton(
+                        onClick = {
+                            odstranitVse()
+                        },
+                        Modifier.padding(all = 8.dp),
+                    ) {
+                        Text(R.string.odstranit_vse.toText().composeString())
+                    }
+
                     TextButton(
                         onClick = {
                             odhlasit()
@@ -232,12 +248,23 @@ fun Dotaznik(
                     ) {
                         Text(R.string.odhlasit_se.toText().composeString())
                     }
+
+                    Text(
+                        "Verze: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                        Modifier.padding(8.dp),
+                        fontSize = 12.sp
+                    )
+                    if (debug) Text(
+                        "Toto je DEBUG verze aplikace. Žádný email nebude odeslán firmě Regulus, pouze Vám na email specifikovaný výše.",
+                        Modifier.padding(8.dp),
+                        fontSize = 12.sp
+                    )
                 }
             }
         },
         drawerState = drawerState,
     ) {
-        when(odesilaniState) {
+        when (odesilaniState) {
             OdesilaniState.Nic -> Unit
             is OdesilaniState.OpravduOdeslat -> AlertDialog(
                 onDismissRequest = {
@@ -271,18 +298,21 @@ fun Dotaznik(
                     Text(text = R.string.export_opravdu_chcete_odeslat_na.toText(odesilaniState.email).composeString())
                 },
             )
+
             OdesilaniState.Odesilani -> AlertDialog(
                 onDismissRequest = {},
                 confirmButton = {},
                 dismissButton = {},
-                title = {
-                    Text(text = R.string.export_odesilani.toText().composeString())
-                },
-                icon = {},
                 text = {
-                    CircularProgressIndicator()
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        CircularProgressIndicator()
+                        Text(text = R.string.export_odesilani.toText().composeString(), Modifier.padding(8.dp))
+                    }
                 },
             )
+
             OdesilaniState.UspechAOdstranitData -> AlertDialog(
                 onDismissRequest = {
                     zmenitState(false)
@@ -315,6 +345,40 @@ fun Dotaznik(
                     Text(text = R.string.export_opravdu_odstranit_data.toText().composeString())
                 },
             )
+
+            OdesilaniState.OdstranitData -> AlertDialog(
+                onDismissRequest = {
+                    zmenitState(false)
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            zmenitState(true)
+                        }
+                    ) {
+                        Text(R.string.ano.toText().composeString())
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            zmenitState(false)
+                        }
+                    ) {
+                        Text(R.string.ne.toText().composeString())
+                    }
+                },
+                title = {
+                    Text(text = R.string.odstranit_vse.toText().composeString())
+                },
+                icon = {
+                    Icon(Icons.Default.DeleteForever, null)
+                },
+                text = {
+                    Text(text = R.string.export_opravdu_odstranit_data.toText().composeString())
+                },
+            )
+
             OdesilaniState.Error.Offline -> AlertDialog(
                 onDismissRequest = {
                     zmenitState(false)
@@ -347,6 +411,7 @@ fun Dotaznik(
                     Text(text = R.string.export_nejste_pripojeni.toText().composeString())
                 },
             )
+
             is OdesilaniState.Error.Podrobne -> AlertDialog(
                 onDismissRequest = {
                     zmenitState(false)
@@ -390,17 +455,28 @@ fun Dotaznik(
                                 }
                             }
                         ) {
-                            Icon(Icons.Default.Menu, "Otevřít menu")
+                            Icon(
+                                Icons.Default.Menu,
+                                (if (drawerState.isOpen) R.string.zavrit else R.string.otevrit).toText().composeString()
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                jitNaFotky()
+                            }
+                        ) {
+                            Icon(Icons.Default.PhotoLibrary, R.string.fotky_sprava_fotek.toText().composeString())
                         }
                     }
                 )
             },
         ) { paddingValues ->
             HorizontalPager(
-                pageCount = stranky.vse.size,
+                state = pagerState,
                 Modifier
                     .padding(paddingValues),
-                state = pagerState
             ) { i ->
                 Scaffold(
                     floatingActionButton = {
@@ -859,6 +935,12 @@ fun Vec(
                     expanded = expanded && filtrovaneFirmy.isNotEmpty(),
                     onDismissRequest = { expanded = false },
                 ) {
+                    DropdownMenuItem(
+                        text = { Text(R.string.kontakty_vyberte_montazni_firmu.toText().composeString()) },
+                        onClick = {},
+                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                        enabled = false,
+                    )
                     filtrovaneFirmy
                         .forEach { moznost ->
                             DropdownMenuItem(

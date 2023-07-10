@@ -13,9 +13,11 @@ sealed interface OdesilaniState {
 
     sealed interface Error : OdesilaniState {
         object Offline : Error
-
         data class Podrobne(
             val error: String,
         ) : Error
+
     }
+
+    object OdstranitData : OdesilaniState
 }

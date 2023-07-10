@@ -2,15 +2,11 @@ package cz.regulus.dotaznik
 
 import android.app.Application
 import android.content.Context
-import cz.regulus.dotaznik.dotaznik.DotaznikViewModel
-import cz.regulus.dotaznik.prihlaseni.PrihlaseniViewModel
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.core.annotation.KoinInternalApi
 import org.koin.core.context.startKoin
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.koin.ksp.generated.defaultModule
-import java.io.File
 
 class App : Application() {
     override fun onCreate() {
@@ -19,8 +15,11 @@ class App : Application() {
         startKoin {
             androidContext(this@App)
             modules(module {
-                single {
+                single(named("cache")) {
                     get<Context>().cacheDir!!
+                }
+                single(named("files")) {
+                    get<Context>().filesDir!!
                 }
                 single {
                     get<Context>().resources!!
