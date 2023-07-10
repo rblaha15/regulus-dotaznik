@@ -47,7 +47,7 @@ class DotaznikViewModel(
     val debug = BuildConfig.DEBUG || '-' in BuildConfig.VERSION_NAME
 
     val stranky = repo.stranky
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), Stranky())
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), null)
 
     fun upravitStranky(stranky: Stranky) = viewModelScope.launch {
         repo.upravitStranky(stranky)

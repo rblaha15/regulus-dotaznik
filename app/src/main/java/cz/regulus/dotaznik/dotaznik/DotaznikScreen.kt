@@ -46,6 +46,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -131,7 +132,7 @@ fun DotaznikScreen(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun Dotaznik(
-    stranky: Stranky,
+    stranky: Stranky?,
     firmy: List<Firma>,
     upravitStranky: (Stranky) -> Unit,
     odhlasit: () -> Unit,
@@ -143,7 +144,7 @@ fun Dotaznik(
     debug: Boolean,
 ) {
     val pagerState = rememberPagerState(pageCount = {
-        stranky.vse.size
+        (stranky ?: Stranky()).vse.size
     })
     val drawerState = rememberDrawerState(DrawerValue.Open)
     val scope = rememberCoroutineScope()
@@ -180,7 +181,7 @@ fun Dotaznik(
 
                     Divider(Modifier.fillMaxWidth())
 
-                    stranky.vse.forEachIndexed { i, stranka ->
+                    (stranky ?: Stranky()).vse.forEachIndexed { i, stranka ->
                         NavigationDrawerItem(
                             label = {
                                 Text(stranka.nazev.composeString())
@@ -437,8 +438,8 @@ fun Dotaznik(
             )
         }
 
-        val aktualniStranka = remember(pagerState.currentPage) { stranky.vse[pagerState.currentPage] }
-        Scaffold(
+        val aktualniStranka = remember(pagerState.currentPage, stranky) { stranky?.vse?.get(pagerState.currentPage) }
+        if (aktualniStranka != null && stranky != null) Scaffold(
             Modifier
                 .imePadding()
                 .navigationBarsPadding(),
@@ -550,6 +551,7 @@ fun Dotaznik(
                 }
             }
         }
+        else LinearProgressIndicator()
     }
 }
 
