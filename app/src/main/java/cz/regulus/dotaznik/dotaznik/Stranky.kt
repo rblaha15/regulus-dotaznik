@@ -9,7 +9,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Pool
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.regulus.dotaznik.R
+import cz.regulus.dotaznik.R
 import cz.regulus.dotaznik.Text
 import cz.regulus.dotaznik.Uzivatel
 import cz.regulus.dotaznik.dotaznik.Stranky.Stranka.Vec.DvojVybiratko
@@ -22,7 +22,7 @@ import cz.regulus.dotaznik.dotaznik.Stranky.Stranka.Vec.Zaskrtavatko
 import cz.regulus.dotaznik.dotaznik.Stranky.Stranka.Vec.ZaskrtavatkoSVybiratkem
 import cz.regulus.dotaznik.toText
 import kotlinx.serialization.Serializable
-import com.regulus.dotaznik.R.string as Strings
+import cz.regulus.dotaznik.R.string as Strings
 
 @Serializable
 data class Stranky(

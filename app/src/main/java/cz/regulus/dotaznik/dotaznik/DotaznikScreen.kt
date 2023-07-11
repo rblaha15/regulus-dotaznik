@@ -83,8 +83,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.regulus.dotaznik.BuildConfig
-import com.regulus.dotaznik.R
+import cz.regulus.dotaznik.BuildConfig
+import cz.regulus.dotaznik.R
 import cz.regulus.dotaznik.Text.Mix
 import cz.regulus.dotaznik.Uzivatel
 import cz.regulus.dotaznik.composeString

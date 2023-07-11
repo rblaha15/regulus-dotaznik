@@ -63,7 +63,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.regulus.dotaznik.R
+import cz.regulus.dotaznik.R
 import cz.regulus.dotaznik.composeString
 import cz.regulus.dotaznik.toText
 import kotlinx.coroutines.launch

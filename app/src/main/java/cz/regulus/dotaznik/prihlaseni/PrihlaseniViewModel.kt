@@ -2,7 +2,7 @@ package cz.regulus.dotaznik.prihlaseni
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.regulus.dotaznik.R
+import cz.regulus.dotaznik.R
 import cz.regulus.dotaznik.Repository
 import cz.regulus.dotaznik.Uzivatel
 import kotlinx.coroutines.Dispatchers

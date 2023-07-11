@@ -4,7 +4,7 @@ import android.content.res.Resources
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.regulus.dotaznik.BuildConfig
+import cz.regulus.dotaznik.BuildConfig
 import cz.regulus.dotaznik.PrihlasenState
 import cz.regulus.dotaznik.Repository
 import cz.regulus.dotaznik.uzivatel
