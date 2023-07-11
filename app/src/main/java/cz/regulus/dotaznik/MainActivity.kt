@@ -5,10 +5,8 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
@@ -23,46 +21,25 @@ import org.koin.android.ext.android.inject
 
 
 class MainActivity : AppCompatActivity() {
-
-//    companion object {
-//        const val VERZE: Int = 4310
-//    }
-
-//    override fun onResume() {
-//        super.onResume()
-//
-//        prefsPrihlaseni.edit {
-//            putInt("verze", VERZE)
-//        }
-//    }
-
     private val repo by inject<Repository>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
-//
-//        if (prefsPrihlaseni.getInt("verze", 0) < VERZE) {
-//            prefsPrihlaseni.edit {
-//                putBoolean("prihlasen", false)
-//            }
-//        }
 
         setContent {
             val navController = rememberNavController()
 
-            val prihlasen by repo.prihlasenState.collectAsStateWithLifecycle(false)
+            val prihlasen by repo.prihlasenState.collectAsStateWithLifecycle(null)
 
-            CompositionLocalProvider(LocalMainActivity provides this) {
-                DotaznikTheme(
-                    useDynamicColor = false
+            if (prihlasen != null) DotaznikTheme(
+                useDynamicColor = true
+            ) {
+                Surface(
+                    color = MaterialTheme.colorScheme.surface
                 ) {
-                    Surface(
-                        color = MaterialTheme.colorScheme.surface
-                    ) {
-                        DestinationsNavHost(navController = navController, navGraph = NavGraphs.root)
-                    }
+                    DestinationsNavHost(navController = navController, navGraph = NavGraphs.root)
                 }
             }
 
@@ -77,8 +54,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-}
-
-val LocalMainActivity = staticCompositionLocalOf<MainActivity> {
-    error("CompositionLocal LocalMainActivity not present")
 }
