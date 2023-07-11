@@ -18,8 +18,8 @@ android {
         applicationId = "cz.regulus.dotaznik"
         minSdk = 21
         targetSdk = 34
-        versionCode = 6
-        versionName = "5.0.0-pre.1"
+        versionCode = 7
+        versionName = "5.0.0-rc.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -114,4 +114,6 @@ dependencies {
 
     implementation(libs.firebase.crashlytics.ktx)
     implementation(libs.firebase.analytics.ktx)
+
+    implementation(libs.semver)
 }

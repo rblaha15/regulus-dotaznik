@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.get
 import com.google.firebase.remoteconfig.ktx.remoteConfig
@@ -17,15 +18,21 @@ import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import cz.regulus.dotaznik.dotaznik.Firma
 import cz.regulus.dotaznik.dotaznik.Stranky
 import cz.regulus.dotaznik.prihlaseni.Zamestnanec
+import io.github.z4kn4fein.semver.toVersion
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.koin.core.annotation.Single
 import java.io.File
+import java.io.IOException
+import java.net.URL
+
 
 @Single
 class Repository(
@@ -194,5 +201,32 @@ class Repository(
     suspend fun pocetDovolenychFotek(): Int {
         val pocet = prefs.data.first()[KEY_FOTKY]?.size ?: 0
         return MAX_POCET_FOTEK - pocet
+    }
+
+    private suspend fun jePotrebaAktualizovatAplikaci(): Boolean {
+        val jeDebug = BuildConfig.DEBUG
+
+        if (jeDebug) return false
+
+        val text = try {
+            withContext(Dispatchers.IO) {
+                URL("https://raw.githubusercontent.com/rblaha15/regulus-dotaznik/main/app/version.txt").openConnection().run {
+                    doInput = true
+                    getInputStream().bufferedReader().readLine() ?: "0.0.0"
+                }
+            }
+        } catch (e: IOException) {
+            Firebase.crashlytics.recordException(e)
+            return false
+        }
+
+        val mistniVerze = BuildConfig.VERSION_NAME.toVersion(false)
+        val nejnovejsiVerze = text.toVersion(false)
+
+        return mistniVerze < nejnovejsiVerze
+    }
+
+    val jePotrebaAktualizovatAplikaci = flow {
+        emit(jePotrebaAktualizovatAplikaci())
     }
 }
