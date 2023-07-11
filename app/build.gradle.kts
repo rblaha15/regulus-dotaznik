@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "cz.regulus.dotaznik"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "cz.regulus.dotaznik"
         minSdk = 21
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 4
         versionName = "5.0.0-alpha.3"
 
