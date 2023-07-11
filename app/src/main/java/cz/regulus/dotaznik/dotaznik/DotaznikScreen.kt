@@ -153,115 +153,128 @@ fun Dotaznik(
     ModalNavigationDrawer(
         drawerContent = {
             ModalDrawerSheet {
-                if (uzivatel == null) {
-                    Text(R.string.nejste_prihlaseni.toText().composeString(), Modifier.padding(all = 8.dp))
-                } else {
-                    Text(
-                        text = Mix(R.string.prihlaseni_jmeno_prijmeni.toText(), " ".toText(), uzivatel.celeJmeno.toText()).composeString(),
-                        Modifier
-                            .padding(horizontal = 8.dp)
-                            .padding(top = 8.dp)
-                    )
-                    Text(
-                        text = Mix(R.string.prihlaseni_email.toText(), " ".toText(), uzivatel.email.toText()).composeString(),
-                        Modifier
-                            .padding(horizontal = 8.dp)
-                            .padding(top = 8.dp)
-                    )
-                    if (uzivatel.ico.isNotBlank()) Text(
-                        text = Mix(R.string.prihlaseni_ico.toText(), " ".toText(), uzivatel.ico.toText()).composeString(),
-                        Modifier
-                            .padding(horizontal = 8.dp)
-                            .padding(top = 8.dp)
-                    )
-                    Text(
-                        text = Mix(R.string.prihlaseni_kod.toText(), " ".toText(), uzivatel.cisloKo.toText()).composeString(),
-                        Modifier
-                            .padding(horizontal = 8.dp)
-                            .padding(vertical = 8.dp)
-                    )
+                Column(
+                    Modifier
+                        .weight(1F)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    if (uzivatel == null) {
+                        Text(R.string.nejste_prihlaseni.toText().composeString(), Modifier.padding(all = 8.dp))
+                    } else {
+                        Text(
+                            text = Mix(
+                                R.string.prihlaseni_jmeno_prijmeni.toText(),
+                                " ".toText(),
+                                uzivatel.celeJmeno.toText()
+                            ).composeString(),
+                            Modifier
+                                .padding(horizontal = 8.dp)
+                                .padding(top = 8.dp)
+                        )
+                        Text(
+                            text = Mix(R.string.prihlaseni_email.toText(), " ".toText(), uzivatel.email.toText()).composeString(),
+                            Modifier
+                                .padding(horizontal = 8.dp)
+                                .padding(top = 8.dp)
+                        )
+                        if (uzivatel.ico.isNotBlank()) Text(
+                            text = Mix(R.string.prihlaseni_ico.toText(), " ".toText(), uzivatel.ico.toText()).composeString(),
+                            Modifier
+                                .padding(horizontal = 8.dp)
+                                .padding(top = 8.dp)
+                        )
+                        Text(
+                            text = Mix(R.string.prihlaseni_kod.toText(), " ".toText(), uzivatel.cisloKo.toText()).composeString(),
+                            Modifier
+                                .padding(horizontal = 8.dp)
+                                .padding(vertical = 8.dp)
+                        )
 
-                    Divider(Modifier.fillMaxWidth())
+                        Divider(Modifier.fillMaxWidth())
 
-                    (stranky ?: Stranky()).vse.forEachIndexed { i, stranka ->
+                        (stranky ?: Stranky()).vse.forEachIndexed { i, stranka ->
+                            NavigationDrawerItem(
+                                label = {
+                                    Text(stranka.nazev.composeString())
+                                },
+                                selected = pagerState.currentPage == i,
+                                onClick = {
+                                    scope.launch {
+                                        drawerState.close()
+                                        pagerState.animateScrollToPage(i)
+                                    }
+                                },
+                                Modifier.padding(all = 8.dp),
+                                icon = {
+                                    Icon(stranka.icon, stranka.nazev.composeString())
+                                },
+                            )
+                        }
+
+                        Divider(Modifier.fillMaxWidth())
+
+                        val posun = remember {
+                            Animatable(0F)
+                        }
+
                         NavigationDrawerItem(
                             label = {
-                                Text(stranka.nazev.composeString())
+                                Text(
+                                    R.string.odeslat.toText().composeString(),
+                                    Modifier.padding(ButtonDefaults.ButtonWithIconContentPadding)
+                                )
                             },
-                            selected = pagerState.currentPage == i,
+                            selected = false,
                             onClick = {
                                 scope.launch {
+                                    posun.animateTo(2500F, FloatTweenSpec(400, 0, FastOutLinearInEasing))
                                     drawerState.close()
-                                    pagerState.animateScrollToPage(i)
+                                    posun.snapTo(0F)
                                 }
+                                zmenitState(true)
                             },
                             Modifier.padding(all = 8.dp),
                             icon = {
-                                Icon(stranka.icon, stranka.nazev.composeString())
+                                Icon(Icons.Default.Send, null, Modifier.offset {
+                                    IntOffset(x = posun.value.toDp().value.toInt(), y = 0)
+                                })
                             },
+                            colors = NavigationDrawerItemDefaults.colors(
+                                unselectedContainerColor = MaterialTheme.colorScheme.primary,
+                                unselectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                                unselectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                            ),
+                        )
+
+                        OutlinedButton(
+                            onClick = {
+                                odstranitVse()
+                            },
+                            Modifier.padding(all = 8.dp),
+                        ) {
+                            Text(R.string.odstranit_vse.toText().composeString())
+                        }
+
+                        TextButton(
+                            onClick = {
+                                odhlasit()
+                            },
+                            Modifier.padding(all = 8.dp),
+                        ) {
+                            Text(R.string.odhlasit_se.toText().composeString())
+                        }
+
+                        Text(
+                            "Verze: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                            Modifier.padding(8.dp),
+                            fontSize = 12.sp
+                        )
+                        if (debug) Text(
+                            "Toto je DEBUG verze aplikace. Žádný email nebude odeslán firmě Regulus, pouze Vám na email specifikovaný výše.",
+                            Modifier.padding(8.dp),
+                            fontSize = 12.sp
                         )
                     }
-
-                    Divider(Modifier.fillMaxWidth())
-
-                    val posun = remember {
-                        Animatable(0F)
-                    }
-
-                    NavigationDrawerItem(
-                        label = {
-                            Text(R.string.odeslat.toText().composeString(), Modifier.padding(ButtonDefaults.ButtonWithIconContentPadding))
-                        },
-                        selected = false,
-                        onClick = {
-                            scope.launch {
-                                posun.animateTo(2500F, FloatTweenSpec(400, 0, FastOutLinearInEasing))
-                                drawerState.close()
-                                posun.snapTo(0F)
-                            }
-                            zmenitState(true)
-                        },
-                        Modifier.padding(all = 8.dp),
-                        icon = {
-                            Icon(Icons.Default.Send, null, Modifier.offset {
-                                IntOffset(x = posun.value.toDp().value.toInt(), y = 0)
-                            })
-                        },
-                        colors = NavigationDrawerItemDefaults.colors(
-                            unselectedContainerColor = MaterialTheme.colorScheme.primary,
-                            unselectedTextColor = MaterialTheme.colorScheme.onPrimary,
-                            unselectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                        ),
-                    )
-
-                    OutlinedButton(
-                        onClick = {
-                            odstranitVse()
-                        },
-                        Modifier.padding(all = 8.dp),
-                    ) {
-                        Text(R.string.odstranit_vse.toText().composeString())
-                    }
-
-                    TextButton(
-                        onClick = {
-                            odhlasit()
-                        },
-                        Modifier.padding(all = 8.dp),
-                    ) {
-                        Text(R.string.odhlasit_se.toText().composeString())
-                    }
-
-                    Text(
-                        "Verze: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
-                        Modifier.padding(8.dp),
-                        fontSize = 12.sp
-                    )
-                    if (debug) Text(
-                        "Toto je DEBUG verze aplikace. Žádný email nebude odeslán firmě Regulus, pouze Vám na email specifikovaný výše.",
-                        Modifier.padding(8.dp),
-                        fontSize = 12.sp
-                    )
                 }
             }
         },
@@ -480,6 +493,8 @@ fun Dotaznik(
                 state = pagerState,
                 Modifier
                     .padding(paddingValues),
+                pageSpacing = 8.dp,
+                key = { stranky.vse[it].nazev.toString() }
             ) { i ->
                 Scaffold(
                     floatingActionButton = {
