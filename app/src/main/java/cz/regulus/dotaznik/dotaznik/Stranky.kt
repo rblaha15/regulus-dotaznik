@@ -705,6 +705,7 @@ data class Stranky(
                         listOf(
                             Strings.system_os_1okruh.toText(),
                             Strings.system_os_2okruhy.toText(),
+                            Strings.system_os_3okruhy.toText(),
                             Strings.system_os_invertor.toText(),
                             Strings.jiny.toText(),
                         )
@@ -1197,7 +1198,7 @@ data class Stranky(
                 override val popis get() = Strings.prislusenstvi_pokojova_jednotka.toText()
                 override val moznosti
                     get() = { _: Stranka ->
-                        listOf("RCD".toText(), "RC 25".toText())
+                        listOf("RC 25".toText())
                     }
             }
 
