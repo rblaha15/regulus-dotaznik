@@ -1,6 +1,7 @@
 package cz.regulus.dotaznik.dotaznik
 
 import android.animation.TimeInterpolator
+import android.annotation.SuppressLint
 import android.view.animation.AnticipateOvershootInterpolator
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Easing
@@ -129,6 +130,7 @@ fun DotaznikScreen(
     )
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun Dotaznik(
@@ -504,11 +506,10 @@ fun Dotaznik(
                             }
                         }
                     },
-                ) { paddingValues1 ->
+                ) { _ ->
                     Column(
                         Modifier
                             .fillMaxSize()
-                            .padding(paddingValues1)
                     ) {
                         val stranka by remember(stranky.vse, i) {
                             derivedStateOf {
