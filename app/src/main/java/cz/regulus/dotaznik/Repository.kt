@@ -54,7 +54,7 @@ class Repository(
                 } catch (e: Exception) {
                     Toast.makeText(
                         ctx,
-                        "Je potřeba připojení k internetu",
+                        R.string.potreba_internet,
                         Toast.LENGTH_SHORT,
                     ).show()
                     throw e

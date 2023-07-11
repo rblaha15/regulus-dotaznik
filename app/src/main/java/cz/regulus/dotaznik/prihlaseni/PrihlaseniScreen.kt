@@ -43,12 +43,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import cz.regulus.dotaznik.R
 import cz.regulus.dotaznik.Uzivatel
+import cz.regulus.dotaznik.composeString
+import cz.regulus.dotaznik.toText
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -102,7 +106,7 @@ fun Prihlaseni(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text("Regulus dotazník")
+                    Text(R.string.app_name.toText().composeString())
                 }
             )
         },
@@ -111,14 +115,16 @@ fun Prihlaseni(
         },
         bottomBar = {
             Row(
-                Modifier.fillMaxWidth().padding(all = 8.dp)
+                Modifier
+                    .fillMaxWidth()
+                    .padding(all = 8.dp)
             ) {
                 TextButton(
                     onClick = {
                         zrusit()
                     }
                 ) {
-                    Text(text = "Zrušit")
+                    Text(text = R.string.zrusit.toText().composeString())
                 }
                 Spacer(Modifier.weight(1F))
                 Button(
@@ -130,7 +136,7 @@ fun Prihlaseni(
                         }
                     }
                 ) {
-                    Text(text = "OK")
+                    Text(text = R.string.ok.toText().composeString())
                 }
             }
         }
@@ -163,7 +169,7 @@ fun Prihlaseni(
                             zmenitJsemZamestnanec(true)
                         },
                     )
-                    Text(text = "Jsem zaměstnanec Regulusu")
+                    Text(text = R.string.prihlaseni_jsem_zamestanec.toText().composeString())
                 }
             }
             Surface(
@@ -181,7 +187,7 @@ fun Prihlaseni(
                             zmenitJsemZamestnanec(false)
                         },
                     )
-                    Text(text = "Nejsem zaměstnanec Regulusu")
+                    Text(text = R.string.prihlaseni_nejsem_zamestanec.toText().composeString())
                 }
             }
             if (zamestanec) {
@@ -201,7 +207,7 @@ fun Prihlaseni(
                         readOnly = true,
                         value = vybrano,
                         onValueChange = {},
-                        label = { Text("Vyberte se") },
+                        label = { Text(R.string.prihlaseni_vyber_se.toText().composeString()) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                     )
@@ -225,9 +231,12 @@ fun Prihlaseni(
                     }
                 }
                 if (novyClovek != null) {
-                    Text(text = "Jméno a příjmení: ${novyClovek.celeJmeno}", Modifier.padding(top = 8.dp))
-                    Text(text = "Číslo KO: ${novyClovek.cisloKo}")
-                    Text(text = "Email: ${novyClovek.email}")
+                    Text(
+                        text = R.string.prihlaseni_vybrany_jmeno_prijmeni.toText(novyClovek.celeJmeno).composeString(),
+                        Modifier.padding(top = 8.dp)
+                    )
+                    Text(text = R.string.prihlaseni_vybrany_kod.toText(novyClovek.cisloKo).composeString())
+                    Text(text = R.string.prihlaseni_vybrany_email.toText(novyClovek.email).composeString())
                 }
             } else {
                 val seznam = remember {
@@ -246,7 +255,7 @@ fun Prihlaseni(
                         readOnly = true,
                         value = vybrano,
                         onValueChange = {},
-                        label = { Text("Váš obchodní zástupce") },
+                        label = { Text(R.string.prihlaseni_vas_zastupce.toText().composeString()) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                     )
@@ -270,7 +279,7 @@ fun Prihlaseni(
                     }
                 }
                 if (novyClovek != null) {
-                    Text(text = "Doplňte, prosím, ještě nějaké informace o Vás:", Modifier.padding(top = 8.dp))
+                    Text(text = R.string.prihlaseni_doplnit_info.toText().composeString(), Modifier.padding(top = 8.dp))
                     val focusManager = LocalFocusManager.current
                     OutlinedTextField(
                         value = novyClovek.jmeno,
@@ -283,7 +292,7 @@ fun Prihlaseni(
                             .fillMaxWidth()
                             .padding(top = 8.dp),
                         label = {
-                            Text(text = "Vaše jméno")
+                            Text(text = R.string.prihlaseni_vase_jmeno.toText().composeString())
                         },
                         keyboardActions = KeyboardActions {
                             focusManager.moveFocus(FocusDirection.Down)
@@ -291,6 +300,7 @@ fun Prihlaseni(
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Next,
                             keyboardType = KeyboardType.Text,
+                            capitalization = KeyboardCapitalization.Words,
                         ),
                     )
                     OutlinedTextField(
@@ -304,7 +314,7 @@ fun Prihlaseni(
                             .fillMaxWidth()
                             .padding(top = 8.dp),
                         label = {
-                            Text(text = "Vaše příjmení")
+                            Text(text = R.string.prihlaseni_vase_prijmeni.toText().composeString())
                         },
                         keyboardActions = KeyboardActions {
                             focusManager.moveFocus(FocusDirection.Down)
@@ -312,6 +322,7 @@ fun Prihlaseni(
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Next,
                             keyboardType = KeyboardType.Text,
+                            capitalization = KeyboardCapitalization.Words,
                         ),
                     )
                     OutlinedTextField(
@@ -325,7 +336,7 @@ fun Prihlaseni(
                             .fillMaxWidth()
                             .padding(top = 8.dp),
                         label = {
-                            Text(text = "Váš email")
+                            Text(text = R.string.prihlaseni_vas_email.toText().composeString())
                         },
                         keyboardActions = KeyboardActions {
                             focusManager.moveFocus(FocusDirection.Down)
@@ -349,7 +360,7 @@ fun Prihlaseni(
                             .fillMaxWidth()
                             .padding(top = 8.dp),
                         label = {
-                            Text(text = "Vaše IČO (nepovinné)")
+                            Text(text = R.string.prihlaseni_vase_ico.toText().composeString())
                         },
                         keyboardActions = KeyboardActions {
                             focusManager.clearFocus()

@@ -76,6 +76,7 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalTextInputService
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -652,7 +653,7 @@ fun Vec(
                             Modifier,
                         ) {
                             Text(vec.vybraneJednotky.composeString())
-                            Icon(Icons.Default.ArrowDropDown, "Vybrat jednotky")
+                            Icon(Icons.Default.ArrowDropDown, stringResource(R.string.vybrat_jednotky))
                         }
                     }
                 },
