@@ -4,6 +4,9 @@ datastore-preferences = "latest.release"
 compose-destinations = "latest.release"
 compose-lifecycle = "latest.release"
 activity-compose = "latest.release"
+firebase-analytics-ktx = "latest.release"
+firebase-crashlytics-ktx = "latest.release"
+firebase-crashlytics-plugin = "latest.release"
 material3-window-size = "latest.release"
 material-icons-extended = "latest.release"
 ui-test-manifest = "latest.release"
@@ -37,6 +40,8 @@ ksp = "latest.release"
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "compose-lifecycle" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore-preferences" }
+firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx", version.ref = "firebase-analytics-ktx" }
+firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx", version.ref = "firebase-crashlytics-ktx" }
 ksp = { module = "io.github.raamcosta.compose-destinations:ksp", version.ref = "compose-destinations" }
 core = { module = "io.github.raamcosta.compose-destinations:core", version.ref = "compose-destinations" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-lifecycle" }
@@ -70,5 +75,6 @@ firebase-config-ktx = { module = "com.google.firebase:firebase-config-ktx", vers
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin-android" }
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-plugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinx-serialization" }

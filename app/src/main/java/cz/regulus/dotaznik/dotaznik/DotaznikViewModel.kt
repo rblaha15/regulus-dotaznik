@@ -4,6 +4,9 @@ import android.content.res.Resources
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
+import com.sun.mail.util.MailConnectException
 import cz.regulus.dotaznik.BuildConfig
 import cz.regulus.dotaznik.PrihlasenState
 import cz.regulus.dotaznik.Repository
@@ -177,13 +180,14 @@ class DotaznikViewModel(
 
         } catch (e: MessagingException) {
             e.printStackTrace()
+            Firebase.crashlytics.recordException(RuntimeException("Could not send email", e))
 
             Log.e("email", "CHYBA", e)
 
             chyba = e.stackTraceToString()
 
             _odeslaniState.value =
-                if (e.toString().contains("Couldn't connect to host"))
+                if (e is MailConnectException)
                     OdesilaniState.Error.Offline
                 else
                     OdesilaniState.Error.Podrobne(e.stackTraceToString())
