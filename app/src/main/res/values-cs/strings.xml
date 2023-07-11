@@ -63,6 +63,7 @@
     <string name="system_otopny_system">Otopný systém</string>
     <string name="system_os_1okruh">1 otopný okruh</string>
     <string name="system_os_2okruhy">2 otopné okruhy</string>
+    <string name="system_os_3okruhy">3 otopné okruhy</string>
     <string name="system_os_invertor">Invertor na přímo</string>
     <string name="system_cirkulace">Cirkulace teplé vody</string>
     <string name="system_ohrev_bazenu">Ohřev bazénu</string>
