@@ -8,6 +8,7 @@ import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FloatTweenSpec
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -62,6 +63,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -74,9 +76,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.ImeOptions
+import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.TextInputService
+import androidx.compose.ui.text.input.TextInputSession
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -543,7 +551,7 @@ fun Dotaznik(
                                         color = if (i % 2 == 0) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant,
                                     ) {
                                         Vec(
-                                            stranka = stranka,
+                                            stranky = stranky,
                                             firmy = firmy,
                                             vec = vec,
                                             upravitVec = { novaVec ->
@@ -556,7 +564,7 @@ fun Dotaznik(
                         }
 
                         Vec(
-                            stranka = stranka,
+                            stranky = stranky,
                             firmy = firmy,
                             vec = stranka.veci.last().last(),
                             upravitVec = { novaVec ->
@@ -574,12 +582,12 @@ fun Dotaznik(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Vec(
-    stranka: Stranky.Stranka,
+    stranky: Stranky,
     firmy: List<Firma>,
     vec: Stranky.Stranka.Vec,
     upravitVec: (Stranky.Stranka.Vec) -> Unit,
 ) {
-    val zobrazit = remember(stranka) { vec.zobrazit(stranka) }
+    val zobrazit = remember(stranky) { vec.zobrazit(stranky) }
     val focusManager = LocalFocusManager.current
     if (zobrazit) when (vec) {
         is Stranky.Stranka.Vec.Nadpis -> {
@@ -611,9 +619,7 @@ fun Vec(
                 keyboardActions = KeyboardActions {
                     focusManager.moveFocus(FocusDirection.Down)
                 },
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next,
-                ),
+                keyboardOptions = vec.klavesnice,
             )
         }
 
@@ -672,14 +678,12 @@ fun Vec(
                 keyboardActions = KeyboardActions {
                     focusManager.moveFocus(FocusDirection.Down)
                 },
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next,
-                ),
+                keyboardOptions = vec.klavesnice,
             )
         }
 
         is Stranky.Stranka.Vec.Vybiratko -> {
-            val seznam = remember(stranka) { vec.moznosti(stranka) }
+            val seznam = remember(stranky) { vec.moznosti(stranky) }
             var expanded by rememberSaveable { mutableStateOf(false) }
             ExposedDropdownMenuBox(
                 expanded = expanded,
@@ -687,21 +691,25 @@ fun Vec(
                 Modifier
                     .fillMaxWidth(),
             ) {
-                OutlinedTextField(
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
-                        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-                    readOnly = true,
-                    value = vec.vybrano.composeString(),
-                    onValueChange = {},
-                    label = { Text(vec.popis.composeString()) },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                    keyboardActions = KeyboardActions {
-                        focusManager.moveFocus(FocusDirection.Down)
-                    },
-                )
+                CompositionLocalProvider(
+                    LocalTextInputService provides null
+                ) {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
+                            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+                        readOnly = true,
+                        value = vec.vybrano.composeString(),
+                        onValueChange = {},
+                        label = { Text(vec.popis.composeString()) },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                        keyboardActions = KeyboardActions {
+                            focusManager.moveFocus(FocusDirection.Down)
+                        },
+                    )
+                }
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
@@ -723,8 +731,8 @@ fun Vec(
         is Stranky.Stranka.Vec.DvojVybiratko -> Row(
             Modifier.fillMaxWidth()
         ) {
-            val seznam1 = remember(stranka) { vec.moznosti1(stranka) }
-            val seznam2 = remember(stranka) { vec.moznosti2(stranka) }
+            val seznam1 = remember(stranky) { vec.moznosti1(stranky) }
+            val seznam2 = remember(stranky) { vec.moznosti2(stranky) }
             var expanded1 by rememberSaveable { mutableStateOf(false) }
             var expanded2 by rememberSaveable { mutableStateOf(false) }
             ExposedDropdownMenuBox(
@@ -733,21 +741,25 @@ fun Vec(
                 Modifier
                     .weight(1F),
             ) {
-                OutlinedTextField(
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
-                        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-                    readOnly = true,
-                    value = vec.vybrano1.composeString(),
-                    onValueChange = {},
-                    label = { Text(vec.popis.composeString()) },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded1) },
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                    keyboardActions = KeyboardActions {
-                        focusManager.moveFocus(FocusDirection.Down)
-                    },
-                )
+                CompositionLocalProvider(
+                    LocalTextInputService provides null
+                ) {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
+                            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+                        readOnly = true,
+                        value = vec.vybrano1.composeString(),
+                        onValueChange = {},
+                        label = { Text(vec.popis.composeString()) },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded1) },
+                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                        keyboardActions = KeyboardActions {
+                            focusManager.moveFocus(FocusDirection.Down)
+                        },
+                    )
+                }
                 ExposedDropdownMenu(
                     expanded = expanded1,
                     onDismissRequest = { expanded1 = false },
@@ -770,21 +782,25 @@ fun Vec(
                 Modifier
                     .weight(1F),
             ) {
-                OutlinedTextField(
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
-                        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-                    readOnly = true,
-                    value = vec.vybrano2.composeString(),
-                    onValueChange = {},
-                    label = { Text(vec.popis.composeString()) },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded2) },
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                    keyboardActions = KeyboardActions {
-                        focusManager.moveFocus(FocusDirection.Down)
-                    },
-                )
+                CompositionLocalProvider(
+                    LocalTextInputService provides null
+                ) {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
+                            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+                        readOnly = true,
+                        value = vec.vybrano2.composeString(),
+                        onValueChange = {},
+                        label = { Text(vec.popis.composeString()) },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded2) },
+                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                        keyboardActions = KeyboardActions {
+                            focusManager.moveFocus(FocusDirection.Down)
+                        },
+                    )
+                }
                 ExposedDropdownMenu(
                     expanded = expanded2,
                     onDismissRequest = { expanded2 = false },
@@ -838,7 +854,7 @@ fun Vec(
                     upravitVec(vec.zaskrtnuto(it))
                 },
             )
-            val seznam = remember(stranka) { vec.moznosti(stranka) }
+            val seznam = remember(stranky) { vec.moznosti(stranky) }
             var expanded by rememberSaveable { mutableStateOf(false) }
             ExposedDropdownMenuBox(
                 expanded = expanded && vec.zaskrtnuto,
@@ -848,24 +864,28 @@ fun Vec(
                 Modifier
                     .fillMaxWidth(),
             ) {
-                OutlinedTextField(
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
-                        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-                    readOnly = true,
-                    value = if (!vec.zaskrtnuto) "" else vec.vybrano.composeString(),
-                    onValueChange = {},
-                    label = { Text(vec.popis.composeString()) },
-                    trailingIcon = { if (vec.zaskrtnuto) ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded && vec.zaskrtnuto) },
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
-                        disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    ),
-                    enabled = vec.zaskrtnuto,
-                    keyboardActions = KeyboardActions {
-                        focusManager.moveFocus(FocusDirection.Down)
-                    },
-                )
+                CompositionLocalProvider(
+                    LocalTextInputService provides null
+                ) {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
+                            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+                        readOnly = true,
+                        value = if (!vec.zaskrtnuto) "" else vec.vybrano.composeString(),
+                        onValueChange = {},
+                        label = { Text(vec.popis.composeString()) },
+                        trailingIcon = { if (vec.zaskrtnuto) ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded && vec.zaskrtnuto) },
+                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
+                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        enabled = vec.zaskrtnuto,
+                        keyboardActions = KeyboardActions {
+                            focusManager.moveFocus(FocusDirection.Down)
+                        },
+                    )
+                }
                 ExposedDropdownMenu(
                     expanded = expanded && vec.zaskrtnuto,
                     onDismissRequest = { expanded = false },

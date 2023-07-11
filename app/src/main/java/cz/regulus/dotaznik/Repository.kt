@@ -64,11 +64,15 @@ class Repository(
         }
     }
 
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
+
     val lidi = remoteConfigLoaded.map {
-        Json.decodeFromString<List<Zamestnanec>>(remoteConfig["lidi"].asString())
+        json.decodeFromString<List<Zamestnanec>>(remoteConfig["lidi"].asString())
     }
     val firmy = remoteConfigLoaded.map {
-        Json.decodeFromString<List<Firma>>(remoteConfig["firmy"].asString())
+        json.decodeFromString<List<Firma>>(remoteConfig["firmy"].asString())
     }
 
     private val prefs = PreferenceDataStoreFactory.create {
@@ -76,28 +80,28 @@ class Repository(
     }
 
     val prihlasenState = prefs.data.map { preferences ->
-        preferences[KEY_PRIHLASEN]?.let { Json.decodeFromString<PrihlasenState>(it) } ?: PrihlasenState.Odhasen
+        preferences[KEY_PRIHLASEN]?.let { json.decodeFromString<PrihlasenState>(it) } ?: PrihlasenState.Odhasen
     }
 
     suspend fun prihlasit(uzivatel: Uzivatel) {
         prefs.edit {
-            it[KEY_PRIHLASEN] = Json.encodeToString<PrihlasenState>(PrihlasenState.Prihlasen(uzivatel))
+            it[KEY_PRIHLASEN] = json.encodeToString<PrihlasenState>(PrihlasenState.Prihlasen(uzivatel))
         }
     }
 
     suspend fun odhlasit() {
         prefs.edit {
-            it[KEY_PRIHLASEN] = Json.encodeToString<PrihlasenState>(PrihlasenState.Odhasen)
+            it[KEY_PRIHLASEN] = json.encodeToString<PrihlasenState>(PrihlasenState.Odhasen)
         }
     }
 
     val stranky = prefs.data.map { preferences ->
-        preferences[KEY_STRANKY]?.let { Json.decodeFromString<Stranky>(it) } ?: Stranky()
+        preferences[KEY_STRANKY]?.let { json.decodeFromString<Stranky>(it) } ?: Stranky()
     }
 
     suspend fun upravitStranky(stranky: Stranky) {
         prefs.edit {
-            it[KEY_STRANKY] = Json.encodeToString(stranky)
+            it[KEY_STRANKY] = json.encodeToString(stranky)
         }
     }
 
