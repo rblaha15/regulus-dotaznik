@@ -22,7 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -348,7 +348,7 @@ fun Fotky(
                             },
                             Modifier.padding(8.dp)
                         ) {
-                            Icon(Icons.Default.DeleteForever, null, Modifier.padding(end = ButtonDefaults.IconSpacing))
+                            Icon(Icons.Default.Delete, null, Modifier.padding(end = ButtonDefaults.IconSpacing))
                             Text("Odstranit")
                         }
                     }

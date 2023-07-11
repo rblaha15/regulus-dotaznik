@@ -83,7 +83,7 @@ class DotaznikViewModel(
                 OdesilaniState.Nic -> zacitOdesilani()
                 is OdesilaniState.OpravduOdeslat -> odeslat()
                 OdesilaniState.Odesilani -> Unit
-                OdesilaniState.UspechAOdstranitData -> odstranitData()
+                OdesilaniState.Uspech -> odstranitVse()
                 OdesilaniState.Error.Offline -> zobrazitChybu()
                 is OdesilaniState.Error.Podrobne -> Unit
                 OdesilaniState.OdstranitData -> odstranitData()
@@ -176,7 +176,7 @@ class DotaznikViewModel(
                 })
             })
 
-            _odeslaniState.value = OdesilaniState.UspechAOdstranitData
+            _odeslaniState.value = OdesilaniState.Uspech
 
         } catch (e: MessagingException) {
             e.printStackTrace()

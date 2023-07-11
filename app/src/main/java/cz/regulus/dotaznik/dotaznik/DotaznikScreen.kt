@@ -8,7 +8,6 @@ import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FloatTweenSpec
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -78,13 +77,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.ImeOptions
-import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.input.TextInputService
-import androidx.compose.ui.text.input.TextInputSession
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -337,9 +331,9 @@ fun Dotaznik(
                 },
             )
 
-            OdesilaniState.UspechAOdstranitData -> AlertDialog(
+            OdesilaniState.Uspech -> AlertDialog(
                 onDismissRequest = {
-                    zmenitState(false)
+                    zmenitState(true)
                 },
                 confirmButton = {
                     TextButton(
@@ -347,16 +341,7 @@ fun Dotaznik(
                             zmenitState(true)
                         }
                     ) {
-                        Text(R.string.ano.toText().composeString())
-                    }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = {
-                            zmenitState(false)
-                        }
-                    ) {
-                        Text(R.string.ne.toText().composeString())
+                        Text(R.string.ok.toText().composeString())
                     }
                 },
                 title = {
@@ -364,9 +349,6 @@ fun Dotaznik(
                 },
                 icon = {
                     Icon(Icons.Default.Check, null)
-                },
-                text = {
-                    Text(text = R.string.export_opravdu_odstranit_data.toText().composeString())
                 },
             )
 

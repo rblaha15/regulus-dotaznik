@@ -106,16 +106,16 @@ class Repository(
     }
 
     private val photoIds = prefs.data.map { preferences ->
-        (preferences[KEY_FOTKY] ?: setOf()).toList().map { it.toInt() }
+        (preferences[KEY_FOTKY] ?: setOf()).toList().map { it.toInt() }.sorted()
     }
 
     private suspend fun newPhotoId() = photoIds.first().maxOrNull()?.plus(1) ?: 0
 
     private fun MutablePreferences.pridatId(id: Int) {
-        this[KEY_FOTKY] = (this[KEY_FOTKY] ?: setOf()).toList().plus(id.toString()).toSet()
+        this[KEY_FOTKY] = (this[KEY_FOTKY] ?: setOf()).toList().plus(id.toString()).sortedBy { it.toInt() }.toSet()
     }
     private fun MutablePreferences.odebratId(id: Int) {
-        this[KEY_FOTKY] = (this[KEY_FOTKY] ?: setOf()).toList().plus(id.toString()).toSet()
+        this[KEY_FOTKY] = (this[KEY_FOTKY] ?: setOf()).toList().minus(id.toString()).sortedBy { it.toInt() }.toSet()
     }
 
     val fotky = photoIds.map { photoIds ->
