@@ -1,3 +1,5 @@
+import java.util.Properties
+
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.kotlin.android)
@@ -20,6 +22,11 @@ android {
         versionName = "5.0.0-pre.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+
+        buildConfigField("String", "HESLO", "\"${properties.getProperty("HESLO")}\"")
     }
     buildTypes {
         release {

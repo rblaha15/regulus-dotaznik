@@ -113,7 +113,7 @@ class DotaznikViewModel(
         },
         object : Authenticator() {
             override fun getPasswordAuthentication(): PasswordAuthentication {
-                return PasswordAuthentication(EmailCredentials.EMAIL, EmailCredentials.PASSWORD)
+                return PasswordAuthentication(EmailCredentials.EMAIL, BuildConfig.HESLO)
             }
         },
     )!!
