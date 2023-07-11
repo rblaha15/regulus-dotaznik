@@ -42,6 +42,8 @@ sealed class Text {
     }
 }
 
+operator fun Text.plus(toText: Text): Text.Mix = Text.Mix(this, toText)
+
 @Composable
 fun Text.composeString(): String =
     when (this) {
