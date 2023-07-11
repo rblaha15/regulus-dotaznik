@@ -35,9 +35,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarData
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -60,7 +57,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.accompanist.permissions.shouldShowRationale
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import cz.regulus.dotaznik.R
@@ -131,20 +127,7 @@ fun Fotky(
 
     Scaffold(
         snackbarHost = {
-            SnackbarHost(snackbarState) {
-                Snackbar(object : SnackbarData {
-                    override val visuals = it.visuals
-
-                    override fun dismiss() {
-                        it.dismiss()
-                    }
-
-                    override fun performAction() {
-                        cameraPermissionState.launchPermissionRequest()
-                        it.performAction()
-                    }
-                })
-            }
+            SnackbarHost(snackbarState)
         },
         topBar = {
             CenterAlignedTopAppBar(
@@ -157,7 +140,7 @@ fun Fotky(
                             navigateUp()
                         }
                     ) {
-                        Icon(Icons.Default.ArrowBack, "Zpět")
+                        Icon(Icons.Default.ArrowBack, R.string.zpet.toText().composeString())
                     }
                 }
             )
@@ -205,26 +188,9 @@ fun Fotky(
                                                     snackbarState.showSnackbar(resources.getString(it))
                                                 }
                                             }
-                                        } else if (cameraPermissionState.status.shouldShowRationale) {
-                                            scope.launch {
-                                                wait = true
-                                                snackbarState.showSnackbar(
-                                                    message = "Prosím, povolte přístup k fotoaparátu.",
-                                                    actionLabel = "Povolit",
-                                                    duration = SnackbarDuration.Indefinite,
-                                                    withDismissAction = true,
-                                                )
-                                            }
                                         } else {
-                                            scope.launch {
-                                                wait = true
-                                                snackbarState.showSnackbar(
-                                                    message = "Bez fotoaparátu nemůže tato funkce fungovat. Prosím, povolte přístup k fotoaparátu.",
-                                                    actionLabel = "Povolit",
-                                                    duration = SnackbarDuration.Indefinite,
-                                                    withDismissAction = true,
-                                                )
-                                            }
+                                            wait = true
+                                            cameraPermissionState.launchPermissionRequest()
                                         }
                                     },
                                     shape = CircleShape
@@ -240,26 +206,8 @@ fun Fotky(
                                                     snackbarState.showSnackbar(resources.getString(it))
                                                 }
                                             }
-                                        } else if (cameraPermissionState.status.shouldShowRationale) {
-                                            scope.launch {
-                                                wait = true
-                                                snackbarState.showSnackbar(
-                                                    message = "Prosím, povolte přístup k fotoaparátu.",
-                                                    actionLabel = "Povolit",
-                                                    duration = SnackbarDuration.Indefinite,
-                                                    withDismissAction = true,
-                                                )
-                                            }
                                         } else {
-                                            scope.launch {
-                                                wait = true
-                                                snackbarState.showSnackbar(
-                                                    message = "Bez fotoaparátu nemůže tato funkce fungovat. Prosím, povolte přístup k fotoaparátu.",
-                                                    actionLabel = "Povolit",
-                                                    duration = SnackbarDuration.Indefinite,
-                                                    withDismissAction = true,
-                                                )
-                                            }
+                                            cameraPermissionState.launchPermissionRequest()
                                         }
                                     },
                                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -349,7 +297,7 @@ fun Fotky(
                             Modifier.padding(8.dp)
                         ) {
                             Icon(Icons.Default.Delete, null, Modifier.padding(end = ButtonDefaults.IconSpacing))
-                            Text("Odstranit")
+                            Text(R.string.odstranit.toText().composeString())
                         }
                     }
                 }

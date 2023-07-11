@@ -160,5 +160,9 @@
     <string name="prislusenstvi_pokojove_cidlo">Pokojové čidlo</string>
     <string name="mena">€</string>
     <string name="nejste_prihlaseni">Nejste přihlášeni!</string>
-    <string name="odhlasit_se">Odhlásit se</string>-->
+    <string name="odhlasit_se">Odhlásit se</string>
+    <string name="potreba_internet">Je potřeba připojení k internetu</string>
+    <string name="zpet">Zpět</string>
+    <string name="prosim_povolte_fotoaparat">Prosím, povolte přístup k fotoaparátu.</string>
+    <string name="vybrat_jednotky">Vybrat jednotky</string>-->
 </resources>

@@ -27,7 +27,6 @@ class PrihlaseniViewModel(
     val zamestnanci = repo.lidi
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), emptyList())
     val zastupci = zamestnanci.map {
-        println("$it 1")
         it.filter { clovek ->
             clovek.zastupce
         }

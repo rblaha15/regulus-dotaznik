@@ -111,8 +111,7 @@
     <string name="prihlaseni_potreba_internet">Pro přihlášení je potřeba připojení k internetu!</string>
     <string name="prihlaseni_jsem_zamestanec">Jsem zaměstanec Regulusu</string>
     <string name="prihlaseni_nejsem_zamestanec">Nejsem zaměstanec Regulusu</string>
-    <string name="prihlaseni_vyberte">Vyberte svého obchodního zástupce:</string>
-    <string name="prihlaseni_vybrany">Vybraný obchodní zástupce: %1$s %2$s</string>
+    <string name="prihlaseni_vas_zastupce">Váš obchodní zástupce</string>
     <string name="prihlaseni_vase_jmeno">Vaše jméno</string>
     <string name="prihlaseni_vase_prijmeni">Vaše příjmení</string>
     <string name="prihlaseni_vase_ico">Vaše IČO (nepovinné)</string>
@@ -161,4 +160,7 @@
     <string name="nejste_prihlaseni">Nejste přihlášeni!</string>
     <string name="odhlasit_se">Odhlásit se</string>
     <string name="fotky_zadne_fotky">Zatím jste nepřidali žádné fotky</string>
+    <string name="potreba_internet">Je potřeba připojení k internetu</string>
+    <string name="zpet">Zpět</string>
+    <string name="vybrat_jednotky">Vybrat jednotky</string>
 </resources>
