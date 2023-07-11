@@ -38,104 +38,6 @@ data class Stranky(
     val doplnkoveZdroje: Stranka.DoplnkoveZdroje = Stranka.DoplnkoveZdroje(),
     val prislusenstvi: Stranka.Prislusenstvi = Stranka.Prislusenstvi(),
 ) {
-    context(Resources)
-    fun createXml(
-        uzivatel: Uzivatel,
-    ) = """
-        <?xml version="1.0" encoding="utf-8"?>
-        <?xml-stylesheet type="text/xsl" href="dotaznik_app.xsl"?>
-        
-        <!-- Tento soubor byl vygenerován automaticky aplikací Regulus Dotazník; verze: 2.1 -->
-        
-        <xml>
-            <system>
-                <resi_tc>Ano</resi_tc>
-                <cislo_ko>${uzivatel.cisloKo}</cislo_ko>
-                <odesilatel>${uzivatel.email}</odesilatel>
-                <odberatel_ico>${uzivatel.ico}</odberatel_ico>
-            </system>
-            <kontakt>
-                <jmeno>${kontakty.jmeno}</jmeno>
-                <prijmeni>${kontakty.prijmeni}</prijmeni>
-                <telefon>${kontakty.telefon}</telefon>
-                <email>${kontakty.email}</email>
-                <ulice>${kontakty.ulice}</ulice>
-                <psc>${
-                    if (kontakty.psc.text.length != 5) ""
-                    else kontakty.psc.text.substring(0, 3) + " " + kontakty.psc.text.substring(3, 5)
-                }</psc>
-                <mesto>${kontakty.mesto}</mesto>
-                <partner_ico>${kontakty.montazniFirma.ico}</partner_ico>
-            </kontakt>
-            <detailobjektu>
-                <os_popis>${system.otopnySystem.vybrano.asString()}</os_popis>
-                <tepelna_ztrata>${detailObjektu.tepelnaZtrata.text}</tepelna_ztrata>
-                <rocni_spotreba_vytapeni>${detailObjektu.potrebaTeplaNaVytapeni.text}</rocni_spotreba_vytapeni>
-                <rocni_spotreba_tv>${detailObjektu.potrebaTeplaNaTeplouVodu.text}</rocni_spotreba_tv>
-                <vytapena_plocha>${detailObjektu.vytapenaPlocha.text}</vytapena_plocha>
-                <vytapeny_objem>${detailObjektu.vytapenyObjem.text}</vytapeny_objem>
-                <spotreba_paliva_druh>${detailObjektu.druhPaliva.text}</spotreba_paliva_druh>
-                <spotreba_paliva_mnozstvi>${detailObjektu.spotrebaPaliva.text}</spotreba_paliva_mnozstvi>
-                <spotreba_paliva_jednotky>${detailObjektu.spotrebaPaliva.vybraneJednotky}</spotreba_paliva_jednotky>
-                <spotreba_paliva_2_druh>${detailObjektu.druhPaliva2.text}</spotreba_paliva_2_druh>
-                <spotreba_paliva_2_mnozstvi>${detailObjektu.spotrebaPaliva2.text}</spotreba_paliva_2_mnozstvi>
-                <spotreba_paliva_2_jednotky>${detailObjektu.spotrebaPaliva2.jednotky}</spotreba_paliva_2_jednotky>
-                <rocni_platba_vytapeni>${detailObjektu.nakladyNaVytapeni.text} ${Strings.mena.toText().asString()}</rocni_platba_vytapeni>
-            </detailobjektu>
-            <tc>
-                <typ>${system.typTC.vybrano.asString()}</typ>
-                <model>${system.modelTC.vybrano.asString()}</model>
-                <nadrz>${system.typNadrze.vybrano1.asString()} ${system.typNadrze.vybrano2} ${system.objemNadrze}</nadrz>
-                <vnitrni_jednotka>${system.typVnitrniJednotky}</vnitrni_jednotka>
-            </tc>
-            <zdrojeTop>
-                <topne_teleso>${doplnkoveZdroje.topneTelesoVNadrziTopeni.text.asString()}</topne_teleso>
-                <elektrokotel>${doplnkoveZdroje.elektrokotelTopeni.text.asString()}</elektrokotel>
-                <plyn_kotel>${doplnkoveZdroje.plynovyKotelTopeni.text.asString()}</plyn_kotel>
-                <krb_KTP>${doplnkoveZdroje.krbTopeni.text.asString()}</krb_KTP>
-                <jiny_zdroj>${doplnkoveZdroje.jinyTopeni.text}</jiny_zdroj>
-            </zdrojeTop>
-            <tv>
-                <zasobnik>${system.typZasobniku.vybrano.asString()} ${system.objemZasobniku.text}</zasobnik>
-                <cirkulace>${if (system.cirkulaceTepleVody.zaskrtnuto) "Ano" else "Ne"}</cirkulace>
-            </tv>
-            <zdrojeTV>
-                <topne_teleso>${doplnkoveZdroje.topneTelesoVNadrziTeplaVoda.text.asString()}</topne_teleso>
-                <elektrokotel>${if (doplnkoveZdroje.elektrokotelTeplaVoda.zaskrtnuto) "Ano" else "Ne"}</elektrokotel>
-                <plyn_kotel>${if (doplnkoveZdroje.plynovyKotelTeplaVoda.zaskrtnuto) "Ano" else "Ne"}</plyn_kotel>
-                <krb_KTP>${if (doplnkoveZdroje.krbTeplaVoda.zaskrtnuto) "Ano" else "Ne"}</krb_KTP>
-                <jiny_zdroj>${doplnkoveZdroje.jinyTeplaVoda.text}</jiny_zdroj>
-            </zdrojeTV>
-            <bazen>
-                <ohrev>${if (bazen.chciBazen.zaskrtnuto) "Ano" else "Ne"}</ohrev>
-                <doba_vyuzivani>${if (bazen.chciBazen.zaskrtnuto) bazen.dobaVyuzivani.vybrano.asString() else ""}</doba_vyuzivani>
-                <umisteni>${if (bazen.chciBazen.zaskrtnuto) bazen.umisteni.vybrano.asString() else ""}</umisteni>
-                <zakryti>${if (bazen.chciBazen.zaskrtnuto) bazen.zakryti.vybrano.asString() else ""}</zakryti>
-                <tvar>${if (bazen.chciBazen.zaskrtnuto) bazen.tvar.vybrano.asString() else ""}</tvar>
-                <sirka>${bazen.sirka}</sirka>
-                <delka>${bazen.delka}</delka>
-                <hloubka>${bazen.hloubka}</hloubka>
-                <prumer>${bazen.prumer}</prumer>
-                <teplota>${bazen.pozadovanaTeplota}</teplota>
-                <voda>${if (bazen.chciBazen.zaskrtnuto) bazen.druhVody.vybrano.asString() else ""}</voda>
-            </bazen>
-            <prislusenstvi>
-                <hadice>${prislusenstvi.hadice.text.asString()}</hadice>
-                <topny_kabel>${prislusenstvi.topnyKabel.text.asString()}</topny_kabel>
-                <drzak_na_tc>${prislusenstvi.drzakNaStenu.text.asString()}</drzak_na_tc>
-                <pokojova_jednotka>${if (prislusenstvi.pokojovaJednotka.zaskrtnuto) "RC 25" else "Ne"}</pokojova_jednotka>
-                <pokojove_cidlo>${prislusenstvi.pokojoveCidlo.text.asString()}</pokojove_cidlo>
-            </prislusenstvi>
-            <poznamka>
-                <kontakty>${kontakty.poznamka}</kontakty>
-                <detail_objektu>${detailObjektu.poznamka}</detail_objektu>
-                <tv_tc_nadrz_a_os>${system.poznamka}</tv_tc_nadrz_a_os>
-                <bazen>${bazen.poznamka}</bazen>
-                <doplnkove_zdroje>${doplnkoveZdroje.poznamka}</doplnkove_zdroje>
-                <prislusenstvi>${prislusenstvi.poznamka}</prislusenstvi>
-            </poznamka>
-        </xml>
-    """.trimIndent()
 
     val vse = listOf(
         kontakty, detailObjektu, system, bazen, doplnkoveZdroje, prislusenstvi
@@ -1353,3 +1255,102 @@ data class Stranky(
         }
     }
 }
+
+context(Resources)
+fun Stranky.createXml(
+    uzivatel: Uzivatel,
+) = """
+    <?xml version="1.0" encoding="utf-8"?>
+    <?xml-stylesheet type="text/xsl" href="dotaznik_app.xsl"?>
+    
+    <!-- Tento soubor byl vygenerován automaticky aplikací Regulus Dotazník; verze: 2.2 -->
+    
+    <xml>
+        <system>
+            <resi_tc>Ano</resi_tc>
+            <cislo_ko>${uzivatel.cisloKo}</cislo_ko>
+            <odesilatel>${uzivatel.email}</odesilatel>
+            <odberatel_ico>${uzivatel.ico}</odberatel_ico>
+        </system>
+        <kontakt>
+            <jmeno>${kontakty.jmeno.text}</jmeno>
+            <prijmeni>${kontakty.prijmeni.text}</prijmeni>
+            <telefon>${kontakty.telefon.text}</telefon>
+            <email>${kontakty.email.text}</email>
+            <ulice>${kontakty.ulice.text}</ulice>
+            <psc>${
+    if (kontakty.psc.text.length != 5) ""
+    else kontakty.psc.text.substring(0, 3) + " " + kontakty.psc.text.substring(3, 5)
+}</psc>
+            <mesto>${kontakty.mesto.text}</mesto>
+            <partner_ico>${kontakty.montazniFirma.ico}</partner_ico>
+        </kontakt>
+        <detailobjektu>
+            <os_popis>${system.otopnySystem.vybrano.asString()}</os_popis>
+            <tepelna_ztrata>${detailObjektu.tepelnaZtrata.text}</tepelna_ztrata>
+            <rocni_spotreba_vytapeni>${detailObjektu.potrebaTeplaNaVytapeni.text}</rocni_spotreba_vytapeni>
+            <rocni_spotreba_tv>${detailObjektu.potrebaTeplaNaTeplouVodu.text}</rocni_spotreba_tv>
+            <vytapena_plocha>${detailObjektu.vytapenaPlocha.text}</vytapena_plocha>
+            <vytapeny_objem>${detailObjektu.vytapenyObjem.text}</vytapeny_objem>
+            <spotreba_paliva_druh>${detailObjektu.druhPaliva.text}</spotreba_paliva_druh>
+            <spotreba_paliva_mnozstvi>${detailObjektu.spotrebaPaliva.text}</spotreba_paliva_mnozstvi>
+            <spotreba_paliva_jednotky>${detailObjektu.spotrebaPaliva.vybraneJednotky.asString()}</spotreba_paliva_jednotky>
+            <spotreba_paliva_2_druh>${detailObjektu.druhPaliva2.text}</spotreba_paliva_2_druh>
+            <spotreba_paliva_2_mnozstvi>${detailObjektu.spotrebaPaliva2.text}</spotreba_paliva_2_mnozstvi>
+            <spotreba_paliva_2_jednotky>${detailObjektu.spotrebaPaliva2.vybraneJednotky.asString()}</spotreba_paliva_2_jednotky>
+            <rocni_platba_vytapeni>${detailObjektu.nakladyNaVytapeni.text} ${Strings.mena.toText().asString()}</rocni_platba_vytapeni>
+        </detailobjektu>
+        <tc>
+            <typ>${system.typTC.vybrano.asString()}</typ>
+            <model>${system.modelTC.vybrano.asString()}</model>
+            <nadrz>${system.typNadrze.vybrano1.asString()} ${system.typNadrze.vybrano2.asString()} ${system.objemNadrze.text}</nadrz>
+            <vnitrni_jednotka>${system.typVnitrniJednotky.vybrano.asString()}</vnitrni_jednotka>
+        </tc>
+        <zdrojeTop>
+            <topne_teleso>${doplnkoveZdroje.topneTelesoVNadrziTopeni.text.asString()}</topne_teleso>
+            <elektrokotel>${doplnkoveZdroje.elektrokotelTopeni.text.asString()}</elektrokotel>
+            <plyn_kotel>${doplnkoveZdroje.plynovyKotelTopeni.text.asString()}</plyn_kotel>
+            <krb_KTP>${doplnkoveZdroje.krbTopeni.text.asString()}</krb_KTP>
+            <jiny_zdroj>${doplnkoveZdroje.jinyTopeni.text}</jiny_zdroj>
+        </zdrojeTop>
+        <tv>
+            <zasobnik>${system.typZasobniku.vybrano.asString()} ${system.objemZasobniku.text}</zasobnik>
+            <cirkulace>${if (system.cirkulaceTepleVody.zaskrtnuto) "Ano" else "Ne"}</cirkulace>
+        </tv>
+        <zdrojeTV>
+            <topne_teleso>${doplnkoveZdroje.topneTelesoVNadrziTeplaVoda.text.asString()}</topne_teleso>
+            <elektrokotel>${if (doplnkoveZdroje.elektrokotelTeplaVoda.zaskrtnuto) "Ano" else "Ne"}</elektrokotel>
+            <plyn_kotel>${if (doplnkoveZdroje.plynovyKotelTeplaVoda.zaskrtnuto) "Ano" else "Ne"}</plyn_kotel>
+            <krb_KTP>${if (doplnkoveZdroje.krbTeplaVoda.zaskrtnuto) "Ano" else "Ne"}</krb_KTP>
+            <jiny_zdroj>${doplnkoveZdroje.jinyTeplaVoda.text}</jiny_zdroj>
+        </zdrojeTV>
+        <bazen>
+            <ohrev>${if (bazen.chciBazen.zaskrtnuto) "Ano" else "Ne"}</ohrev>
+            <doba_vyuzivani>${if (bazen.chciBazen.zaskrtnuto) bazen.dobaVyuzivani.vybrano.asString() else ""}</doba_vyuzivani>
+            <umisteni>${if (bazen.chciBazen.zaskrtnuto) bazen.umisteni.vybrano.asString() else ""}</umisteni>
+            <zakryti>${if (bazen.chciBazen.zaskrtnuto) bazen.zakryti.vybrano.asString() else ""}</zakryti>
+            <tvar>${if (bazen.chciBazen.zaskrtnuto) bazen.tvar.vybrano.asString() else ""}</tvar>
+            <sirka>${bazen.sirka.text}</sirka>
+            <delka>${bazen.delka.text}</delka>
+            <hloubka>${bazen.hloubka.text}</hloubka>
+            <prumer>${bazen.prumer.text}</prumer>
+            <teplota>${bazen.pozadovanaTeplota.text}</teplota>
+            <voda>${if (bazen.chciBazen.zaskrtnuto) bazen.druhVody.vybrano.asString() else ""}</voda>
+        </bazen>
+        <prislusenstvi>
+            <hadice>${prislusenstvi.hadice.text.asString()}</hadice>
+            <topny_kabel>${prislusenstvi.topnyKabel.text.asString()}</topny_kabel>
+            <drzak_na_tc>${prislusenstvi.drzakNaStenu.text.asString()}</drzak_na_tc>
+            <pokojova_jednotka>${if (prislusenstvi.pokojovaJednotka.zaskrtnuto) "RC 25" else "Ne"}</pokojova_jednotka>
+            <pokojove_cidlo>${prislusenstvi.pokojoveCidlo.text.asString()}</pokojove_cidlo>
+        </prislusenstvi>
+        <poznamka>
+            <kontakty>${kontakty.poznamka.text}</kontakty>
+            <detail_objektu>${detailObjektu.poznamka.text}</detail_objektu>
+            <tv_tc_nadrz_a_os>${system.poznamka.text}</tv_tc_nadrz_a_os>
+            <bazen>${bazen.poznamka.text}</bazen>
+            <doplnkove_zdroje>${doplnkoveZdroje.poznamka.text}</doplnkove_zdroje>
+            <prislusenstvi>${prislusenstvi.poznamka.text}</prislusenstvi>
+        </poznamka>
+    </xml>
+""".trimIndent()
