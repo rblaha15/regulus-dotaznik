@@ -15,8 +15,8 @@ android {
         applicationId = "cz.regulus.dotaznik"
         minSdk = 21
         targetSdk = 34
-        versionCode = 4
-        versionName = "5.0.0-alpha.3"
+        versionCode = 5
+        versionName = "5.0.0-alpha.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
