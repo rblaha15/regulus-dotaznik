@@ -1,0 +1,14 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+  categories:
+    - title: "Novinky"
+      labels:
+        - enhancement
+    - title: Opravy chyb
+      labels:
+        - bug
+    - title: Ostatní
+      labels:
+        - "*"

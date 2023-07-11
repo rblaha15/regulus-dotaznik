@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_name">Regulus dotazník</string>
     <string name="kontakty">Kontakty a místo realizace</string>
     <string name="detail_objektu">Detail objektu</string>
     <string name="system">Systém</string>
@@ -9,10 +10,8 @@
 
     <string name="poznamka">Poznámka</string>
 
-    <string name="dalsi">Další stránka</string>
-    <string name="zpet">Předchozí stránka</string>
-    <string name="otevrit">Otevřít</string>
-    <string name="zavrit">Zavřít</string>
+    <string name="otevrit">Otevřít menu</string>
+    <string name="zavrit">Zavřít menu</string>
     <string name="ok">OK</string>
     <string name="ano">Ano</string>
     <string name="ne">Ne</string>
@@ -24,7 +23,6 @@
     <string name="zadny">Žádný</string>
     <string name="zadne">Žádné</string>
     <string name="vyberte">Vyberte</string>
-    <string name="nevim">Nevím</string>
     <string name="jine">Jiné</string>
     <string name="jiny">Jiný</string>
 
@@ -38,7 +36,7 @@
     <string name="kontakty_psc">PSČ</string>
     <string name="kontakty_telefon">Telefon</string>
     <string name="kontakty_email">Email</string>
-    <string name="kontakty_m_firma">Montážní firma</string>
+    <string name="kontakty_vyberte_montazni_firmu">Vyberte montážní firmu</string>
     <string name="kontakty_vybrat_firmu">Vybrat firmu</string>
     <string name="kontakty_vyberte_firmu">Vyberte montážní firmu</string>
     <string name="kontakty_vyhledat_firmu">Vyhledat firmu</string>
@@ -65,6 +63,7 @@
     <string name="system_otopny_system">Otopný systém</string>
     <string name="system_os_1okruh">1 otopný okruh</string>
     <string name="system_os_2okruhy">2 otopné okruhy</string>
+    <string name="system_os_3okruhy">3 otopné okruhy</string>
     <string name="system_os_invertor">Invertor na přímo</string>
     <string name="system_cirkulace">Cirkulace teplé vody</string>
     <string name="system_ohrev_bazenu">Ohřev bazénu</string>
@@ -112,8 +111,7 @@
     <string name="prihlaseni_potreba_internet">Pro přihlášení je potřeba připojení k internetu!</string>
     <string name="prihlaseni_jsem_zamestanec">Jsem zaměstanec Regulusu</string>
     <string name="prihlaseni_nejsem_zamestanec">Nejsem zaměstanec Regulusu</string>
-    <string name="prihlaseni_vyberte">Vyberte svého obchodního zástupce:</string>
-    <string name="prihlaseni_vybrany">Vybraný obchodní zástupce: %1$s %2$s</string>
+    <string name="prihlaseni_vas_zastupce">Váš obchodní zástupce</string>
     <string name="prihlaseni_vase_jmeno">Vaše jméno</string>
     <string name="prihlaseni_vase_prijmeni">Vaše příjmení</string>
     <string name="prihlaseni_vase_ico">Vaše IČO (nepovinné)</string>
@@ -139,7 +137,9 @@
     <string name="fotky_vyfotit">Vyfotit</string>
     <string name="fotky_vybrat_z_galerie">Vybrat z galerie</string>
     <string name="fotky_fotka">Fotka</string>
+    <string name="fotky_pridat">Přidat fotku</string>
     <string name="fotky_maximalne_fotek">Můžete přidat maximálně 5 fotek</string>
+    <string name="fotky_maximalne_fotek_presazeno">Protože můžete přidat maximálně 5 fotek, nebyly všechny vybrané fotky vloženy</string>
 
     <string name="odstranit_vse">Odstranit vše</string>
     <string name="toto_je_chyba">Toto je chyba:</string>
@@ -151,9 +151,16 @@
     <string name="na_stenu">Na stěnu</string>
     <string name="na_izolovanou_stenu">Na izolovanou stěnu</string>
     <string name="prislusenstvi">Příslušenství</string>
-    <string name="hadice">Hadice</string>
-    <string name="drzak_pro_tc">Držák pro TČ</string>
-    <string name="pokojova_jednotka">Pokojová jednotka</string>
-    <string name="topny_kabel">Topný kabel</string>
-    <string name="pokojove_cidlo">Pokojové čidlo</string>
+    <string name="prislusenstvi_hadice">Hadice</string>
+    <string name="prislusenstvi_drzak_pro_tc">Držák pro TČ</string>
+    <string name="prislusenstvi_pokojova_jednotka">Pokojová jednotka</string>
+    <string name="prislusenstvi_topny_kabel">Topný kabel</string>
+    <string name="prislusenstvi_pokojove_cidlo">Pokojové čidlo</string>
+    <string name="mena">Kč</string>
+    <string name="nejste_prihlaseni">Nejste přihlášeni!</string>
+    <string name="odhlasit_se">Odhlásit se</string>
+    <string name="fotky_zadne_fotky">Zatím jste nepřidali žádné fotky</string>
+    <string name="potreba_internet">Je potřeba připojení k internetu</string>
+    <string name="zpet">Zpět</string>
+    <string name="vybrat_jednotky">Vybrat jednotky</string>
 </resources>
