@@ -1,0 +1,151 @@
+<resources>
+
+    <string-array name="jednotky">
+        <item>@string/q</item>
+        <item>@string/m3</item>
+        <item>@string/kWh</item>
+    </string-array>
+
+    <string-array name="tcTyp">
+        <item>@string/vzduch_voda</item>
+        <item>@string/zeme_voda</item>
+    </string-array>
+    <string-array name="tcModel">
+        <item>@string/vyberte</item>
+        <item>ECOAIR 400</item>
+        <item>ECOAIR 600</item>
+        <item>RTC 6i</item>
+        <item>RTC 12i</item>
+        <item>ECOAIR 614M</item>
+        <item>ECOAIR 622M</item>
+        <item>ECOAIR 510M</item>
+        <item>ECOAIR 406</item>
+        <item>ECOAIR 408</item>
+        <item>ECOAIR 410</item>
+        <item>ECOAIR 415</item>
+        <item>ECOAIR 420</item>
+    </string-array>
+    <string-array name="tcModelA">
+        <item>@string/vyberte</item>
+        <item>ECOPART</item>
+        <item>ECOHEAT</item>
+        <item>ECOPART 406</item>
+        <item>ECOPART 408</item>
+        <item>ECOPART 410</item>
+        <item>ECOPART 412</item>
+        <item>ECOPART 414</item>
+        <item>ECOPART 417</item>
+        <item>ECOPART 435</item>
+        <item>ECOHEAT 406</item>
+        <item>ECOHEAT 408</item>
+        <item>ECOHEAT 410</item>
+        <item>ECOHEAT 412</item>
+    </string-array>
+    <string-array name="jednotka">
+        <item>@string/zadna</item>
+        <item>RegulusBOX</item>
+        <item>EcoZenith i360</item>
+        <item>EcoZenith i250</item>
+    </string-array>
+    <string-array name="nadrzTyp1">
+        <item>@string/zadna</item>
+        <item>DUO</item>
+        <item>HSK</item>
+        <item>PS</item>
+    </string-array>
+    <string-array name="nadrzTyp2">
+        <item>-</item>
+        <item>P</item>
+        <item>PR</item>
+        <item>K</item>
+        <item>K P</item>
+        <item>K PR</item>
+    </string-array>
+    <string-array name="nadrzTyp2A">
+        <item>P</item>
+        <item>PR</item>
+        <item>PV</item>
+    </string-array>
+    <string-array name="nadrzTyp2B">
+        <item>E+</item>
+        <item>ES+</item>
+        <item>N+</item>
+        <item>K+</item>
+        <item>2F</item>
+        <item>WF</item>
+    </string-array>
+    <string-array name="zasobnik">
+        <item>@string/zadny</item>
+        <item>RDC</item>
+        <item>R2DC</item>
+        <item>R0BC</item>
+        <item>RBC</item>
+        <item>RBC HP</item>
+        <item>R2BC</item>
+        <item>NBC</item>
+        <item>RGC</item>
+    </string-array>
+    <string-array name="os">
+        <item>@string/system_os_1okruh</item>
+        <item>@string/system_os_2okruhy</item>
+        <item>@string/system_os_invertor</item>
+        <item>@string/jiny</item>
+    </string-array>
+    <string-array name="dobaVyuzivani">
+        <item>@string/bazen_doba_celorocni</item>
+        <item>@string/bazen_doba_sezonni</item>
+    </string-array>
+    <string-array name="umisteni">
+        <item>@string/bazen_umisteni_venkovni</item>
+        <item>@string/bazen_umisteni_vnitrni</item>
+    </string-array>
+    <string-array name="druhVody">
+        <item>@string/bazen_druh_sladka</item>
+        <item>@string/bazen_druh_slana</item>
+    </string-array>
+    <string-array name="tvar">
+        <item>@string/bazen_tvar_obdelnikovy</item>
+        <item>@string/bazen_tvar_ovalny</item>
+        <item>@string/bazen_tvar_kruhovy</item>
+    </string-array>
+    <string-array name="zakryti">
+        <item>@string/zadne</item>
+        <item>@string/bazen_zakryti_pevna</item>
+        <item>@string/bazen_zakryti_polykarbonat</item>
+        <item>@string/jine</item>
+    </string-array>
+    <string-array name="nove">
+        <item>@string/zdroje_stavajici</item>
+        <item>@string/zdroje_nove</item>
+    </string-array>
+    <string-array name="novy">
+        <item>@string/zdroje_stavajici</item>
+        <item>@string/zdroje_novy</item>
+    </string-array>
+    <string-array name="kamTeleso">
+        <item>@string/zdroje_tv_do_zasuvky</item>
+        <item>@string/zdroje_tv_z_regulace</item>
+    </string-array>
+    <string-array name="hadice">
+        <item>300 mm</item>
+        <item>500 mm</item>
+        <item>700 mm</item>
+        <item>1000 mm</item>
+    </string-array>
+    <string-array name="topnyKabel">
+        <item>3,5 m</item>
+        <item>5 m</item>
+    </string-array>
+    <string-array name="drzakNaTc">
+        <item>@string/na_stenu</item>
+        <item>@string/na_izolovanou_stenu</item>
+    </string-array>
+    <string-array name="pokojovaJednotka">
+        <item>RCD</item>
+        <item>RC 25</item>
+    </string-array>
+    <string-array name="pokojoveCidlo">
+        <item>RS 10</item>
+        <item>RSW 30</item>
+    </string-array>
+</resources>
