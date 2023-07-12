@@ -47,7 +47,7 @@ class DotaznikViewModel(
     @Named("cache") private val cacheDir: File,
     @InjectedParam private val reset: () -> Unit
 ) : ViewModel() {
-    val debug = BuildConfig.DEBUG || '-' in BuildConfig.VERSION_NAME
+    val debug = repo.debug
 
     val stranky = repo.stranky
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), null)
