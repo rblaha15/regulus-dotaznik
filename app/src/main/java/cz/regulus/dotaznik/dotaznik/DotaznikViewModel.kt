@@ -166,11 +166,10 @@ class DotaznikViewModel(
                         fileName = file.name
                     })
 
-                    repo.pripravitFotkyNaExport()
-                    repo.fotky.first().forEachIndexed { i, (_, file) ->
+                    repo.fotkyNaExport().forEach { file ->
                         addBodyPart(MimeBodyPart().apply {
                             attachFile(file)
-                            setHeader("Content-Type", "image/jpg; charset=UTF-8 name=\"fotka ${i + 1}\"")
+                            setHeader("Content-Type", "image/jpg; charset=UTF-8 name=\"${file.name}\"")
                         })
                     }
                 })

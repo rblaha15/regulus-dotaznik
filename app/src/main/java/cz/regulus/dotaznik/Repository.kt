@@ -169,12 +169,13 @@ class Repository(
         }
     }
 
-    suspend fun pripravitFotkyNaExport() {
-        photoIds.first().forEachIndexed { i, id ->
+    suspend fun fotkyNaExport(): List<File> {
+        return photoIds.first().mapIndexed { i, id ->
             val oldFile = File(ctx.filesDir, "photo${id}.jpg")
             val newFile = File(ctx.filesDir, "fotka ${i + 1}.jpg")
             if (newFile.exists()) newFile.delete()
             oldFile.copyTo(newFile)
+            newFile
         }
     }
 

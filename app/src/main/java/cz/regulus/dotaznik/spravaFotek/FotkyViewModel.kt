@@ -24,10 +24,10 @@ class FotkyViewModel(
     private val launchers: Launchers,
 ) : ViewModel() {
 
-    data class Launchers(
-        inline val getTakePicture: ((Boolean) -> Unit) -> ManagedActivityResultLauncher<Uri, Boolean>,
-        inline val getPickMultipleMedia: ((List<Uri>) -> Unit) -> ManagedActivityResultLauncher<PickVisualMediaRequest, List<Uri>>,
-    )
+    interface Launchers {
+        fun getTakePicture(callback: (Boolean) -> Unit): ManagedActivityResultLauncher<Uri, Boolean>
+        fun getPickMultipleMedia(callback: (List<Uri>) -> Unit): ManagedActivityResultLauncher<PickVisualMediaRequest, List<Uri>>
+    }
 
     val fotky = repo.fotky
         .map {
@@ -51,7 +51,7 @@ class FotkyViewModel(
             val (id, newUri) = repo.uriIdNoveFotky()
 
             val takePicture = launchers.getTakePicture {
-                viewModelScope.launch {
+                if (it) viewModelScope.launch {
                     repo.pridalJsemFoto(id)
                 }
             }
