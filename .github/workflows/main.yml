@@ -33,8 +33,8 @@ jobs:
           key_password: ${{ secrets.key_password }}
       - name: Push git tag
         run: |
-          git config --global user.name 'jaro-jaro'
-          git config --global user.email 'jaro-jaro@users.noreply.github.com'
+          git config --global user.name 'rblaha15'
+          git config --global user.email 'rblaha15@users.noreply.github.com'
           git push --tags
       - name: Rename APK
         run: mv app/build/outputs/apk/release/app-release.apk "app/build/outputs/apk/release/Dotaznik-$(cat ./app/version.txt).apk"
