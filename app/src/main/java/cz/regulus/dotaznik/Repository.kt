@@ -46,6 +46,8 @@ class Repository(
         private const val MAX_POCET_FOTEK = 5
     }
 
+    val debug = BuildConfig.DEBUG || '-' in BuildConfig.VERSION_NAME
+
     private val remoteConfig = Firebase.remoteConfig
 
     private val remoteConfigLoaded = flow {
@@ -205,9 +207,7 @@ class Repository(
     }
 
     private suspend fun jePotrebaAktualizovatAplikaci(): Boolean {
-        val jeDebug = BuildConfig.DEBUG
-
-        if (jeDebug) return false
+        if (debug) return false
 
         val text = try {
             withContext(Dispatchers.IO) {
