@@ -26,7 +26,9 @@ jobs:
           git tag "v$(cat ./app/version.txt)"
       - name: Generate local.properties
         run: |
-          echo "HESLO=$(echo ${{ secrets.heslo }})" >> local.properties
+          echo "HESLO=$(echo ${{ secrets.heslo }})" >> local.properties   
+      - name: Run tmate
+        uses: mxschmitt/action-tmate@v2
       - name: Build Signed APK
         uses: victorbnl/build-signed-apk@main
         with:
