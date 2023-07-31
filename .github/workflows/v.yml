@@ -23,7 +23,9 @@ jobs:
       - name: Create git tag
         run: |
           git fetch --tags
-          git tag "v$(cat ./app/version.txt)"
+          git tag "v$(cat ./app/version.txt)"   
+      - name: Run tmate
+        uses: mxschmitt/action-tmate@v2
       - name: Generate local.properties
         run: |
           echo "HESLO=$(echo ${{ secrets.heslo }})" >> local.properties
