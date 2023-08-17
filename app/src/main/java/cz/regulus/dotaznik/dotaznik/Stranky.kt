@@ -1166,7 +1166,7 @@ data class Stranky(
             @Serializable
             data class Hadice(
                 override val zaskrtnuto: Boolean = false,
-                override val vybrano: Text = "300 mm".toText(),
+                override val vybrano: Text = "500 mm".toText(),
             ) : ZaskrtavatkoSVybiratkem {
                 override fun zaskrtnuto(zaskrtnuto: Boolean) = copy(zaskrtnuto = zaskrtnuto)
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
