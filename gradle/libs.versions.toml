@@ -19,7 +19,8 @@ koin-annotations = "latest.release"
 koin-androidx-compose = "latest.release"
 koin-android = "latest.release"
 koin-core = "latest.release"
-kotlinx-serialization = "1.9.0"
+kotlinx-serialization = "1.6.0-RC"
+kotlinx-serialization-plugin = "1.9.0"
 preference-ktx = "latest.release"
 espresso-core = "latest.release"
 androidx-junit = "latest.release"
@@ -79,4 +80,4 @@ android-application = { id = "com.android.application", version.ref = "android-g
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-plugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinx-serialization" }
+plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinx-serialization-plugin" }
