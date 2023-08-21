@@ -171,7 +171,7 @@ class DotaznikViewModel(
                             append(uzivatel.jmeno)
                             append(" ")
                             append(uzivatel.prijmeni)
-                            if (uzivatel.ico.isEmpty()) {
+                            if (uzivatel.ico.isNotBlank()) {
                                 append(", IČO: ")
                                 append(uzivatel.ico)
                             }

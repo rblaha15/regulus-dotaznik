@@ -531,6 +531,9 @@ data class Stranky(
 
                             Strings.zeme_voda.toText() -> listOf(
                                 Strings.vyberte.toText(),
+                                "ECOPART 600M".toText(),
+                                "ECOPART 612M".toText(),
+                                "ECOPART 616M".toText(),
                                 "ECOPART 400".toText(),
                                 "ECOPART 406".toText(),
                                 "ECOPART 408".toText(),
@@ -539,9 +542,6 @@ data class Stranky(
                                 "ECOPART 414".toText(),
                                 "ECOPART 417".toText(),
                                 "ECOPART 435".toText(),
-                                "ECOPART 600M".toText(),
-                                "ECOPART 612M".toText(),
-                                "ECOPART 616M".toText(),
                                 "ECOHEAT 400".toText(),
                                 "ECOHEAT 406".toText(),
                                 "ECOHEAT 408".toText(),
