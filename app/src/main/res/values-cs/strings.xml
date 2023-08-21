@@ -40,7 +40,7 @@
     <string name="kontakty_vybrat_firmu">Vybrat firmu</string>
     <string name="kontakty_vyberte_firmu">Vyberte montážní firmu</string>
     <string name="kontakty_vyhledat_firmu">Vyhledat firmu</string>
-    <string name="kontakty_ico">Ičo firmy</string>
+    <string name="kontakty_ico">IČO monážní firmy</string>
 
     <string name="detail_objektu_ztrata">Tepelná ztráta</string>
     <string name="detail_objektu_potreba_vytapeni">Potřeba tepla – vytápění</string>

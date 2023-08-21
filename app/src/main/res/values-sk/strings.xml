@@ -36,7 +36,7 @@
     <string name="kontakty_telefon">Telefón</string>
     <string name="kontakty_email">Email</string>
     <string name="kontakty_vyberte_montazni_firmu">Vyberte montážnu firmu</string>
-    <string name="kontakty_ico">Ičo firmy</string>
+    <string name="kontakty_ico">IČO monážní firmy</string>
 
     <string name="detail_objektu_ztrata">Tepelná strata</string>
     <string name="detail_objektu_potreba_vytapeni">Potreba tepla – kúrenie</string>
