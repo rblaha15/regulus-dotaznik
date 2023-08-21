@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
@@ -40,11 +41,14 @@ class Repository(
 ) {
     companion object {
         private val KEY_PRIHLASEN = stringPreferencesKey("prihlasen")
+        private val KEY_POPRVE = booleanPreferencesKey("poprve")
         private val KEY_STRANKY = stringPreferencesKey("stranky")
         private val KEY_FOTKY = stringSetPreferencesKey("fotkyIds")
 
         private const val MAX_POCET_FOTEK = 5
     }
+
+    val debug = BuildConfig.DEBUG || '-' in BuildConfig.VERSION_NAME
 
     private val remoteConfig = Firebase.remoteConfig
 
@@ -84,6 +88,16 @@ class Repository(
 
     private val prefs = PreferenceDataStoreFactory.create {
         ctx.preferencesDataStoreFile("prefs-DOTAZNIK")
+    }
+
+    val poprve = prefs.data.map { preferences ->
+        preferences[KEY_POPRVE] ?: true
+    }
+
+    suspend fun podruhe() {
+        prefs.edit {
+            it[KEY_POPRVE] = false
+        }
     }
 
     val prihlasenState = prefs.data.map { preferences ->
@@ -169,12 +183,13 @@ class Repository(
         }
     }
 
-    suspend fun pripravitFotkyNaExport() {
-        photoIds.first().forEachIndexed { i, id ->
+    suspend fun fotkyNaExport(): List<File> {
+        return photoIds.first().mapIndexed { i, id ->
             val oldFile = File(ctx.filesDir, "photo${id}.jpg")
             val newFile = File(ctx.filesDir, "fotka ${i + 1}.jpg")
             if (newFile.exists()) newFile.delete()
             oldFile.copyTo(newFile)
+            newFile
         }
     }
 
@@ -204,9 +219,7 @@ class Repository(
     }
 
     private suspend fun jePotrebaAktualizovatAplikaci(): Boolean {
-        val jeDebug = BuildConfig.DEBUG
-
-        if (jeDebug) return false
+        if (debug) return false
 
         val text = try {
             withContext(Dispatchers.IO) {

@@ -1,0 +1,169 @@
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingDefaultResource">
+    <!--    <string name="app_name">Regulus form</string>
+        <string name="kontakty">Contacts and place of installation</string>
+        <string name="detail_objektu">Object details</string>
+        <string name="system">System</string>
+        <string name="bazen">Swimming pool</string>
+        <string name="zdroje_tv">Warm water</string>
+        <string name="zdroje_top">Heating</string>
+        <string name="zdroje">Additional resources</string>
+
+        <string name="poznamka">Note</string>
+
+        <string name="otevrit">Open menu</string>
+        <string name="zavrit">Open menu</string>
+        <string name="ok">OK</string>
+        <string name="ano">Yes</string>
+        <string name="ne">No</string>
+        <string name="zrusit">Cancel</string>
+        <string name="odeslat">Send</string>
+        <string name="odstranit">Delete</string>
+
+        <string name="zadna">None</string>
+        <string name="zadny">None</string>
+        <string name="zadne">None</string>
+        <string name="vyberte">Choose</string>
+        <string name="jine">Other</string>
+        <string name="jiny">Other</string>
+
+        <string name="vzduch_voda">air-to-water</string>
+        <string name="zeme_voda">ground-to-water</string>
+
+        <string name="kontakty_prijmeni">Surname</string>
+        <string name="kontakty_jmeno">First name</string>
+        <string name="kontakty_ulice">Street, building number</string>
+        <string name="kontakty_mesto">Town</string>
+        <string name="kontakty_psc">ZIP code</string>
+        <string name="kontakty_telefon">Phone number</string>
+        <string name="kontakty_email">Email address</string>
+        <string name="kontakty_vyberte_montazni_firmu">Choose an assembly company\nNote: In this list, there are only czech companies. If you
+            want to use some other one, enter company ID manulally</string>
+        <string name="kontakty_vybrat_firmu">Vybrat firmu</string>
+        <string name="kontakty_vyberte_firmu">Vyberte montážní firmu</string>
+        <string name="kontakty_vyhledat_firmu">Vyhledat firmu</string>
+        <string name="kontakty_ico">Ičo montážní firmy</string>
+
+        <string name="detail_objektu_ztrata">Tepelná ztráta</string>
+        <string name="detail_objektu_potreba_vytapeni">Potřeba tepla – vytápění</string>
+        <string name="detail_objektu_potreba_tv">Potřeba tepla – teplá voda</string>
+        <string name="detail_objektu_plocha">Vytápěná plocha</string>
+        <string name="detail_objektu_objem">Vytápěný objem</string>
+        <string name="detail_objektu_naklady">Náklady na vytápění</string>
+        <string name="detail_objektu_druh">Druh paliva</string>
+        <string name="detail_objektu_spotreba">Spotřeba paliva</string>
+        <string name="detail_objektu_druh2">Druh 2. paliva</string>
+        <string name="detail_objektu_spotreba2">Spotřeba 2. paliva</string>
+
+        <string name="system_tc_typ">Typ tepelného čerpadla</string>
+        <string name="system_tc_model">Model tepelného čerpadla</string>
+        <string name="system_nadrz_typ">Typ nádrže</string>
+        <string name="system_nadrz_objem">Objem nádrže</string>
+        <string name="system_zasobnik_typ">Typ zásobníku</string>
+        <string name="sytem_zasobnik_objem">Objem zásobníku</string>
+        <string name="system_typ_jednotky">Typ vnitřní jednotky</string>
+        <string name="system_otopny_system">Otopný systém</string>
+        <string name="system_os_1okruh">1 otopný okruh</string>
+        <string name="system_os_2okruhy">2 otopné okruhy</string>
+        <string name="system_os_3okruhy">3 otopné okruhy</string>
+        <string name="system_os_invertor">Invertor na přímo</string>
+        <string name="system_cirkulace">Cirkulace teplé vody</string>
+        <string name="system_ohrev_bazenu">Ohřev bazénu</string>
+
+        <string name="bazen_doba_uzivani">Doba využívání</string>
+        <string name="bazen_doba_celorocni">celeroční</string>
+        <string name="bazen_doba_sezonni">sezónní</string>
+        <string name="bazen_umisteni">Umístění</string>
+        <string name="bazen_umisteni_venkovni">venkovní</string>
+        <string name="bazen_umisteni_vnitrni">vnitřní</string>
+        <string name="bazen_druh_vody">Druh vody</string>
+        <string name="bazen_druh_sladka">sladká</string>
+        <string name="bazen_druh_slana">slaná</string>
+        <string name="bazen_tvar">Tvar</string>
+        <string name="bazen_tvar_obdelnikovy">obdélníkový</string>
+        <string name="bazen_tvar_ovalny">oválný</string>
+        <string name="bazen_tvar_kruhovy">kruhový</string>
+        <string name="bazen_delka">Délka</string>
+        <string name="bazen_sirka">Šířka</string>
+        <string name="bazen_radius">Průměr</string>
+        <string name="bazen_hloubka">Hloubka</string>
+        <string name="bazen_zakryti">Zakrytí</string>
+        <string name="bazen_zakryti_pevna">pevná střecha</string>
+        <string name="bazen_zakryti_polykarbonat">polykarbonát</string>
+        <string name="bazen_teplota">Požadovaná teplota</string>
+
+        <string name="zdroje_topne_teleso">Topné těleso v nádrži</string>
+        <string name="zdroje_elektrokotel">Elektrokotel</string>
+        <string name="zdroje_plyn_kotel">Plynový kotel</string>
+        <string name="zdroje_krb">Krb nebo kotel na tuhá paliva</string>
+        <string name="zdroje_nove">nové</string>
+        <string name="zdroje_novy">nový</string>
+        <string name="zdroje_stavajici">stávající</string>
+
+        <string name="zdroje_tv_do_zasuvky">do zásuvky</string>
+        <string name="zdroje_tv_z_regulace">ovládané z regulace</string>
+
+        <string name="je_potreba_zadat_jmeno_a_prijmeni">Je potřeba zadat alespoň jméno a příjmení</string>
+        <string name="je_potreba_zadat_zastupce">Je potřeba vybrat obchodního zástupce</string>
+        <string name="je_potreba_zadat_email">Je potřeba vyplnit email</string>
+        <string name="je_potreba_zadat_prijmeni">Je potřeba vyplnit příjmení</string>
+        <string name="je_potreba_zadat_jmeno">Je potřeba vypllnit jméno</string>
+
+        <string name="prihlaseni">Přihlášení</string>
+        <string name="prihlaseni_potreba_internet">Pro přihlášení je potřeba připojení k internetu!</string>
+        <string name="prihlaseni_jsem_zamestanec">Jsem zaměstanec Regulusu</string>
+        <string name="prihlaseni_nejsem_zamestanec">Nejsem zaměstanec Regulusu</string>
+        <string name="prihlaseni_vyberte">Vyberte svého obchodního zástupce:</string>
+        <string name="prihlaseni_vybrany">Vybraný obchodní zástupce: %1$s %2$s</string>
+        <string name="prihlaseni_vase_jmeno">Vaše jméno</string>
+        <string name="prihlaseni_vase_prijmeni">Vaše příjmení</string>
+        <string name="prihlaseni_vase_ico">Vaše IČO (nepovinné)</string>
+        <string name="prihlaseni_vas_email">Váš email</string>
+        <string name="prihlaseni_vyber_se">Vyber se:</string>
+        <string name="prihlaseni_vybrany_jmeno_prijmeni">Jméno a příjmení: %1$s %2$s\n</string>
+        <string name="prihlaseni_vybrany_email">Email: %s</string>
+        <string name="prihlaseni_vybrany_kod">Číslo KO: %s\n</string>
+        <string name="prihlaseni_jmeno_prijmeni">Jméno a příjmení:</string>
+        <string name="prihlaseni_email">Email:</string>
+        <string name="prihlaseni_kod">Číslo KO:</string>
+        <string name="prihlaseni_ico">IČO:</string>
+
+        <string name="export_odesilani">Odesílání</string>
+        <string name="export_email_se_odesila">Email se odesílá</string>
+        <string name="export_email_uspesne_odeslan">Email byl úspěšně odeslán!</string>
+        <string name="export_chcete_odeslat">Odeslat?</string>
+        <string name="export_opravdu_chcete_odeslat_na">"Opravdu chcete odeslat email na \"%s\"?"</string>
+        <string name="export_email_neodeslan">Omlouvám se, ale email se nepodařilo odeslat. %s</string>
+        <string name="toto_je_chyba">Toto je chyba:</string>
+        <string name="export_opravdu_odstranit_data">Chcete odstranit všechna data?</string>
+
+        <string name="fotky_sprava_fotek">Správa fotek</string>
+        <string name="fotky_vyfotit">Vyfotit</string>
+        <string name="fotky_vybrat_z_galerie">Vybrat z galerie</string>
+        <string name="fotky_fotka">Fotka</string>
+        <string name="fotky_pridat">Přidat fotku</string>
+        <string name="fotky_maximalne_fotek">Můžete přidat maximálně 5 fotek</string>
+        <string name="fotky_maximalne_fotek_presazeno">Protože můžete přidat maximálně 5 fotek, nebyly všechny vybrané fotky vloženy</string>
+
+        <string name="odstranit_vse">Odstranit vše</string>
+        <string name="podrobnejsi_info">Podrobnější informace</string>
+        <string name="export_nejste_pripojeni">Pravděpodobně nejste připojeni k internetu. Zkontrolujte připojení a zkuste to znovu</string>
+        <string name="prihlaseni_doplnit_info">Doplntě, prosím, ještě nějaké informace o Vás:</string>
+        <string name="aktualizovat">Aktualizovat</string>
+        <string name="vyberte_firmu">Vyberte firmu:</string>
+        <string name="na_stenu">Na stěnu</string>
+        <string name="na_izolovanou_stenu">Na izolovanou stěnu</string>
+        <string name="prislusenstvi">Příslušenství</string>
+        <string name="prislusenstvi_hadice">Hadice</string>
+        <string name="prislusenstvi_topny_kabel">Topný kabel</string>
+        <string name="prislusenstvi_drzak_pro_tc">Držák pro TČ</string>
+        <string name="prislusenstvi_pokojova_jednotka">Pokojová jednotka</string>
+        <string name="prislusenstvi_pokojove_cidlo">Pokojové čidlo</string>
+        <string name="mena">€</string>
+        <string name="nejste_prihlaseni">Nejste přihlášeni!</string>
+        <string name="odhlasit_se">Odhlásit se</string>
+        <string name="potreba_internet">Je potřeba připojení k internetu</string>
+        <string name="zpet">Zpět</string>
+        <string name="prosim_povolte_fotoaparat">Prosím, povolte přístup k fotoaparátu.</string>
+        <string name="vybrat_jednotky">Vybrat jednotky</string>-->
+</resources>

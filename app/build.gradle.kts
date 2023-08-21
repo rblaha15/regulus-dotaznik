@@ -18,8 +18,8 @@ android {
         applicationId = "cz.regulus.dotaznik"
         minSdk = 21
         targetSdk = 34
-        versionCode = 8
-        versionName = "5.0.0"
+        versionCode = 10
+        versionName = "5.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -30,8 +30,7 @@ android {
     }
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
 
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -49,6 +48,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.0-dev-k1.9.0-6a60475e07f"

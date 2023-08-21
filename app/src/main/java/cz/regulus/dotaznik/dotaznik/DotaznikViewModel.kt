@@ -47,7 +47,7 @@ class DotaznikViewModel(
     @Named("cache") private val cacheDir: File,
     @InjectedParam private val reset: () -> Unit
 ) : ViewModel() {
-    val debug = BuildConfig.DEBUG || '-' in BuildConfig.VERSION_NAME
+    val debug = repo.debug
 
     val stranky = repo.stranky
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), null)
@@ -118,6 +118,14 @@ class DotaznikViewModel(
         },
     )!!
 
+    val poprve = repo.poprve.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), true)
+
+    fun podruhe() {
+        viewModelScope.launch {
+            repo.podruhe()
+        }
+    }
+
     private suspend fun odeslat() {
         _odeslaniState.value = OdesilaniState.Odesilani
 
@@ -158,7 +166,16 @@ class DotaznikViewModel(
                 setContent(MimeMultipart().apply {
 
                     addBodyPart(MimeBodyPart().apply {
-                        setText("Prosím o přípravu nabídky. Děkuji.\n\n${uzivatel.jmeno}")
+                        setText(buildString {
+                            append("Prosím o přípravu nabídky. Děkuji.\n\n")
+                            append(uzivatel.jmeno)
+                            append(" ")
+                            append(uzivatel.prijmeni)
+                            if (uzivatel.ico.isNotBlank()) {
+                                append(", IČO: ")
+                                append(uzivatel.ico)
+                            }
+                        })
                     })
 
                     addBodyPart(MimeBodyPart().apply {
@@ -166,11 +183,10 @@ class DotaznikViewModel(
                         fileName = file.name
                     })
 
-                    repo.pripravitFotkyNaExport()
-                    repo.fotky.first().forEachIndexed { i, (_, file) ->
+                    repo.fotkyNaExport().forEach { file ->
                         addBodyPart(MimeBodyPart().apply {
                             attachFile(file)
-                            setHeader("Content-Type", "image/jpg; charset=UTF-8 name=\"fotka ${i + 1}\"")
+                            setHeader("Content-Type", "image/jpg; charset=UTF-8 name=\"${file.name}\"")
                         })
                     }
                 })

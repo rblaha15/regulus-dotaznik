@@ -40,7 +40,7 @@
     <string name="kontakty_vybrat_firmu">Vybrat firmu</string>
     <string name="kontakty_vyberte_firmu">Vyberte montážní firmu</string>
     <string name="kontakty_vyhledat_firmu">Vyhledat firmu</string>
-    <string name="kontakty_ico">Ičo firmy</string>
+    <string name="kontakty_ico">IČO monážní firmy</string>
 
     <string name="detail_objektu_ztrata">Tepelná ztráta</string>
     <string name="detail_objektu_potreba_vytapeni">Potřeba tepla – vytápění</string>
@@ -117,9 +117,9 @@
     <string name="prihlaseni_vase_ico">Vaše IČO (nepovinné)</string>
     <string name="prihlaseni_vas_email">Váš email</string>
     <string name="prihlaseni_vyber_se">Vyber se:</string>
-    <string name="prihlaseni_vybrany_jmeno_prijmeni">Jméno a příjmení: %1$s %2$s\n</string>
+    <string name="prihlaseni_vybrany_jmeno_prijmeni">Jméno a příjmení: %s</string>
     <string name="prihlaseni_vybrany_email">Email: %s</string>
-    <string name="prihlaseni_vybrany_kod">Číslo KO: %s\n</string>
+    <string name="prihlaseni_vybrany_kod">Číslo KO: %s</string>
     <string name="prihlaseni_jmeno_prijmeni">Jméno a příjmení:</string>
     <string name="prihlaseni_email">Email:</string>
     <string name="prihlaseni_kod">Číslo KO:</string>

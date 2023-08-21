@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Send
@@ -37,7 +38,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -45,6 +45,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -116,6 +117,31 @@ fun DotaznikScreen(
     val firmy by viewModel.firmy.collectAsStateWithLifecycle()
     val prihlasen by viewModel.prihlasen.collectAsStateWithLifecycle()
     val odesilaniState by viewModel.odesilaniState.collectAsStateWithLifecycle()
+    val poprve by viewModel.poprve.collectAsStateWithLifecycle()
+
+    if (poprve && prihlasen != null) AlertDialog(
+        onDismissRequest = {
+            viewModel.podruhe()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    viewModel.podruhe()
+                }
+            ) {
+                Text(stringResource(android.R.string.ok))
+            }
+        },
+        title = {
+            Text("TIP!")
+        },
+        text = {
+            Text("Mezi obrazovkami můžete přepínat posunutím do stran.")
+        },
+        icon = {
+            Icon(Icons.Default.Lightbulb, null)
+        },
+    )
 
     Dotaznik(
         stranky = stranky,
@@ -193,7 +219,7 @@ fun Dotaznik(
                                 .padding(vertical = 8.dp)
                         )
 
-                        Divider(Modifier.fillMaxWidth())
+                        HorizontalDivider(Modifier.fillMaxWidth())
 
                         (stranky ?: Stranky()).vse.forEachIndexed { i, stranka ->
                             NavigationDrawerItem(
@@ -214,7 +240,7 @@ fun Dotaznik(
                             )
                         }
 
-                        Divider(Modifier.fillMaxWidth())
+                        HorizontalDivider(Modifier.fillMaxWidth())
 
                         val posun = remember {
                             Animatable(0F)

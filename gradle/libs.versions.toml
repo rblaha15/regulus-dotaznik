@@ -1,6 +1,6 @@
 [versions]
 accompanist-permissions = "latest.release"
-datastore-preferences = "latest.release"
+datastore-preferences = "1.0.0"
 compose-destinations = "latest.release"
 compose-lifecycle = "latest.release"
 activity-compose = "latest.release"
@@ -19,7 +19,8 @@ koin-annotations = "latest.release"
 koin-androidx-compose = "latest.release"
 koin-android = "latest.release"
 koin-core = "latest.release"
-kotlinx-serialization = "latest.release"
+kotlinx-serialization = "1.5.1"
+kotlinx-serialization-plugin = "1.9.0"
 preference-ktx = "latest.release"
 espresso-core = "latest.release"
 androidx-junit = "latest.release"
@@ -32,7 +33,7 @@ android-activation = "latest.release"
 android-mail = "latest.release"
 firebase-config-ktx = "latest.release"
 kotlin-android = "latest.release"
-android-gradle-plugin = "8.1.0-rc01"
+android-gradle-plugin = "8.1.0"
 google-services = "latest.release"
 ksp = "latest.release"
 semver = "latest.release"
@@ -79,4 +80,4 @@ android-application = { id = "com.android.application", version.ref = "android-g
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-plugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinx-serialization" }
+plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinx-serialization-plugin" }

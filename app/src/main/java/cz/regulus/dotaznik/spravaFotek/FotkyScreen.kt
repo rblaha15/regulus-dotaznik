@@ -1,7 +1,9 @@
 package cz.regulus.dotaznik.spravaFotek
 
 import android.net.Uri
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -86,16 +88,17 @@ fun FotkyScreen(
 
     val viewModel = koinViewModel<FotkyViewModel> {
         parametersOf(
-            FotkyViewModel.Launchers(
-                getTakePicture = {
-                    callback1 = it
-                    launcher1
-                },
-                getPickMultipleMedia = {
-                    callback2 = it
-                    launcher2
-                },
-            )
+            object : FotkyViewModel.Launchers {
+                override fun getTakePicture(callback: (Boolean) -> Unit): ManagedActivityResultLauncher<Uri, Boolean> {
+                    callback1 = callback
+                    return launcher1
+                }
+
+                override fun getPickMultipleMedia(callback: (List<Uri>) -> Unit): ManagedActivityResultLauncher<PickVisualMediaRequest, List<Uri>> {
+                    callback2 = callback
+                    return launcher2
+                }
+            }
         )
     }
 
