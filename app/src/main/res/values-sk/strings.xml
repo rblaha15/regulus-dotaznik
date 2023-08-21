@@ -113,9 +113,9 @@
     <string name="prihlaseni_vase_ico">Vaše IČO (nepovinné)</string>
     <string name="prihlaseni_vas_email">Váš email</string>
     <string name="prihlaseni_vyber_se">Vyber sa:</string>
-    <string name="prihlaseni_vybrany_jmeno_prijmeni">Meno a priezvisko: %1$s %2$s\n</string>
+    <string name="prihlaseni_vybrany_jmeno_prijmeni">Meno a priezvisko: %s</string>
     <string name="prihlaseni_vybrany_email">Email: %s</string>
-    <string name="prihlaseni_vybrany_kod">Číslo KO: %s\n</string>
+    <string name="prihlaseni_vybrany_kod">Číslo KO: %s</string>
     <string name="prihlaseni_jmeno_prijmeni">Meno a priezvisko:</string>
     <string name="prihlaseni_email">Email:</string>
     <string name="prihlaseni_kod">Číslo KO:</string>

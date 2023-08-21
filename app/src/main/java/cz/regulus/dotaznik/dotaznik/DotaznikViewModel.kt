@@ -118,6 +118,14 @@ class DotaznikViewModel(
         },
     )!!
 
+    val poprve = repo.poprve.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), true)
+
+    fun podruhe() {
+        viewModelScope.launch {
+            repo.podruhe()
+        }
+    }
+
     private suspend fun odeslat() {
         _odeslaniState.value = OdesilaniState.Odesilani
 
@@ -158,7 +166,16 @@ class DotaznikViewModel(
                 setContent(MimeMultipart().apply {
 
                     addBodyPart(MimeBodyPart().apply {
-                        setText("Prosím o přípravu nabídky. Děkuji.\n\n${uzivatel.jmeno}")
+                        setText(buildString {
+                            append("Prosím o přípravu nabídky. Děkuji.\n\n")
+                            append(uzivatel.jmeno)
+                            append(" ")
+                            append(uzivatel.prijmeni)
+                            if (uzivatel.ico.isEmpty()) {
+                                append(", IČO: ")
+                                append(uzivatel.ico)
+                            }
+                        })
                     })
 
                     addBodyPart(MimeBodyPart().apply {

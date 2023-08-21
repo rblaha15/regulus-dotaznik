@@ -19,7 +19,7 @@ android {
         minSdk = 21
         targetSdk = 34
         versionCode = 9
-        versionName = "5.0.1-rc.3"
+        versionName = "5.0.1-rc.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -48,6 +48,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.0-dev-k1.9.0-6a60475e07f"

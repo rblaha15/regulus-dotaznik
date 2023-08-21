@@ -513,15 +513,15 @@ data class Stranky(
                         when (it.system.typTC.vybrano) {
                             Strings.vzduch_voda.toText() -> listOf(
                                 Strings.vyberte.toText(),
-                                "ECOAIR 400".toText(),
-                                "ECOAIR 600".toText(),
                                 "RTC".toText(),
                                 "RTC 6i".toText(),
                                 "RTC 13e".toText(),
                                 "RTC 20e".toText(),
+                                "ECOAIR 600M".toText(),
                                 "ECOAIR 614M".toText(),
                                 "ECOAIR 622M".toText(),
                                 "ECOAIR 510M".toText(),
+                                "ECOAIR 400".toText(),
                                 "ECOAIR 406".toText(),
                                 "ECOAIR 408".toText(),
                                 "ECOAIR 410".toText(),
@@ -542,7 +542,7 @@ data class Stranky(
                                 "ECOPART 600M".toText(),
                                 "ECOPART 612M".toText(),
                                 "ECOPART 616M".toText(),
-                                "ECOHEAT".toText(),
+                                "ECOHEAT 400".toText(),
                                 "ECOHEAT 406".toText(),
                                 "ECOHEAT 408".toText(),
                                 "ECOHEAT 410".toText(),
@@ -1223,7 +1223,7 @@ data class Stranky(
                 override val popis get() = Strings.prislusenstvi_pokojove_cidlo.toText()
                 override val moznosti
                     get() = { _: Stranky ->
-                        listOf("RS 10".toText(), "RSW 30".toText())
+                        listOf("RS 10".toText(), "RSW 30 - WiFi".toText())
                     }
             }
 
