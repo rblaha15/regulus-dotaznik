@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import cz.regulus.dotaznik.Produkty
 import cz.regulus.dotaznik.R
 import cz.regulus.dotaznik.Text
 import cz.regulus.dotaznik.Uzivatel
@@ -27,6 +28,7 @@ import cz.regulus.dotaznik.dotaznik.Stranky.Stranka.Vec.ZaskrtavatkoSVybiratkem
 import cz.regulus.dotaznik.plus
 import cz.regulus.dotaznik.toText
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import cz.regulus.dotaznik.R.string as Strings
 
 @Serializable
@@ -37,6 +39,7 @@ data class Stranky(
     val bazen: Stranka.Bazen = Stranka.Bazen(),
     val doplnkoveZdroje: Stranka.DoplnkoveZdroje = Stranka.DoplnkoveZdroje(),
     val prislusenstvi: Stranka.Prislusenstvi = Stranka.Prislusenstvi(),
+    @Transient private val produkty: Produkty = Produkty(),
 ) {
 
     val vse = listOf(
@@ -510,44 +513,12 @@ data class Stranky(
                 override val popis get() = Strings.system_tc_model.toText()
                 override val moznosti
                     get() = { it: Stranky ->
-                        when (it.system.typTC.vybrano) {
-                            Strings.vzduch_voda.toText() -> listOf(
-                                Strings.vyberte.toText(),
-                                "RTC".toText(),
-                                "RTC 6i".toText(),
-                                "RTC 13e".toText(),
-                                "RTC 20e".toText(),
-                                "ECOAIR 600M".toText(),
-                                "ECOAIR 614M".toText(),
-                                "ECOAIR 622M".toText(),
-                                "ECOAIR 510M".toText(),
-                                "ECOAIR 400".toText(),
-                                "ECOAIR 406".toText(),
-                                "ECOAIR 408".toText(),
-                                "ECOAIR 410".toText(),
-                                "ECOAIR 415".toText(),
-                                "ECOAIR 420".toText(),
-                            )
+                        listOf(
+                            Strings.vyberte.toText(),
+                        ) + when (it.system.typTC.vybrano) {
+                            Strings.vzduch_voda.toText() -> it.produkty.tcVzduchVoda.map(String::toText)
 
-                            Strings.zeme_voda.toText() -> listOf(
-                                Strings.vyberte.toText(),
-                                "ECOPART 600M".toText(),
-                                "ECOPART 612M".toText(),
-                                "ECOPART 616M".toText(),
-                                "ECOPART 400".toText(),
-                                "ECOPART 406".toText(),
-                                "ECOPART 408".toText(),
-                                "ECOPART 410".toText(),
-                                "ECOPART 412".toText(),
-                                "ECOPART 414".toText(),
-                                "ECOPART 417".toText(),
-                                "ECOPART 435".toText(),
-                                "ECOHEAT 400".toText(),
-                                "ECOHEAT 406".toText(),
-                                "ECOHEAT 408".toText(),
-                                "ECOHEAT 410".toText(),
-                                "ECOHEAT 412".toText(),
-                            )
+                            Strings.zeme_voda.toText() -> it.produkty.tcZemeVoda.map(String::toText)
 
                             else -> throw IllegalArgumentException()
                         }
@@ -561,13 +532,10 @@ data class Stranky(
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
                 override val popis get() = Strings.system_typ_jednotky.toText()
                 override val moznosti
-                    get() = { _: Stranky ->
+                    get() = { it: Stranky ->
                         listOf(
                             Strings.zadna.toText(),
-                            "RegulusBOX".toText(),
-                            "RegulusHBOX 112".toText(),
-                            "RegulusHBOX 212".toText(),
-                        )
+                        ) + it.produkty.boxy.map(String::toText)
                     }
             }
 
@@ -578,44 +546,17 @@ data class Stranky(
             ) : DvojVybiratko {
                 override val popis get() = Strings.system_nadrz_typ.toText()
                 override val moznosti1
-                    get() = { _: Stranky ->
+                    get() = { it: Stranky ->
                         listOf(
                             Strings.zadna.toText(),
-                            "DUO".toText(),
-                            "HSK".toText(),
-                            "PS".toText(),
-                        )
+                        ) + it.produkty.nadrze.keys.map(String::toText)
                     }
                 override val moznosti2
                     get() = { it: Stranky ->
-                        when (it.system.typNadrze.vybrano1) {
-                            "DUO".toText() -> listOf(
-                                "-".toText(),
-                                "P".toText(),
-                                "PR".toText(),
-                                "K".toText(),
-                                "K P".toText(),
-                                "K PR".toText(),
-                            )
-
-                            "HSK".toText() -> listOf(
-                                "P".toText(),
-                                "P+".toText(),
-                                "PR".toText(),
-                                "PR+".toText(),
-                                "PV".toText(),
-                            )
-
-                            "PS".toText() -> listOf(
-                                "E+".toText(),
-                                "ES+".toText(),
-                                "N+".toText(),
-                                "K+".toText(),
-                                "2F".toText(),
-                                "WF".toText(),
-                            )
-
-                            else -> emptyList()
+                        if (it.system.typNadrze.vybrano1 == Strings.zadna.toText()) emptyList()
+                        else {
+                            val moznost1 = (it.system.typNadrze.vybrano1 as Text.Plain).value
+                            it.produkty.nadrze[moznost1].orEmpty().map(String::toText)
                         }
                     }
 
@@ -647,18 +588,10 @@ data class Stranky(
                 override fun vybrano(vybrano: Text) = copy(vybrano = vybrano)
                 override val popis get() = Strings.system_zasobnik_typ.toText()
                 override val moznosti
-                    get() = { _: Stranky ->
+                    get() = { it: Stranky ->
                         listOf(
                             Strings.zadny.toText(),
-                            "RDC".toText(),
-                            "R2DC".toText(),
-                            "R0BC".toText(),
-                            "RBC".toText(),
-                            "RBC HP".toText(),
-                            "R2BC".toText(),
-                            "NBC".toText(),
-                            "RGC".toText(),
-                        )
+                        ) + it.produkty.zasobniky.map(String::toText)
                     }
             }
 
