@@ -11,16 +11,17 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStoreFile
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.remoteconfig.ktx.get
-import com.google.firebase.remoteconfig.ktx.remoteConfig
-import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.crashlytics
+import com.google.firebase.remoteconfig.get
+import com.google.firebase.remoteconfig.remoteConfig
+import com.google.firebase.remoteconfig.remoteConfigSettings
 import cz.regulus.dotaznik.dotaznik.Firma
 import cz.regulus.dotaznik.dotaznik.Stranky
 import cz.regulus.dotaznik.prihlaseni.Zamestnanec
 import io.github.z4kn4fein.semver.toVersion
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -85,6 +86,9 @@ class Repository(
     val firmy = remoteConfigLoaded.map {
         json.decodeFromString<List<Firma>>(remoteConfig["firmy"].asString())
     }
+    private val produkty = remoteConfigLoaded.map {
+        json.decodeFromString<Produkty>(remoteConfig["produkty"].asString())
+    }
 
     private val prefs = PreferenceDataStoreFactory.create {
         ctx.preferencesDataStoreFile("prefs-DOTAZNIK")
@@ -118,6 +122,8 @@ class Repository(
 
     val stranky = prefs.data.map { preferences ->
         preferences[KEY_STRANKY]?.let { json.decodeFromString<Stranky>(it) } ?: Stranky()
+    }.combine(produkty) { stranky, produkty ->
+        stranky.pridatProdukty(produkty)
     }
 
     suspend fun upravitStranky(stranky: Stranky) {
@@ -243,3 +249,5 @@ class Repository(
         emit(jePotrebaAktualizovatAplikaci())
     }
 }
+
+fun Stranky.pridatProdukty(produkty: Produkty) = copy(produkty = produkty)

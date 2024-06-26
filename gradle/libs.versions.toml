@@ -1,49 +1,47 @@
 [versions]
-accompanist-permissions = "latest.release"
-datastore-preferences = "1.0.0"
-compose-destinations = "latest.release"
-compose-lifecycle = "latest.release"
-activity-compose = "latest.release"
-firebase-analytics-ktx = "latest.release"
-firebase-crashlytics-ktx = "latest.release"
-firebase-crashlytics-plugin = "latest.release"
-material3-window-size = "latest.release"
-material-icons-extended = "latest.release"
-ui-test-manifest = "latest.release"
-ui-test-junit4 = "latest.release"
-ui-tooling = "latest.release"
-ui-tooling-preview = "latest.release"
-material3 = "latest.release"
-koin-ksp-compiler = "latest.release"
-koin-annotations = "latest.release"
-koin-androidx-compose = "latest.release"
-koin-android = "latest.release"
-koin-core = "latest.release"
-kotlinx-serialization = "1.5.1"
-kotlinx-serialization-plugin = "1.9.0"
-preference-ktx = "latest.release"
-espresso-core = "latest.release"
-androidx-junit = "latest.release"
-junit = "latest.release"
-appcompat = "latest.release"
-androidx-core-ktx = "latest.release"
-kotlin-stdlib = "latest.release"
-core-ktx = "latest.release"
-android-activation = "latest.release"
-android-mail = "latest.release"
-firebase-config-ktx = "latest.release"
-kotlin-android = "latest.release"
-android-gradle-plugin = "8.1.0"
-google-services = "latest.release"
-ksp = "latest.release"
-semver = "latest.release"
+accompanist-permissions = "0.35.0-alpha"
+datastore-preferences = "1.1.1"
+compose-destinations = "1.9.56"
+compose-lifecycle = "2.8.2"
+activity-compose = "1.9.0"
+firebase-analytics = "22.0.0"
+firebase-crashlytics = "19.0.0"
+firebase-crashlytics-plugin = "3.0.2"
+material3-window-size = "1.2.1"
+material-icons-extended = "1.6.8"
+ui-test-manifest = "1.6.8"
+ui-test-junit4 = "1.6.8"
+ui-tooling = "1.6.8"
+ui-tooling-preview = "1.6.8"
+material3 = "1.2.1"
+koin-ksp-compiler = "1.3.1"
+koin-annotations = "1.3.1"
+koin-androidx-compose = "3.5.3"
+koin-android = "3.5.3"
+koin-core = "3.5.3"
+kotlinx-serialization = "1.6.3"
+kotlin = "2.0.0-RC3"
+preference-ktx = "1.2.1"
+espresso-core = "3.6.0"
+androidx-junit = "1.2.0"
+junit = "4.13.2"
+appcompat = "1.7.0"
+androidx-core-ktx = "1.13.1"
+kotlin-stdlib = "1.9.23"
+android-activation = "1.6.7"
+android-mail = "1.6.7"
+firebase-config = "22.0.0"
+android-gradle-plugin = "8.5.0"
+google-services = "4.4.2"
+ksp = "2.0.0-RC3-1.0.20"
+semver = "2.0.0"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "compose-lifecycle" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore-preferences" }
-firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx", version.ref = "firebase-analytics-ktx" }
-firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx", version.ref = "firebase-crashlytics-ktx" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics", version.ref = "firebase-analytics" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics", version.ref = "firebase-crashlytics" }
 ksp = { module = "io.github.raamcosta.compose-destinations:ksp", version.ref = "compose-destinations" }
 core = { module = "io.github.raamcosta.compose-destinations:core", version.ref = "compose-destinations" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-lifecycle" }
@@ -68,16 +66,16 @@ junit = { module = "junit:junit", version.ref = "junit" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core-ktx" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin-stdlib" }
-core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 android-activation = { module = "com.sun.mail:android-activation", version.ref = "android-activation" }
 android-mail = { module = "com.sun.mail:android-mail", version.ref = "android-mail" }
-firebase-config-ktx = { module = "com.google.firebase:firebase-config-ktx", version.ref = "firebase-config-ktx" }
+firebase-config = { module = "com.google.firebase:firebase-config", version.ref = "firebase-config" }
 semver = { module = "io.github.z4kn4fein:semver", version.ref = "semver" }
 
 [plugins]
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin-android" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-plugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinx-serialization-plugin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
