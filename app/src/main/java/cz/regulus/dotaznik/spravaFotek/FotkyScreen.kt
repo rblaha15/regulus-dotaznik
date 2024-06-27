@@ -1,9 +1,5 @@
 package cz.regulus.dotaznik.spravaFotek
 
-import android.net.Uri
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -21,8 +17,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PhotoLibrary
@@ -53,7 +49,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -61,15 +56,10 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import cz.regulus.dotaznik.R
-import cz.regulus.dotaznik.composeString
-import cz.regulus.dotaznik.toText
+import cz.regulus.dotaznik.strings.strings
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-
-var callback1 = { _: Boolean -> }
-var callback2 = { _: List<Uri> -> }
 
 @Destination
 @Composable
@@ -77,28 +67,17 @@ fun FotkyScreen(
     navigator: DestinationsNavigator,
 ) {
     val launcher1 =
-        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
-            callback1(it)
-        }
+        rememberResultLauncher(ActivityResultContracts.TakePicture())
 
     val launcher2 =
-        rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) {
-            callback2(it)
-        }
+        rememberResultLauncher(ActivityResultContracts.PickMultipleVisualMedia())
 
     val viewModel = koinViewModel<FotkyViewModel> {
         parametersOf(
-            object : FotkyViewModel.Launchers {
-                override fun getTakePicture(callback: (Boolean) -> Unit): ManagedActivityResultLauncher<Uri, Boolean> {
-                    callback1 = callback
-                    return launcher1
-                }
-
-                override fun getPickMultipleMedia(callback: (List<Uri>) -> Unit): ManagedActivityResultLauncher<PickVisualMediaRequest, List<Uri>> {
-                    callback2 = callback
-                    return launcher2
-                }
-            }
+            FotkyViewModel.Launchers(
+                takePicture = launcher1,
+                pickMultipleMedia = launcher2,
+            )
         )
     }
 
@@ -117,13 +96,12 @@ fun FotkyScreen(
 @Composable
 fun Fotky(
     fotky: List<Pair<Int, ImageBitmap>>,
-    vyfotit: ((Int) -> Unit) -> Unit,
-    vybrat: ((Int) -> Unit) -> Unit,
+    vyfotit: ((String) -> Unit) -> Unit,
+    vybrat: ((String) -> Unit) -> Unit,
     odebrat: (Int) -> Unit,
     navigateUp: () -> Unit,
 ) {
     val snackbarState = remember { SnackbarHostState() }
-    val resources = LocalContext.current.resources
     val scope = rememberCoroutineScope()
     val cameraPermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
     var expanded by remember { mutableStateOf(false) }
@@ -135,7 +113,7 @@ fun Fotky(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(R.string.fotky_sprava_fotek.toText().composeString())
+                    Text(strings.fotkySpravaFotek)
                 },
                 navigationIcon = {
                     IconButton(
@@ -143,7 +121,7 @@ fun Fotky(
                             navigateUp()
                         }
                     ) {
-                        Icon(Icons.Default.ArrowBack, R.string.zpet.toText().composeString())
+                        Icon(Icons.AutoMirrored.Default.ArrowBack, strings.zpet)
                     }
                 }
             )
@@ -162,7 +140,7 @@ fun Fotky(
                             expanded = false
                             vyfotit {
                                 scope.launch {
-                                    snackbarState.showSnackbar(resources.getString(it))
+                                    snackbarState.showSnackbar(it)
                                 }
                             }
                         }
@@ -188,7 +166,7 @@ fun Fotky(
                                             expanded = false
                                             vyfotit {
                                                 scope.launch {
-                                                    snackbarState.showSnackbar(resources.getString(it))
+                                                    snackbarState.showSnackbar(it)
                                                 }
                                             }
                                         } else {
@@ -198,7 +176,7 @@ fun Fotky(
                                     },
                                     shape = CircleShape
                                 ) {
-                                    Text(R.string.fotky_vyfotit.toText().composeString(), Modifier.padding(8.dp), style = MaterialTheme.typography.labelMedium)
+                                    Text(strings.fotkyVyfotit, Modifier.padding(8.dp), style = MaterialTheme.typography.labelMedium)
                                 }
                                 SmallFloatingActionButton(
                                     onClick = {
@@ -206,7 +184,7 @@ fun Fotky(
                                             expanded = false
                                             vyfotit {
                                                 scope.launch {
-                                                    snackbarState.showSnackbar(resources.getString(it))
+                                                    snackbarState.showSnackbar(it)
                                                 }
                                             }
                                         } else {
@@ -236,20 +214,20 @@ fun Fotky(
                                         expanded = false
                                         vybrat {
                                             scope.launch {
-                                                snackbarState.showSnackbar(resources.getString(it))
+                                                snackbarState.showSnackbar(it)
                                             }
                                         }
                                     },
                                     shape = CircleShape
                                 ) {
-                                    Text(R.string.fotky_vybrat_z_galerie.toText().composeString(), Modifier.padding(8.dp), style = MaterialTheme.typography.labelMedium)
+                                    Text(strings.fotkyVybratZGalerie, Modifier.padding(8.dp), style = MaterialTheme.typography.labelMedium)
                                 }
                                 SmallFloatingActionButton(
                                     onClick = {
                                         expanded = false
                                         vybrat {
                                             scope.launch {
-                                                snackbarState.showSnackbar(resources.getString(it))
+                                                snackbarState.showSnackbar(it)
                                             }
                                         }
                                     },
@@ -269,7 +247,7 @@ fun Fotky(
                 ) {
                     Icon(
                         Icons.Default.Add,
-                        R.string.fotky_fotka.toText().composeString(),
+                        strings.fotkyFotka,
                         Modifier.rotate(rotation)
                     )
                 }
@@ -300,13 +278,13 @@ fun Fotky(
                             Modifier.padding(8.dp)
                         ) {
                             Icon(Icons.Default.Delete, null, Modifier.padding(end = ButtonDefaults.IconSpacing))
-                            Text(R.string.odstranit.toText().composeString())
+                            Text(strings.odstranit)
                         }
                     }
                 }
             }
             if (fotky.isEmpty()) item {
-                Text(R.string.fotky_zadne_fotky.toText().composeString(), Modifier.padding(8.dp))
+                Text(strings.fotkyZadneFotky, Modifier.padding(8.dp))
             }
         }
         AnimatedVisibility(

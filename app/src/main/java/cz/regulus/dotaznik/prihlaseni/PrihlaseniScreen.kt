@@ -36,10 +36,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -49,10 +47,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import cz.regulus.dotaznik.R
 import cz.regulus.dotaznik.Uzivatel
-import cz.regulus.dotaznik.composeString
-import cz.regulus.dotaznik.toText
+import cz.regulus.dotaznik.strings.strings
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -84,7 +80,7 @@ fun PrihlaseniSceen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Prihlaseni(
     zastupci: List<Zamestnanec>,
@@ -93,11 +89,10 @@ fun Prihlaseni(
     zmenitJsemZamestnanec: (Boolean) -> Unit,
     novyClovek: Uzivatel?,
     upravitCloveka: ((Uzivatel?) -> Uzivatel?) -> Unit,
-    potvrdit: (chyba: (Int) -> Unit) -> Unit,
+    potvrdit: (chyba: (String) -> Unit) -> Unit,
     zrusit: () -> Unit,
 ) {
     val snackbarState = remember { SnackbarHostState() }
-    val resources = LocalContext.current.resources
     val scope = rememberCoroutineScope()
     Scaffold(
         Modifier
@@ -106,7 +101,7 @@ fun Prihlaseni(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(R.string.app_name.toText().composeString())
+                    Text(strings.appName)
                 }
             )
         },
@@ -124,19 +119,19 @@ fun Prihlaseni(
                         zrusit()
                     }
                 ) {
-                    Text(text = R.string.zrusit.toText().composeString())
+                    Text(text = strings.zrusit)
                 }
                 Spacer(Modifier.weight(1F))
                 Button(
                     onClick = {
                         potvrdit {
                             scope.launch {
-                                snackbarState.showSnackbar(resources.getString(it))
+                                snackbarState.showSnackbar(it)
                             }
                         }
                     }
                 ) {
-                    Text(text = R.string.ok.toText().composeString())
+                    Text(text = strings.ok)
                 }
             }
         }
@@ -169,7 +164,7 @@ fun Prihlaseni(
                             zmenitJsemZamestnanec(true)
                         },
                     )
-                    Text(text = R.string.prihlaseni_jsem_zamestanec.toText().composeString())
+                    Text(text = strings.prihlaseniJsemZamestanec)
                 }
             }
             Surface(
@@ -187,7 +182,7 @@ fun Prihlaseni(
                             zmenitJsemZamestnanec(false)
                         },
                     )
-                    Text(text = R.string.prihlaseni_nejsem_zamestanec.toText().composeString())
+                    Text(text = strings.prihlaseniNejsemZamestanec)
                 }
             }
             if (zamestanec) {
@@ -207,7 +202,7 @@ fun Prihlaseni(
                         readOnly = true,
                         value = vybrano,
                         onValueChange = {},
-                        label = { Text(R.string.prihlaseni_vyber_se.toText().composeString()) },
+                        label = { Text(strings.prihlaseniVyberSe) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                     )
@@ -232,11 +227,11 @@ fun Prihlaseni(
                 }
                 if (novyClovek != null) {
                     Text(
-                        text = R.string.prihlaseni_vybrany_jmeno_prijmeni.toText(novyClovek.celeJmeno).composeString(),
+                        text = strings.prihlaseniVybranyJmenoPrijmeni(novyClovek.jmeno, novyClovek.prijmeni),
                         Modifier.padding(top = 8.dp)
                     )
-                    Text(text = R.string.prihlaseni_vybrany_kod.toText(novyClovek.cisloKo).composeString())
-                    Text(text = R.string.prihlaseni_vybrany_email.toText(novyClovek.email).composeString())
+                    Text(text = strings.prihlaseniVybranyKod(novyClovek.cisloKo))
+                    Text(text = strings.prihlaseniVybranyEmail(novyClovek.email))
                 }
             } else {
                 val seznam = remember {
@@ -255,7 +250,7 @@ fun Prihlaseni(
                         readOnly = true,
                         value = vybrano,
                         onValueChange = {},
-                        label = { Text(R.string.prihlaseni_vas_zastupce.toText().composeString()) },
+                        label = { Text(strings.prihlaseniVasZastupce) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                     )
@@ -279,7 +274,7 @@ fun Prihlaseni(
                     }
                 }
                 if (novyClovek != null) {
-                    Text(text = R.string.prihlaseni_doplnit_info.toText().composeString(), Modifier.padding(top = 8.dp))
+                    Text(text = strings.prihlaseniDoplnitInfo, Modifier.padding(top = 8.dp))
                     val focusManager = LocalFocusManager.current
                     OutlinedTextField(
                         value = novyClovek.jmeno,
@@ -292,7 +287,7 @@ fun Prihlaseni(
                             .fillMaxWidth()
                             .padding(top = 8.dp),
                         label = {
-                            Text(text = R.string.prihlaseni_vase_jmeno.toText().composeString())
+                            Text(text = strings.prihlaseniVaseJmeno)
                         },
                         keyboardActions = KeyboardActions {
                             focusManager.moveFocus(FocusDirection.Down)
@@ -314,7 +309,7 @@ fun Prihlaseni(
                             .fillMaxWidth()
                             .padding(top = 8.dp),
                         label = {
-                            Text(text = R.string.prihlaseni_vase_prijmeni.toText().composeString())
+                            Text(text = strings.prihlaseniVasePrijmeni)
                         },
                         keyboardActions = KeyboardActions {
                             focusManager.moveFocus(FocusDirection.Down)
@@ -336,7 +331,7 @@ fun Prihlaseni(
                             .fillMaxWidth()
                             .padding(top = 8.dp),
                         label = {
-                            Text(text = R.string.prihlaseni_vas_email.toText().composeString())
+                            Text(text = strings.prihlaseniVasEmail)
                         },
                         keyboardActions = KeyboardActions {
                             focusManager.moveFocus(FocusDirection.Down)
@@ -360,14 +355,14 @@ fun Prihlaseni(
                             .fillMaxWidth()
                             .padding(top = 8.dp),
                         label = {
-                            Text(text = R.string.prihlaseni_vase_ico.toText().composeString())
+                            Text(text = strings.prihlaseniVaseIco)
                         },
                         keyboardActions = KeyboardActions {
                             focusManager.clearFocus()
                             keyboardController?.hide()
                             potvrdit {
                                 scope.launch {
-                                    snackbarState.showSnackbar(resources.getString(it))
+                                    snackbarState.showSnackbar(it)
                                 }
                             }
                         },

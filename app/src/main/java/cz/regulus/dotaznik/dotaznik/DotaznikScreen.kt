@@ -24,6 +24,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DeleteForever
@@ -31,7 +32,6 @@ import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -63,7 +63,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -76,8 +75,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalTextInputService
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -89,13 +86,10 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import cz.regulus.dotaznik.BuildConfig
-import cz.regulus.dotaznik.R
-import cz.regulus.dotaznik.Text.Mix
 import cz.regulus.dotaznik.Uzivatel
-import cz.regulus.dotaznik.composeString
 import cz.regulus.dotaznik.destinations.FotkyScreenDestination
 import cz.regulus.dotaznik.destinations.ResetScreenDestination
-import cz.regulus.dotaznik.toText
+import cz.regulus.dotaznik.strings.strings
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -129,7 +123,7 @@ fun DotaznikScreen(
                     viewModel.podruhe()
                 }
             ) {
-                Text(stringResource(android.R.string.ok))
+                Text(strings.ok)
             }
         },
         title = {
@@ -173,9 +167,9 @@ fun Dotaznik(
     jitNaFotky: () -> Unit,
     odstranitVse: () -> Unit,
     debug: Boolean,
-) {
+) = with(stranky.orEmpty()) {
     val pagerState = rememberPagerState(pageCount = {
-        (stranky ?: Stranky()).vse.size
+        (stranky.orEmpty()).vse.size
     })
     val drawerState = rememberDrawerState(DrawerValue.Open)
     val scope = rememberCoroutineScope()
@@ -188,32 +182,28 @@ fun Dotaznik(
                         .verticalScroll(rememberScrollState())
                 ) {
                     if (uzivatel == null) {
-                        Text(R.string.nejste_prihlaseni.toText().composeString(), Modifier.padding(all = 8.dp))
+                        Text(strings.nejstePrihlaseni, Modifier.padding(all = 8.dp))
                     } else {
                         Text(
-                            text = Mix(
-                                R.string.prihlaseni_jmeno_prijmeni.toText(),
-                                " ".toText(),
-                                uzivatel.celeJmeno.toText()
-                            ).composeString(),
+                            text = strings.menuVybranyJmenoPrijmeni(uzivatel.jmeno, uzivatel.prijmeni),
                             Modifier
                                 .padding(horizontal = 8.dp)
                                 .padding(top = 8.dp)
                         )
                         Text(
-                            text = Mix(R.string.prihlaseni_email.toText(), " ".toText(), uzivatel.email.toText()).composeString(),
+                            text = strings.menuVybranyEmail(uzivatel.email),
                             Modifier
                                 .padding(horizontal = 8.dp)
                                 .padding(top = 8.dp)
                         )
                         if (uzivatel.ico.isNotBlank()) Text(
-                            text = Mix(R.string.prihlaseni_ico.toText(), " ".toText(), uzivatel.ico.toText()).composeString(),
+                            text = strings.menuVybranyIco(uzivatel.ico),
                             Modifier
                                 .padding(horizontal = 8.dp)
                                 .padding(top = 8.dp)
                         )
                         Text(
-                            text = Mix(R.string.prihlaseni_kod.toText(), " ".toText(), uzivatel.cisloKo.toText()).composeString(),
+                            text = strings.menuVybranyKod(uzivatel.cisloKo),
                             Modifier
                                 .padding(horizontal = 8.dp)
                                 .padding(vertical = 8.dp)
@@ -221,23 +211,25 @@ fun Dotaznik(
 
                         HorizontalDivider(Modifier.fillMaxWidth())
 
-                        (stranky ?: Stranky()).vse.forEachIndexed { i, stranka ->
-                            NavigationDrawerItem(
-                                label = {
-                                    Text(stranka.nazev.composeString())
-                                },
-                                selected = pagerState.currentPage == i,
-                                onClick = {
-                                    scope.launch {
-                                        drawerState.close()
-                                        pagerState.animateScrollToPage(i)
-                                    }
-                                },
-                                Modifier.padding(all = 8.dp),
-                                icon = {
-                                    Icon(stranka.icon, stranka.nazev.composeString())
-                                },
-                            )
+                        (stranky.orEmpty()).vse.forEachIndexed { i, stranka ->
+                            with(stranky.orEmpty()) {
+                                NavigationDrawerItem(
+                                    label = {
+                                        Text(stranka.nazev)
+                                    },
+                                    selected = pagerState.currentPage == i,
+                                    onClick = {
+                                        scope.launch {
+                                            drawerState.close()
+                                            pagerState.animateScrollToPage(i)
+                                        }
+                                    },
+                                    Modifier.padding(all = 8.dp),
+                                    icon = {
+                                        Icon(stranka.icon, stranka.nazev)
+                                    },
+                                )
+                            }
                         }
 
                         HorizontalDivider(Modifier.fillMaxWidth())
@@ -249,7 +241,7 @@ fun Dotaznik(
                         NavigationDrawerItem(
                             label = {
                                 Text(
-                                    R.string.odeslat.toText().composeString(),
+                                    strings.odeslat,
                                     Modifier.padding(ButtonDefaults.ButtonWithIconContentPadding)
                                 )
                             },
@@ -264,7 +256,7 @@ fun Dotaznik(
                             },
                             Modifier.padding(all = 8.dp),
                             icon = {
-                                Icon(Icons.Default.Send, null, Modifier.offset {
+                                Icon(Icons.AutoMirrored.Default.Send, null, Modifier.offset {
                                     IntOffset(x = posun.value.toDp().value.toInt(), y = 0)
                                 })
                             },
@@ -281,7 +273,7 @@ fun Dotaznik(
                             },
                             Modifier.padding(all = 8.dp),
                         ) {
-                            Text(R.string.odstranit_vse.toText().composeString())
+                            Text(strings.odstranitVse)
                         }
 
                         TextButton(
@@ -290,7 +282,7 @@ fun Dotaznik(
                             },
                             Modifier.padding(all = 8.dp),
                         ) {
-                            Text(R.string.odhlasit_se.toText().composeString())
+                            Text(strings.odhlasitSe)
                         }
 
                         Text(
@@ -321,7 +313,7 @@ fun Dotaznik(
                             zmenitState(true)
                         }
                     ) {
-                        Text(R.string.ano.toText().composeString())
+                        Text(strings.ano)
                     }
                 },
                 dismissButton = {
@@ -330,17 +322,17 @@ fun Dotaznik(
                             zmenitState(false)
                         }
                     ) {
-                        Text(R.string.ne.toText().composeString())
+                        Text(strings.ne)
                     }
                 },
                 title = {
-                    Text(text = R.string.export_chcete_odeslat.toText().composeString())
+                    Text(text = strings.exportChceteOdeslat)
                 },
                 icon = {
-                    Icon(Icons.Default.Send, null)
+                    Icon(Icons.AutoMirrored.Default.Send, null)
                 },
                 text = {
-                    Text(text = R.string.export_opravdu_chcete_odeslat_na.toText(odesilaniState.email).composeString())
+                    Text(text = strings.exportOpravduChceteOdeslatNa(odesilaniState.email))
                 },
             )
 
@@ -353,7 +345,7 @@ fun Dotaznik(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         CircularProgressIndicator()
-                        Text(text = R.string.export_odesilani.toText().composeString(), Modifier.padding(8.dp))
+                        Text(text = strings.exportOdesilani, Modifier.padding(8.dp))
                     }
                 },
             )
@@ -368,11 +360,11 @@ fun Dotaznik(
                             zmenitState(true)
                         }
                     ) {
-                        Text(R.string.ok.toText().composeString())
+                        Text(strings.ok)
                     }
                 },
                 title = {
-                    Text(text = R.string.export_email_uspesne_odeslan.toText().composeString())
+                    Text(text = strings.exportEmailUspesneOdeslan)
                 },
                 icon = {
                     Icon(Icons.Default.Check, null)
@@ -389,7 +381,7 @@ fun Dotaznik(
                             zmenitState(true)
                         }
                     ) {
-                        Text(R.string.ano.toText().composeString())
+                        Text(strings.ano)
                     }
                 },
                 dismissButton = {
@@ -398,17 +390,17 @@ fun Dotaznik(
                             zmenitState(false)
                         }
                     ) {
-                        Text(R.string.ne.toText().composeString())
+                        Text(strings.ne)
                     }
                 },
                 title = {
-                    Text(text = R.string.odstranit_vse.toText().composeString())
+                    Text(text = strings.odstranitVse)
                 },
                 icon = {
                     Icon(Icons.Default.DeleteForever, null)
                 },
                 text = {
-                    Text(text = R.string.export_opravdu_odstranit_data.toText().composeString())
+                    Text(text = strings.exportOpravduOdstranitData)
                 },
             )
 
@@ -422,7 +414,7 @@ fun Dotaznik(
                             zmenitState(false)
                         }
                     ) {
-                        Text(R.string.ok.toText().composeString())
+                        Text(strings.ok)
                     }
                 },
                 dismissButton = {
@@ -431,17 +423,17 @@ fun Dotaznik(
                             zmenitState(true)
                         }
                     ) {
-                        Text(R.string.podrobnejsi_info.toText().composeString())
+                        Text(strings.podrobnejsiInfo)
                     }
                 },
                 title = {
-                    Text(text = R.string.export_email_neodeslan.toText("").composeString())
+                    Text(text = strings.exportEmailNeodeslan(""))
                 },
                 icon = {
                     Icon(Icons.Default.WifiOff, null)
                 },
                 text = {
-                    Text(text = R.string.export_nejste_pripojeni.toText().composeString())
+                    Text(text = strings.exportNejstePripojeni)
                 },
             )
 
@@ -455,11 +447,11 @@ fun Dotaznik(
                             zmenitState(false)
                         }
                     ) {
-                        Text(R.string.ok.toText().composeString())
+                        Text(strings.ok)
                     }
                 },
                 title = {
-                    Text(text = R.string.export_email_neodeslan.toText(R.string.toto_je_chyba.toText().composeString()).composeString())
+                    Text(text = strings.exportEmailNeodeslan(strings.totoJeChyba))
                 },
                 icon = {
                     Icon(Icons.Default.ErrorOutline, null)
@@ -478,7 +470,7 @@ fun Dotaznik(
             topBar = {
                 CenterAlignedTopAppBar(
                     title = {
-                        Text(aktualniStranka.nazev.composeString())
+                        Text(aktualniStranka.nazev)
                     },
                     navigationIcon = {
                         IconButton(
@@ -490,7 +482,7 @@ fun Dotaznik(
                         ) {
                             Icon(
                                 Icons.Default.Menu,
-                                (if (drawerState.isOpen) R.string.zavrit else R.string.otevrit).toText().composeString()
+                                if (drawerState.isOpen) strings.zavrit else strings.otevrit
                             )
                         }
                     },
@@ -500,7 +492,7 @@ fun Dotaznik(
                                 jitNaFotky()
                             }
                         ) {
-                            Icon(Icons.Default.PhotoLibrary, R.string.fotky_sprava_fotek.toText().composeString())
+                            Icon(Icons.Default.PhotoLibrary, strings.fotkySpravaFotek)
                         }
                     }
                 )
@@ -511,7 +503,7 @@ fun Dotaznik(
                 Modifier
                     .padding(paddingValues),
                 pageSpacing = 8.dp,
-                key = { stranky.vse[it].nazev.toString() }
+                key = { stranky.vse[it].nazev }
             ) { i ->
                 Scaffold(
                     floatingActionButton = {
@@ -534,7 +526,7 @@ fun Dotaznik(
                                     }
                                     .padding(bottom = OutlinedTextFieldDefaults.MinHeight),
                             ) {
-                                Icon(Icons.Default.Send, R.string.odeslat.toText().composeString())
+                                Icon(Icons.AutoMirrored.Default.Send, strings.odeslat)
                             }
                         }
                     },
@@ -588,6 +580,8 @@ fun Dotaznik(
     }
 }
 
+private fun Stranky?.orEmpty() = this ?: Stranky()
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Vec(
@@ -595,20 +589,20 @@ fun Vec(
     firmy: List<Firma>,
     vec: Stranky.Stranka.Vec,
     upravitVec: (Stranky.Stranka.Vec) -> Unit,
-) {
-    val zobrazit = remember(stranky) { vec.zobrazit(stranky) }
+) = with(stranky) {
+    val zobrazit = remember(stranky) { with(stranky) { vec.zobrazit } }
     val focusManager = LocalFocusManager.current
     if (zobrazit) when (vec) {
         is Stranky.Stranka.Vec.Nadpis -> {
             Text(
-                text = vec.text.composeString(),
+                text = vec.text,
                 Modifier.padding(all = 8.dp),
                 style = MaterialTheme.typography.headlineSmall,
             )
         }
 
         is Stranky.Stranka.Vec.Pisatko -> {
-            var text by remember { mutableStateOf(vec.text) }
+            var text by remember { mutableStateOf(vec.textOrDefault) }
             OutlinedTextField(
                 value = text,
                 onValueChange = {
@@ -619,10 +613,10 @@ fun Vec(
                     .fillMaxWidth()
                     .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
                 label = {
-                    Text(vec.popis.composeString())
+                    Text(vec.popis)
                 },
                 trailingIcon = {
-                    Text(text = vec.suffix.composeString())
+                    Text(text = vec.suffix)
                 },
                 singleLine = true,
                 keyboardActions = KeyboardActions {
@@ -633,7 +627,7 @@ fun Vec(
         }
 
         is Stranky.Stranka.Vec.PisatkoSJednotkama -> {
-            var text by remember { mutableStateOf(vec.text) }
+            var text by remember { mutableStateOf(vec.textOrDefault) }
             OutlinedTextField(
                 value = text,
                 onValueChange = {
@@ -644,7 +638,7 @@ fun Vec(
                     .fillMaxWidth()
                     .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
                 label = {
-                    Text(vec.popis.composeString())
+                    Text(vec.popis)
                 },
                 trailingIcon = {
                     var expanded by remember { mutableStateOf(false) }
@@ -655,13 +649,13 @@ fun Vec(
                         },
                         Modifier,
                     ) {
-                        vec.jednotky.forEach {
+                        vec.jednotky.forEachIndexed { i, it ->
                             DropdownMenuItem(
                                 text = {
-                                    Text(it.composeString())
+                                    Text(it)
                                 },
                                 onClick = {
-                                    upravitVec(vec.vybraneJednotky(it))
+                                    upravitVec(vec.vybraneJednotkyIndex(i))
                                     expanded = false
                                 }
                             )
@@ -678,8 +672,8 @@ fun Vec(
                         Row(
                             Modifier,
                         ) {
-                            Text(vec.vybraneJednotky.composeString())
-                            Icon(Icons.Default.ArrowDropDown, stringResource(R.string.vybrat_jednotky))
+                            Text(vec.vybraneJednotkyOrDefault)
+                            Icon(Icons.Default.ArrowDropDown, strings.vybratJednotky)
                         }
                     }
                 },
@@ -692,7 +686,6 @@ fun Vec(
         }
 
         is Stranky.Stranka.Vec.Vybiratko -> {
-            val seznam = remember(stranky) { vec.moznosti(stranky) }
             var expanded by rememberSaveable { mutableStateOf(false) }
             ExposedDropdownMenuBox(
                 expanded = expanded,
@@ -700,35 +693,35 @@ fun Vec(
                 Modifier
                     .fillMaxWidth(),
             ) {
-                CompositionLocalProvider(
-                    LocalTextInputService provides null
-                ) {
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth()
-                            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-                        readOnly = true,
-                        value = vec.vybrano.composeString(),
-                        onValueChange = {},
-                        label = { Text(vec.popis.composeString()) },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                        keyboardActions = KeyboardActions {
-                            focusManager.moveFocus(FocusDirection.Down)
-                        },
-                    )
-                }
+                OutlinedTextField(
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+                    readOnly = true,
+                    value = vec.vybranoOrDefault,
+                    onValueChange = {},
+                    label = { Text(vec.popis) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    keyboardActions = KeyboardActions {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    },
+                )
                 ExposedDropdownMenu(
                     expanded = expanded,
-                    onDismissRequest = { expanded = false },
+                    onDismissRequest = {
+                        expanded = false
+                        focusManager.clearFocus()
+                    },
                 ) {
-                    seznam.forEach { moznost ->
+                    vec.moznosti.forEachIndexed { i, moznost ->
                         DropdownMenuItem(
-                            text = { Text(moznost.composeString()) },
+                            text = { Text(moznost) },
                             onClick = {
-                                upravitVec(vec.vybrano(moznost))
+                                upravitVec(vec.vybranoIndex(i))
                                 expanded = false
+                                focusManager.clearFocus()
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                         )
@@ -740,8 +733,6 @@ fun Vec(
         is Stranky.Stranka.Vec.DvojVybiratko -> Row(
             Modifier.fillMaxWidth()
         ) {
-            val seznam1 = remember(stranky) { vec.moznosti1(stranky) }
-            val seznam2 = remember(stranky) { vec.moznosti2(stranky) }
             var expanded1 by rememberSaveable { mutableStateOf(false) }
             var expanded2 by rememberSaveable { mutableStateOf(false) }
             ExposedDropdownMenuBox(
@@ -750,76 +741,76 @@ fun Vec(
                 Modifier
                     .weight(1F),
             ) {
-                CompositionLocalProvider(
-                    LocalTextInputService provides null
-                ) {
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth()
-                            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-                        readOnly = true,
-                        value = vec.vybrano1.composeString(),
-                        onValueChange = {},
-                        label = { Text(vec.popis.composeString()) },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded1) },
-                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                        keyboardActions = KeyboardActions {
-                            focusManager.moveFocus(FocusDirection.Down)
-                        },
-                    )
-                }
+                OutlinedTextField(
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+                    readOnly = true,
+                    value = vec.vybrano1OrDefault,
+                    onValueChange = {},
+                    label = { Text(vec.popis) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded1) },
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    keyboardActions = KeyboardActions {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    },
+                )
                 ExposedDropdownMenu(
                     expanded = expanded1,
-                    onDismissRequest = { expanded1 = false },
+                    onDismissRequest = {
+                        expanded1 = false
+                        focusManager.clearFocus()
+                    },
                 ) {
-                    seznam1.forEach { moznost ->
+                    vec.moznosti1.forEachIndexed { i, moznost ->
                         DropdownMenuItem(
-                            text = { Text(moznost.composeString()) },
+                            text = { Text(moznost) },
                             onClick = {
-                                upravitVec(vec.vybrano1(moznost))
+                                upravitVec(vec.vybrano1Index(i))
                                 expanded1 = false
+                                focusManager.clearFocus()
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                         )
                     }
                 }
             }
-            if (seznam2.isNotEmpty()) ExposedDropdownMenuBox(
+            if (vec.moznosti2.isNotEmpty()) ExposedDropdownMenuBox(
                 expanded = expanded2,
                 onExpandedChange = { expanded2 = !expanded2 },
                 Modifier
                     .weight(1F),
             ) {
-                CompositionLocalProvider(
-                    LocalTextInputService provides null
-                ) {
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth()
-                            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-                        readOnly = true,
-                        value = vec.vybrano2.composeString(),
-                        onValueChange = {},
-                        label = { Text(vec.popis.composeString()) },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded2) },
-                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                        keyboardActions = KeyboardActions {
-                            focusManager.moveFocus(FocusDirection.Down)
-                        },
-                    )
-                }
+                OutlinedTextField(
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+                    readOnly = true,
+                    value = vec.vybrano2OrDefault,
+                    onValueChange = {},
+                    label = { Text(vec.popis) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded2) },
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    keyboardActions = KeyboardActions {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    },
+                )
                 ExposedDropdownMenu(
                     expanded = expanded2,
-                    onDismissRequest = { expanded2 = false },
+                    onDismissRequest = {
+                        expanded2 = false
+                        focusManager.clearFocus()
+                    },
                 ) {
-                    seznam2.forEach { moznost ->
+                    vec.moznosti2.forEachIndexed { i, moznost ->
                         DropdownMenuItem(
-                            text = { Text(moznost.composeString()) },
+                            text = { Text(moznost) },
                             onClick = {
-                                upravitVec(vec.vybrano2(moznost))
+                                upravitVec(vec.vybrano2Index(i))
                                 expanded2 = false
+                                focusManager.clearFocus()
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                         )
@@ -831,7 +822,7 @@ fun Vec(
         is Stranky.Stranka.Vec.Zaskrtavatko -> {
             Surface(
                 onClick = {
-                    upravitVec(vec.zaskrtnuto(!vec.zaskrtnuto))
+                    upravitVec(vec.zaskrtnuto(!vec.zaskrtnutoOrDefault))
                 },
                 Modifier.padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
                 shape = CircleShape,
@@ -841,12 +832,12 @@ fun Vec(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Checkbox(
-                        checked = vec.zaskrtnuto,
+                        checked = vec.zaskrtnutoOrDefault,
                         onCheckedChange = {
-                            upravitVec(vec.zaskrtnuto(!vec.zaskrtnuto))
+                            upravitVec(vec.zaskrtnuto(!vec.zaskrtnutoOrDefault))
                         },
                     )
-                    Text(text = vec.popis.composeString())
+                    Text(text = vec.popis)
                 }
             }
         }
@@ -858,53 +849,49 @@ fun Vec(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Checkbox(
-                checked = vec.zaskrtnuto,
+                checked = vec.zaskrtnutoOrDefault,
                 onCheckedChange = {
                     upravitVec(vec.zaskrtnuto(it))
                 },
             )
-            val seznam = remember(stranky) { vec.moznosti(stranky) }
             var expanded by rememberSaveable { mutableStateOf(false) }
             ExposedDropdownMenuBox(
-                expanded = expanded && vec.zaskrtnuto,
+                expanded = expanded && vec.zaskrtnutoOrDefault,
                 onExpandedChange = {
                     expanded = !expanded
                 },
                 Modifier
                     .fillMaxWidth(),
             ) {
-                CompositionLocalProvider(
-                    LocalTextInputService provides null
-                ) {
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth()
-                            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-                        readOnly = true,
-                        value = if (!vec.zaskrtnuto) "" else vec.vybrano.composeString(),
-                        onValueChange = {},
-                        label = { Text(vec.popis.composeString()) },
-                        trailingIcon = { if (vec.zaskrtnuto) ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded && vec.zaskrtnuto) },
-                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
-                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
-                        enabled = vec.zaskrtnuto,
-                        keyboardActions = KeyboardActions {
-                            focusManager.moveFocus(FocusDirection.Down)
-                        },
-                    )
-                }
+                OutlinedTextField(
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+                    readOnly = true,
+                    value = vec.vybranoOrDefault,
+                    onValueChange = {},
+                    label = { Text(vec.popis) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    keyboardActions = KeyboardActions {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    },
+                )
                 ExposedDropdownMenu(
-                    expanded = expanded && vec.zaskrtnuto,
-                    onDismissRequest = { expanded = false },
+                    expanded = expanded,
+                    onDismissRequest = {
+                        expanded = false
+                        focusManager.clearFocus()
+                    },
                 ) {
-                    seznam.forEach { moznost ->
+                    vec.moznosti.forEachIndexed { i, moznost ->
                         DropdownMenuItem(
-                            text = { Text(moznost.composeString()) },
+                            text = { Text(moznost) },
                             onClick = {
-                                upravitVec(vec.vybrano(moznost))
+                                upravitVec(vec.vybranoIndex(i))
                                 expanded = false
+                                focusManager.clearFocus()
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                         )
@@ -955,7 +942,7 @@ fun Vec(
                         else
                             upravitVec(vec.ico(""))
                     },
-                    label = { Text(R.string.kontakty_ico.toText().composeString()) },
+                    label = { Text(strings.kontaktyIco) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                     supportingText = {
@@ -983,7 +970,7 @@ fun Vec(
                     onDismissRequest = { expanded = false },
                 ) {
                     DropdownMenuItem(
-                        text = { Text(R.string.kontakty_vyberte_montazni_firmu.toText().composeString()) },
+                        text = { Text(strings.kontaktyVyberteMontazniFirmu) },
                         onClick = {},
                         contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                         enabled = false,

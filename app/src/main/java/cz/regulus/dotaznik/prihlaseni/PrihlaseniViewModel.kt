@@ -2,9 +2,10 @@ package cz.regulus.dotaznik.prihlaseni
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cz.regulus.dotaznik.R
 import cz.regulus.dotaznik.Repository
 import cz.regulus.dotaznik.Uzivatel
+import cz.regulus.dotaznik.strings.GenericStringsProvider
+import cz.regulus.dotaznik.strings.strings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -49,26 +50,26 @@ class PrihlaseniViewModel(
     }
 
     fun potvrdit(
-        chyba: (Int) -> Unit,
-    ) {
+        chyba: (String) -> Unit,
+    ) = with(GenericStringsProvider) {
         val clovek = _novyClovek.value
             ?: if (jeZamestnanec.value)
-                return
+                return@with
             else {
-                chyba(R.string.je_potreba_zadat_zastupce)
-                return
+                chyba(strings.jePotrebaZadatZastupce)
+                return@with
             }
         if (clovek.jmeno.isBlank()) {
-            chyba(R.string.je_potreba_zadat_jmeno)
-            return
+            chyba(strings.jePotrebaZadatJmeno)
+            return@with
         }
         if (clovek.prijmeni.isBlank()) {
-            chyba(R.string.je_potreba_zadat_prijmeni)
-            return
+            chyba(strings.jePotrebaZadatPrijmeni)
+            return@with
         }
         if (clovek.email.isBlank()) {
-            chyba(R.string.je_potreba_zadat_email)
-            return
+            chyba(strings.jePotrebaZadatEmail)
+            return@with
         }
         viewModelScope.launch {
             repo.prihlasit(

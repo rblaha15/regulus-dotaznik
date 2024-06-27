@@ -1,6 +1,5 @@
 package cz.regulus.dotaznik.dotaznik
 
-import android.content.res.Resources
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -43,9 +42,8 @@ import kotlin.time.Duration.Companion.seconds
 @KoinViewModel
 class DotaznikViewModel(
     private val repo: Repository,
-    private val res: Resources,
     @Named("cache") private val cacheDir: File,
-    @InjectedParam private val reset: () -> Unit
+    @InjectedParam private val reset: () -> Unit,
 ) : ViewModel() {
     val debug = repo.debug
 
@@ -138,13 +136,9 @@ class DotaznikViewModel(
 
         val file = File(cacheDir, "dotaznik_app.xml")
 
-        with(res) {
-            file.writeText(
-                stranky.createXml(
-                    repo.prihlasenState.first().uzivatel!!
-                )
-            )
-        }
+        file.writeText(
+            stranky.createXml(repo.prihlasenState.first().uzivatel!!)
+        )
 
         try {
             Transport.send(MimeMessage(session).apply {

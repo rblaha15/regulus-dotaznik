@@ -10,10 +10,9 @@ data class Zamestnanec(
     val email: String,
     val zastupce: Boolean,
     val cislo: String,
-) {
-    val celeJmeno get() = "$jmeno $prijmeni"
+)
 
-}
+val Zamestnanec.celeJmeno get() = "$jmeno $prijmeni"
 
 fun Zamestnanec.vytvoritUzivatele(jsemToJa: Boolean) =
     if (jsemToJa) Uzivatel(

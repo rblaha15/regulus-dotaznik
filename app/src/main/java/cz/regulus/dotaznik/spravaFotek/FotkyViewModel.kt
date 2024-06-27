@@ -2,14 +2,14 @@ package cz.regulus.dotaznik.spravaFotek
 
 import android.graphics.BitmapFactory
 import android.net.Uri
-import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cz.regulus.dotaznik.R
 import cz.regulus.dotaznik.Repository
+import cz.regulus.dotaznik.strings.GenericStringsProvider
+import cz.regulus.dotaznik.strings.strings
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.map
@@ -23,11 +23,10 @@ class FotkyViewModel(
     private val repo: Repository,
     private val launchers: Launchers,
 ) : ViewModel() {
-
-    interface Launchers {
-        fun getTakePicture(callback: (Boolean) -> Unit): ManagedActivityResultLauncher<Uri, Boolean>
-        fun getPickMultipleMedia(callback: (List<Uri>) -> Unit): ManagedActivityResultLauncher<PickVisualMediaRequest, List<Uri>>
-    }
+    data class Launchers(
+        val takePicture: GenericActivityResultLauncher<Uri, Boolean>,
+        val pickMultipleMedia: GenericActivityResultLauncher<PickVisualMediaRequest, List<Uri>>,
+    )
 
     val fotky = repo.fotky
         .map {
@@ -38,52 +37,48 @@ class FotkyViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), emptyList())
 
     fun vyfotit(
-        chyba: (Int) -> Unit,
-    ) {
+        chyba: (String) -> Unit,
+    ) = with(GenericStringsProvider) {
         viewModelScope.launch {
             val pocetDovolenychFotek = repo.pocetDovolenychFotek()
 
             if (pocetDovolenychFotek <= 0) {
-                chyba(R.string.fotky_maximalne_fotek)
+                chyba(strings.fotkyMaximalneFotek)
                 return@launch
             }
 
             val (id, newUri) = repo.uriIdNoveFotky()
 
-            val takePicture = launchers.getTakePicture {
+            launchers.takePicture.launch(newUri) {
                 if (it) viewModelScope.launch {
                     repo.pridalJsemFoto(id)
                 }
             }
-
-            takePicture.launch(newUri)
         }
     }
 
     fun vybrat(
-        chyba: (Int) -> Unit,
-    ) {
+        chyba: (String) -> Unit,
+    ) = with(GenericStringsProvider) {
         viewModelScope.launch {
             val pocetDovolenychFotek = repo.pocetDovolenychFotek()
 
             if (pocetDovolenychFotek <= 0) {
-                chyba(R.string.fotky_maximalne_fotek)
+                chyba(strings.fotkyMaximalneFotek)
                 return@launch
             }
 
-            val pickMultipleMedia = launchers.getPickMultipleMedia { uris ->
-                val prekrocenoO = (uris.size - pocetDovolenychFotek).let { if (it < 0) 0 else it }
+            launchers.pickMultipleMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) { uris ->
+                val prekroceno = (uris.size - pocetDovolenychFotek).let { if (it < 0) 0 else it }
 
-                if (prekrocenoO > 0) chyba(R.string.fotky_maximalne_fotek_presazeno)
+                if (prekroceno > 0) chyba(strings.fotkyMaximalneFotekPresazeno)
 
                 viewModelScope.launch {
-                    uris.dropLast(prekrocenoO).forEach { uri ->
+                    uris.dropLast(prekroceno).forEach { uri ->
                         repo.prekopirovat(uri)
                     }
                 }
             }
-
-            pickMultipleMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
     }
 

@@ -10,6 +10,4 @@ data class Uzivatel(
     val ico: String = "",
     val cisloKo: String,
     val jeZamestnanec: Boolean,
-) {
-    val celeJmeno get() = "$jmeno $prijmeni"
-}
+)

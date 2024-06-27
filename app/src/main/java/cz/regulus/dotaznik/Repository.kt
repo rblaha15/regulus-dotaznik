@@ -19,6 +19,8 @@ import com.google.firebase.remoteconfig.remoteConfigSettings
 import cz.regulus.dotaznik.dotaznik.Firma
 import cz.regulus.dotaznik.dotaznik.Stranky
 import cz.regulus.dotaznik.prihlaseni.Zamestnanec
+import cz.regulus.dotaznik.strings.GenericStringsProvider
+import cz.regulus.dotaznik.strings.strings
 import io.github.z4kn4fein.semver.toVersion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
@@ -66,7 +68,7 @@ class Repository(
                 } catch (e: Exception) {
                     Toast.makeText(
                         ctx,
-                        R.string.potreba_internet,
+                        GenericStringsProvider.run { strings.potrebaInternet },
                         Toast.LENGTH_SHORT,
                     ).show()
                     throw e
