@@ -1,6 +1,5 @@
 package cz.regulus.dotaznik.reset
 
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.ramcosta.composedestinations.annotation.Destination
@@ -14,7 +13,6 @@ import kotlinx.coroutines.launch
 fun ResetScreen(
     navigator: DestinationsNavigator
 ) {
-    LinearProgressIndicator()
     LaunchedEffect(Unit) {
         delay(500)
         launch(Dispatchers.Main) {

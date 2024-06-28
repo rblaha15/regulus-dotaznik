@@ -1,17 +1,15 @@
 package cz.regulus.dotaznik.dotaznik
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.sun.mail.util.MailConnectException
 import cz.regulus.dotaznik.BuildConfig
-import cz.regulus.dotaznik.PrihlasenState
 import cz.regulus.dotaznik.Repository
-import cz.regulus.dotaznik.uzivatel
+import cz.regulus.dotaznik.User
+import cz.regulus.dotaznik.userOrNull
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.WhileSubscribed
@@ -20,6 +18,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.intellij.lang.annotations.Language
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.Named
@@ -40,65 +39,61 @@ import javax.mail.internet.MimeMultipart
 import kotlin.time.Duration.Companion.seconds
 
 @KoinViewModel
-class DotaznikViewModel(
+class QuestionnaireViewModel(
     private val repo: Repository,
     @Named("cache") private val cacheDir: File,
     @InjectedParam private val reset: () -> Unit,
 ) : ViewModel() {
-    val debug = repo.debug
+    val isDebug = repo.isDebug
 
-    val stranky = repo.stranky
+    val sites = repo.sites
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), null)
 
-    fun upravitStranky(stranky: Stranky) = viewModelScope.launch {
-        repo.upravitStranky(stranky)
+    fun editSites(sites: Sites) = viewModelScope.launch {
+        repo.editSites(sites)
     }
 
-    val firmy = repo.firmy
+    val companies = repo.companies
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), emptyList())
 
-    fun odhlasit() = viewModelScope.launch {
-        repo.odhlasit()
+    fun logOut() = viewModelScope.launch {
+        repo.logOut()
     }
 
-    val prihlasen = repo.prihlasenState.map {
-        when (it) {
-            PrihlasenState.Odhasen -> null
-            is PrihlasenState.Prihlasen -> it.uzivatel
-        }
+    val userOrNull = repo.authenticationState.map {
+        it.userOrNull
     }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), null)
 
-    private val _odeslaniState = MutableStateFlow<OdesilaniState>(OdesilaniState.Nic)
-    val odesilaniState = _odeslaniState.asStateFlow()
+    private val _sendState = MutableStateFlow<SendState>(SendState.Nothing)
+    val sendState = _sendState.asStateFlow()
 
-    private lateinit var chyba: String
+    private lateinit var error: String
 
-    fun zmenitState(positive: Boolean) {
-        val state = odesilaniState.value
-        if (positive) viewModelScope.launch(Dispatchers.IO) {
-            when (state) {
-                OdesilaniState.Nic -> zacitOdesilani()
-                is OdesilaniState.OpravduOdeslat -> odeslat()
-                OdesilaniState.Odesilani -> Unit
-                OdesilaniState.Uspech -> odstranitVse()
-                OdesilaniState.Error.Offline -> zobrazitChybu()
-                is OdesilaniState.Error.Podrobne -> Unit
-                OdesilaniState.OdstranitData -> odstranitData()
+    fun changeState(moveOn: Boolean) {
+        if (moveOn) viewModelScope.launch(Dispatchers.IO) {
+            when (sendState.value) {
+                SendState.Nothing -> askForConfirmation()
+                is SendState.ConfirmSend -> sendEmail()
+                SendState.Sending -> Unit
+                SendState.Success -> askForRemoval()
+                SendState.Error.Offline -> showError()
+                SendState.Error.Other -> showError()
+                is SendState.Error.Details -> Unit
+                SendState.ConfirmDataRemoval -> removeData()
             }
         }
-        else _odeslaniState.value = OdesilaniState.Nic
+        else _sendState.value = SendState.Nothing
     }
 
-    private suspend fun emailDoruceni() = when {
-        debug -> repo.prihlasenState.first().uzivatel!!.email
+    private suspend fun recipientAdress() = when {
+        isDebug -> repo.authenticationState.first().userOrNull!!.email
         Locale.getDefault().language == Locale("sk").language -> "obchod@regulus.sk"
         else -> "poptavky@regulus.cz"
     }
 
-    private suspend fun zacitOdesilani() {
-        delay(1000)
-        _odeslaniState.value = OdesilaniState.OpravduOdeslat(emailDoruceni())
+    private suspend fun askForConfirmation() {
+        _sendState.value = SendState.ConfirmSend(recipientAdress())
     }
 
     private val session = Session.getInstance(
@@ -116,60 +111,50 @@ class DotaznikViewModel(
         },
     )!!
 
-    val poprve = repo.poprve.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), true)
+    val firstStart = repo.firstStart.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), true)
 
-    fun podruhe() {
+    fun started() {
         viewModelScope.launch {
-            repo.podruhe()
+            repo.started()
         }
     }
 
-    private suspend fun odeslat() {
-        _odeslaniState.value = OdesilaniState.Odesilani
+    private suspend fun sendEmail() {
+        _sendState.value = SendState.Sending
 
-        val stranky = repo.stranky.first()
+        val sites = repo.sites.first()
 
-        val uzivatel = repo.prihlasenState.first().uzivatel!!
+        val user = repo.authenticationState.first().userOrNull!!
 
-        val jmeno = stranky.kontakty.jmeno.text
-        val prijmeni = stranky.kontakty.prijmeni.text
+        val name = sites.contacts.name.text
+        val surname = sites.contacts.surname.text
 
         val file = File(cacheDir, "dotaznik_app.xml")
 
         file.writeText(
-            stranky.createXml(repo.prihlasenState.first().uzivatel!!)
+            sites.createXml(repo.authenticationState.first().userOrNull!!)
         )
 
         try {
             Transport.send(MimeMessage(session).apply {
                 setFrom(InternetAddress(EmailCredentials.EMAIL, "Aplikace Regulus"))
 
-                subject = "REGULUS – Apka – OSOBA: $jmeno $prijmeni"
+                subject = "REGULUS – Apka – OSOBA: $name $surname"
 
                 addRecipient(
                     Message.RecipientType.TO,
-                    InternetAddress(emailDoruceni())
+                    InternetAddress(recipientAdress())
                 )
-                if (!debug) {
+                if (!isDebug) {
                     addRecipient(
                         Message.RecipientType.CC,
-                        InternetAddress(uzivatel.email)
+                        InternetAddress(user.email)
                     )
                 }
 
                 setContent(MimeMultipart().apply {
-
                     addBodyPart(MimeBodyPart().apply {
-                        setText(buildString {
-                            append("Prosím o přípravu nabídky. Děkuji.\n\n")
-                            append(uzivatel.jmeno)
-                            append(" ")
-                            append(uzivatel.prijmeni)
-                            if (uzivatel.ico.isNotBlank()) {
-                                append(", IČO: ")
-                                append(uzivatel.ico)
-                            }
-                        })
+                        setText(user.constructEmail(), null, "html")
                     })
 
                     addBodyPart(MimeBodyPart().apply {
@@ -177,7 +162,7 @@ class DotaznikViewModel(
                         fileName = file.name
                     })
 
-                    repo.fotkyNaExport().forEach { file ->
+                    repo.getPhotosForExport().forEach { file ->
                         addBodyPart(MimeBodyPart().apply {
                             attachFile(file)
                             setHeader("Content-Type", "image/jpg; charset=UTF-8 name=\"${file.name}\"")
@@ -186,41 +171,48 @@ class DotaznikViewModel(
                 })
             })
 
-            _odeslaniState.value = OdesilaniState.Uspech
+            _sendState.value = SendState.Success
 
         } catch (e: MessagingException) {
-            e.printStackTrace()
-            Firebase.crashlytics.recordException(RuntimeException("Could not send email", e))
+            val wrapper = RuntimeException("Could not send email", e)
+            wrapper.printStackTrace()
+            Firebase.crashlytics.recordException(wrapper)
 
-            Log.e("email", "CHYBA", e)
+            error = wrapper.stackTraceToString()
 
-            chyba = e.stackTraceToString()
-
-            _odeslaniState.value =
+            _sendState.value =
                 if (e is MailConnectException)
-                    OdesilaniState.Error.Offline
+                    SendState.Error.Offline
                 else
-                    OdesilaniState.Error.Podrobne(e.stackTraceToString())
+                    SendState.Error.Other
         }
     }
 
-    private suspend fun odstranitData() {
-        _odeslaniState.value = OdesilaniState.Nic
+    private suspend fun removeData() {
+        _sendState.value = SendState.Nothing
 
-        repo.upravitStranky(Stranky())
+        repo.editSites(Sites())
 
-        repo.odstranitVsechnyFotky()
+        repo.deleteAllPhotos()
 
         viewModelScope.launch(Dispatchers.Main) {
             reset()
         }
     }
 
-    private fun zobrazitChybu() {
-        _odeslaniState.value = OdesilaniState.Error.Podrobne(chyba)
+    private fun showError() {
+        _sendState.value = SendState.Error.Details(error)
     }
 
-    fun odstranitVse() {
-        _odeslaniState.value = OdesilaniState.OdstranitData
+    fun askForRemoval() {
+        _sendState.value = SendState.ConfirmDataRemoval
     }
 }
+
+@Language("html")
+private fun User.constructEmail() = """
+    <p>Prosím o přípravu nabídky. Děkuji.</p>
+    ${if (crn.isNotBlank()) "<p>$name $surname, IČO: $crn</p>" else "<p>$name $surname</p>"}
+    <hr style='color: gray' />
+    <p style='color: gray'>Tento email byl vygenerován automaticky, pokud chcete odpovědět, zvolte Odpovědět všem.</p>
+""".trimIndent()

@@ -1,10 +1,10 @@
 package cz.regulus.dotaznik
 
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -23,7 +23,7 @@ import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.navigate
-import cz.regulus.dotaznik.destinations.PrihlaseniSceenDestination
+import cz.regulus.dotaznik.destinations.LogInScreenDestination
 import cz.regulus.dotaznik.theme.DotaznikTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        val aktualizovatAplikaci = {
+        val updateApp = {
             lifecycle.coroutineScope.launch(Dispatchers.IO) {
                 val text = try {
                     withContext(Dispatchers.IO) {
@@ -55,10 +55,13 @@ class MainActivity : AppCompatActivity() {
                     return@launch
                 }
 
-                startActivity(Intent().apply {
-                    action = Intent.ACTION_VIEW
-                    data = Uri.parse("https://github.com/rblaha15/regulus-dotaznik/releases/download/v$text/Dotaznik-$text.apk")
-                })
+                CustomTabsIntent.Builder()
+                    .setShowTitle(true)
+                    .build()
+                    .launchUrl(
+                        this@MainActivity,
+                        Uri.parse("https://github.com/rblaha15/regulus-dotaznik/releases/download/v$text/Dotaznik-$text.apk")
+                    )
             }
             Unit
         }
@@ -66,16 +69,16 @@ class MainActivity : AppCompatActivity() {
         setContent {
             val navController = rememberNavController()
 
-            val prihlasen by repo.prihlasenState.collectAsStateWithLifecycle(null)
+            val authState by repo.authenticationState.collectAsStateWithLifecycle(null)
 
-            if (prihlasen != null) DotaznikTheme(
+            if (authState != null) DotaznikTheme(
                 useDynamicColor = true
             ) {
                 Surface(
                     color = MaterialTheme.colorScheme.surface
                 ) {
-                    val jePotrebaAktualizovatAplikaci by repo.jePotrebaAktualizovatAplikaci.collectAsStateWithLifecycle(false)
-                    if (jePotrebaAktualizovatAplikaci) {
+                    val isAppUpdateNeeded by repo.isAppUpdateNeeded.collectAsStateWithLifecycle(false)
+                    if (isAppUpdateNeeded) {
                         var zobrazitDialog by remember { mutableStateOf(true) }
 
                         if (zobrazitDialog) AlertDialog(
@@ -86,7 +89,7 @@ class MainActivity : AppCompatActivity() {
                                 TextButton(
                                     onClick = {
                                         zobrazitDialog = false
-                                        aktualizovatAplikaci()
+                                        updateApp()
                                     }
                                 ) {
                                     Text("Ano")
@@ -114,11 +117,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            LaunchedEffect(prihlasen) {
+            LaunchedEffect(authState) {
                 launch(Dispatchers.IO) {
-                    if (prihlasen is PrihlasenState.Odhasen) {
+                    if (authState is AuthenticationState.LoggedOut) {
                         withContext(Dispatchers.Main) {
-                            navController.navigate(PrihlaseniSceenDestination)
+                            navController.navigate(LogInScreenDestination)
                         }
                     }
                 }

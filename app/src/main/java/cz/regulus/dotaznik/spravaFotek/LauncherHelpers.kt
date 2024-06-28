@@ -11,6 +11,7 @@ fun interface GenericActivityResultLauncher<I, O> {
 }
 
 @Composable
+@Suppress("UNCHECKED_CAST")
 fun <I, O> rememberResultLauncher(contract: ActivityResultContract<I, O>): GenericActivityResultLauncher<I, O> {
     var i = rememberSaveable { 0 }
 

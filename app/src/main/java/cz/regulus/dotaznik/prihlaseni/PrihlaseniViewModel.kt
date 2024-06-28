@@ -3,8 +3,7 @@ package cz.regulus.dotaznik.prihlaseni
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cz.regulus.dotaznik.Repository
-import cz.regulus.dotaznik.Uzivatel
-import cz.regulus.dotaznik.strings.GenericStringsProvider
+import cz.regulus.dotaznik.User
 import cz.regulus.dotaznik.strings.strings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,63 +24,61 @@ class PrihlaseniViewModel(
     private val repo: Repository,
     @InjectedParam private val navigateUp: () -> Unit,
 ) : ViewModel() {
-    val zamestnanci = repo.lidi
+    val employees = repo.people
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), emptyList())
-    val zastupci = zamestnanci.map {
+    val representatives = employees.map {
         it.filter { clovek ->
-            clovek.zastupce
+            clovek.isRepresentative
         }
     }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), emptyList())
 
-    private val _novyClovek = MutableStateFlow(null as Uzivatel?)
-    val novyClovek = _novyClovek.asStateFlow()
+    private val _newUser = MutableStateFlow(null as User?)
+    val newUser = _newUser.asStateFlow()
 
-    fun upravitNovehoCloveka(upravit: (Uzivatel?) -> Uzivatel?) {
-        _novyClovek.value = upravit(_novyClovek.value)
+    fun editNewUser(edit: (User?) -> User?) {
+        _newUser.value = edit(_newUser.value)
     }
 
-    private val _jeZamestanec = MutableStateFlow(false)
-    val jeZamestnanec = _jeZamestanec.asStateFlow()
+    private val _isEmployee = MutableStateFlow(false)
+    val isEmployee = _isEmployee.asStateFlow()
 
-    fun zmenitZdaJeZamestnanec(jeZamestanec: Boolean) {
-        _jeZamestanec.value = jeZamestanec
-        _novyClovek.value = null
+    fun changeBeingEmployee(isEmployee: Boolean) {
+        _isEmployee.value = isEmployee
+        _newUser.value = null
     }
 
-    fun potvrdit(
-        chyba: (String) -> Unit,
-    ) = with(GenericStringsProvider) {
-        val clovek = _novyClovek.value
-            ?: if (jeZamestnanec.value)
-                return@with
+    fun confirm(
+        error: (String) -> Unit,
+    ) {
+        val user = _newUser.value
+            ?: if (isEmployee.value)
+                return
             else {
-                chyba(strings.jePotrebaZadatZastupce)
-                return@with
+                error(strings.logIn.representativeNeeded)
+                return
             }
-        if (clovek.jmeno.isBlank()) {
-            chyba(strings.jePotrebaZadatJmeno)
-            return@with
+        if (user.name.isBlank()) {
+            error(strings.logIn.nameNeeded)
+            return
         }
-        if (clovek.prijmeni.isBlank()) {
-            chyba(strings.jePotrebaZadatPrijmeni)
-            return@with
+        if (user.surname.isBlank()) {
+            error(strings.logIn.surnameNeeded)
+            return
         }
-        if (clovek.email.isBlank()) {
-            chyba(strings.jePotrebaZadatEmail)
-            return@with
+        if (user.email.isBlank()) {
+            error(strings.logIn.emailNeeded)
+            return
         }
         viewModelScope.launch {
-            repo.prihlasit(
-                clovek
-            )
+            repo.logIn(user)
             withContext(Dispatchers.Main) {
                 navigateUp()
             }
         }
     }
 
-    fun zrusit() {
+    fun cancel() {
         exitProcess(1)
     }
 }

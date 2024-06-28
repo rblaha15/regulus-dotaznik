@@ -16,10 +16,9 @@ import com.google.firebase.crashlytics.crashlytics
 import com.google.firebase.remoteconfig.get
 import com.google.firebase.remoteconfig.remoteConfig
 import com.google.firebase.remoteconfig.remoteConfigSettings
-import cz.regulus.dotaznik.dotaznik.Firma
-import cz.regulus.dotaznik.dotaznik.Stranky
-import cz.regulus.dotaznik.prihlaseni.Zamestnanec
-import cz.regulus.dotaznik.strings.GenericStringsProvider
+import cz.regulus.dotaznik.dotaznik.Company
+import cz.regulus.dotaznik.dotaznik.Sites
+import cz.regulus.dotaznik.prihlaseni.Employee
 import cz.regulus.dotaznik.strings.strings
 import io.github.z4kn4fein.semver.toVersion
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +29,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.koin.core.annotation.Single
@@ -43,19 +43,19 @@ class Repository(
     private val ctx: Context,
 ) {
     companion object {
-        private val KEY_PRIHLASEN = stringPreferencesKey("prihlasen")
-        private val KEY_POPRVE = booleanPreferencesKey("poprve")
-        private val KEY_STRANKY = stringPreferencesKey("stranky")
-        private val KEY_FOTKY = stringSetPreferencesKey("fotkyIds")
+        private val KEY_LOGGED_IN = stringPreferencesKey("loggedIn")
+        private val KEY_FIRST_START = booleanPreferencesKey("poprve")
+        private val KEY_SITES = stringPreferencesKey("stranky")
+        private val KEY_PHOTOS = stringSetPreferencesKey("fotkyIds")
 
-        private const val MAX_POCET_FOTEK = 5
+        private const val MAX_PHOTO_AMOUNT = 5
     }
 
-    val debug = BuildConfig.DEBUG || '-' in BuildConfig.VERSION_NAME
+    val isDebug = BuildConfig.DEBUG || '-' in BuildConfig.VERSION_NAME
 
     private val remoteConfig = Firebase.remoteConfig
 
-    private val remoteConfigLoaded = flow {
+    private val isRemoteConfigLoaded = flow {
         remoteConfig.setConfigSettingsAsync(remoteConfigSettings {
             minimumFetchIntervalInSeconds = 3600
         })
@@ -68,7 +68,7 @@ class Repository(
                 } catch (e: Exception) {
                     Toast.makeText(
                         ctx,
-                        GenericStringsProvider.run { strings.potrebaInternet },
+                        strings.internetConnectionNeeded,
                         Toast.LENGTH_SHORT,
                     ).show()
                     throw e
@@ -82,83 +82,91 @@ class Repository(
         ignoreUnknownKeys = true
     }
 
-    val lidi = remoteConfigLoaded.map {
-        json.decodeFromString<List<Zamestnanec>>(remoteConfig["lidi"].asString())
+    private inline fun <reified T> T.toJson() = json.encodeToString(this)
+    private inline fun <reified T> String.fromJson() = try {
+        json.decodeFromString<T>(this)
+    } catch (e: SerializationException) {
+        null
     }
-    val firmy = remoteConfigLoaded.map {
-        json.decodeFromString<List<Firma>>(remoteConfig["firmy"].asString())
+
+    val people = isRemoteConfigLoaded.map {
+        remoteConfig["lidi"].asString().fromJson<List<Employee>>()!!
     }
-    private val produkty = remoteConfigLoaded.map {
-        json.decodeFromString<Produkty>(remoteConfig["produkty"].asString())
+    val companies = isRemoteConfigLoaded.map {
+        remoteConfig["firmy"].asString().fromJson<List<Company>>()!!
+    }
+    private val products = isRemoteConfigLoaded.map {
+        remoteConfig["products"].asString().fromJson<Products>()!!
     }
 
     private val prefs = PreferenceDataStoreFactory.create {
         ctx.preferencesDataStoreFile("prefs-DOTAZNIK")
     }
 
-    val poprve = prefs.data.map { preferences ->
-        preferences[KEY_POPRVE] ?: true
+    val firstStart = prefs.data.map { preferences ->
+        preferences[KEY_FIRST_START] ?: true
     }
 
-    suspend fun podruhe() {
+    suspend fun started() {
         prefs.edit {
-            it[KEY_POPRVE] = false
+            it[KEY_FIRST_START] = false
         }
     }
 
-    val prihlasenState = prefs.data.map { preferences ->
-        preferences[KEY_PRIHLASEN]?.let { json.decodeFromString<PrihlasenState>(it) } ?: PrihlasenState.Odhasen
+    val authenticationState = prefs.data.map { preferences ->
+        preferences[KEY_LOGGED_IN]?.fromJson<AuthenticationState>() ?: AuthenticationState.LoggedOut
     }
 
-    suspend fun prihlasit(uzivatel: Uzivatel) {
+    suspend fun logIn(user: User) {
         prefs.edit {
-            it[KEY_PRIHLASEN] = json.encodeToString<PrihlasenState>(PrihlasenState.Prihlasen(uzivatel))
+            it[KEY_LOGGED_IN] = AuthenticationState.LoggedIn(user).toJson<AuthenticationState>()
         }
     }
 
-    suspend fun odhlasit() {
+    suspend fun logOut() {
         prefs.edit {
-            it[KEY_PRIHLASEN] = json.encodeToString<PrihlasenState>(PrihlasenState.Odhasen)
+            it[KEY_LOGGED_IN] = AuthenticationState.LoggedOut.toJson<AuthenticationState>()
         }
     }
 
-    val stranky = prefs.data.map { preferences ->
-        preferences[KEY_STRANKY]?.let { json.decodeFromString<Stranky>(it) } ?: Stranky()
-    }.combine(produkty) { stranky, produkty ->
-        stranky.pridatProdukty(produkty)
+    val sites = prefs.data.map { preferences ->
+        preferences[KEY_SITES]?.fromJson<Sites>() ?: Sites()
+    }.combine(products) { sites, products ->
+        sites.withProducts(products)
     }
 
-    suspend fun upravitStranky(stranky: Stranky) {
+    suspend fun editSites(sites: Sites) {
         prefs.edit {
-            it[KEY_STRANKY] = json.encodeToString(stranky)
+            it[KEY_SITES] = sites.toJson()
         }
     }
 
     private val photoIds = prefs.data.map { preferences ->
-        (preferences[KEY_FOTKY] ?: setOf()).toList().map { it.toInt() }.sorted()
+        (preferences[KEY_PHOTOS] ?: setOf()).toList().map { it.toInt() }.sorted()
     }
 
     private suspend fun newPhotoId() = photoIds.first().maxOrNull()?.plus(1) ?: 0
 
-    private fun MutablePreferences.pridatId(id: Int) {
-        this[KEY_FOTKY] = (this[KEY_FOTKY] ?: setOf()).toList().plus(id.toString()).sortedBy { it.toInt() }.toSet()
-    }
-    private fun MutablePreferences.odebratId(id: Int) {
-        this[KEY_FOTKY] = (this[KEY_FOTKY] ?: setOf()).toList().minus(id.toString()).sortedBy { it.toInt() }.toSet()
+    private fun MutablePreferences.addPhotoId(id: Int) {
+        this[KEY_PHOTOS] = this[KEY_PHOTOS].orEmpty().toList().plus(id.toString()).sortedBy { it.toInt() }.toSet()
     }
 
-    val fotky = photoIds.map { photoIds ->
+    private fun MutablePreferences.removePhotoId(id: Int) {
+        this[KEY_PHOTOS] = this[KEY_PHOTOS].orEmpty().toList().minus(id.toString()).sortedBy { it.toInt() }.toSet()
+    }
+
+    val photos = photoIds.map { photoIds ->
         photoIds.map { id ->
             id to File(ctx.filesDir, "photo${id}.jpg")
         }
     }
 
-    suspend fun prekopirovat(
+    suspend fun copyPhotoTuInternalStorage(
         uri: Uri,
     ) {
         prefs.edit { preferences ->
-            val novyPocet = (preferences[KEY_FOTKY]?.size ?: 0) + 1
-            require(novyPocet <= MAX_POCET_FOTEK)
+            val newPhotoCount = (preferences[KEY_PHOTOS]?.size ?: 0) + 1
+            require(newPhotoCount <= MAX_PHOTO_AMOUNT)
             val newId = newPhotoId()
 
             ctx.contentResolver.openInputStream(uri)!!.use { input ->
@@ -166,32 +174,31 @@ class Repository(
                     input.copyTo(output)
                 }
             }
-            preferences.pridatId(newId)
+            preferences.addPhotoId(newId)
         }
     }
 
-    suspend fun pridalJsemFoto(id: Int) {
+    suspend fun registerTakenPhoto(id: Int) {
         prefs.edit { preferences ->
-            val novyPocet = (preferences[KEY_FOTKY]?.size ?: 0) + 1
-            assert(novyPocet <= MAX_POCET_FOTEK)
+            val newPhotoCount = (preferences[KEY_PHOTOS]?.size ?: 0) + 1
+            assert(newPhotoCount <= MAX_PHOTO_AMOUNT)
 
             assert(File(ctx.filesDir, "photo${id}.jpg").exists())
-            preferences.pridatId(id)
+            preferences.addPhotoId(id)
         }
     }
 
-    suspend fun odebratFoto(
+    suspend fun removePhoto(
         id: Int,
     ) {
         prefs.edit { preferences ->
-
             val file = File(ctx.filesDir, "photo${id}.jpg")
             file.delete()
-            preferences.odebratId(id)
+            preferences.removePhotoId(id)
         }
     }
 
-    suspend fun fotkyNaExport(): List<File> {
+    suspend fun getPhotosForExport(): List<File> {
         return photoIds.first().mapIndexed { i, id ->
             val oldFile = File(ctx.filesDir, "photo${id}.jpg")
             val newFile = File(ctx.filesDir, "fotka ${i + 1}.jpg")
@@ -201,33 +208,32 @@ class Repository(
         }
     }
 
-    suspend fun odstranitVsechnyFotky() {
-        fotky.first().forEach {
+    suspend fun deleteAllPhotos() {
+        photos.first().forEach {
             it.second.delete()
         }
 
         prefs.edit {
-            it[KEY_FOTKY] = emptySet()
+            it[KEY_PHOTOS] = emptySet()
         }
-
     }
 
-    suspend fun uriIdNoveFotky(): Pair<Int, Uri> {
-        val novyPocet = (prefs.data.first()[KEY_FOTKY]?.size ?: 0) + 1
-        require(novyPocet <= MAX_POCET_FOTEK)
+    suspend fun getIdAndUriOfNewPhoto(): Pair<Int, Uri> {
+        val newCount = (prefs.data.first()[KEY_PHOTOS]?.size ?: 0) + 1
+        require(newCount <= MAX_PHOTO_AMOUNT)
         val newId = newPhotoId()
 
         val newFile = File(ctx.filesDir, "photo${newId}.jpg")
         return newId to FileProvider.getUriForFile(ctx, "${ctx.packageName}.provider", newFile)
     }
 
-    suspend fun pocetDovolenychFotek(): Int {
-        val pocet = prefs.data.first()[KEY_FOTKY]?.size ?: 0
-        return MAX_POCET_FOTEK - pocet
+    suspend fun remainingPhotoSlots(): Int {
+        val count = prefs.data.first()[KEY_PHOTOS]?.size ?: 0
+        return MAX_PHOTO_AMOUNT - count
     }
 
-    private suspend fun jePotrebaAktualizovatAplikaci(): Boolean {
-        if (debug) return false
+    private suspend fun isAppUpdateNeeded(): Boolean {
+        if (isDebug) return false
 
         val text = try {
             withContext(Dispatchers.IO) {
@@ -241,15 +247,15 @@ class Repository(
             return false
         }
 
-        val mistniVerze = BuildConfig.VERSION_NAME.toVersion(false)
-        val nejnovejsiVerze = text.toVersion(false)
+        val localVersion = BuildConfig.VERSION_NAME.toVersion(false)
+        val newestVersion = text.toVersion(false)
 
-        return mistniVerze < nejnovejsiVerze
+        return localVersion < newestVersion
     }
 
-    val jePotrebaAktualizovatAplikaci = flow {
-        emit(jePotrebaAktualizovatAplikaci())
+    val isAppUpdateNeeded = flow {
+        emit(isAppUpdateNeeded())
     }
 }
 
-fun Stranky.pridatProdukty(produkty: Produkty) = copy(produkty = produkty)
+fun Sites.withProducts(products: Products) = copy(products = products)

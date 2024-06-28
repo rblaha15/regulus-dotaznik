@@ -1,172 +1,217 @@
 package cz.regulus.dotaznik.strings
 
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.intl.Locale
 
 typealias LanguageTag = String
 
 interface Strings {
     val appName: String
-    val kontakty: String
-    val detailObjektu: String
-    val system: String
-    val bazen: String
-    val zdrojeTv: String
-    val zdrojeTop: String
-    val zdroje: String
-    val poznamka: String
-    val otevrit: String
-    val zavrit: String
+    val contacts: KontaktyStrings
+    val objectDetail: DetailObjektuStrings
+    val system: SystemStrings
+    val pool: BazenStrings
+    val additionalSources: DoplnkoveZdrojeStrings
+    val accessories: PrislusenstviStrings
+    val logIn: PrihlaseniStrings
+    val photos: FotkyStrings
+    val export: ExportStrings
+    val note: String
+    val open: String
+    val close: String
     val ok: String
-    val ano: String
-    val ne: String
-    val zrusit: String
-    val odeslat: String
-    val odstranit: String
-    val kW get() = "kW"
-    val kWh get() = "kWh"
-    val m2 get() = "m²"
-    val q get() = "q"
-    val m3 get() = "m³"
-    val dm3 get() = "dm³"
-    val m get() = "m"
-    val stupenC get() = "°C"
-    val zadna: String
-    val zadny: String
-    val zadne: String
-    val vyberte: String
-    val jine: String
-    val jiny: String
-    val vzduchVoda: String
-    val zemeVoda: String
-    val kontaktyPrijmeni: String
-    val kontaktyJmeno: String
-    val kontaktyUlice: String
-    val kontaktyMesto: String
-    val kontaktyPsc: String
-    val kontaktyTelefon: String
-    val kontaktyEmail: String
-    val kontaktyVyberteMontazniFirmu: String
-    val kontaktyVybratFirmu: String
-    val kontaktyVyberteFirmu: String
-    val kontaktyVyhledatFirmu: String
-    val kontaktyIco: String
-    val detailObjektuZtrata: String
-    val detailObjektuPotrebaVytapeni: String
-    val detailObjektuPotrebaTv: String
-    val detailObjektuPlocha: String
-    val detailObjektuObjem: String
-    val detailObjektuNaklady: String
-    val detailObjektuDruh: String
-    val detailObjektuSpotreba: String
-    val detailObjektuDruh2: String
-    val detailObjektuSpotreba2: String
-    val systemTcTyp: String
-    val systemTcModel: String
-    val systemNadrzTyp: String
-    val systemNadrzObjem: String
-    val systemZasobnikTyp: String
-    val sytemZasobnikObjem: String
-    val systemTypJednotky: String
-    val systemOtopnySystem: String
-    val systemOs1okruh: String
-    val systemOs2okruhy: String
-    val systemOs3okruhy: String
-    val systemOsInvertor: String
-    val systemCirkulace: String
-    val systemOhrevBazenu: String
-    val bazenDobaUzivani: String
-    val bazenDobaCelorocni: String
-    val bazenDobaSezonni: String
-    val bazenUmisteni: String
-    val bazenUmisteniVenkovni: String
-    val bazenUmisteniVnitrni: String
-    val bazenDruhVody: String
-    val bazenDruhSladka: String
-    val bazenDruhSlana: String
-    val bazenTvar: String
-    val bazenTvarObdelnikovy: String
-    val bazenTvarOvalny: String
-    val bazenTvarKruhovy: String
-    val bazenDelka: String
-    val bazenSirka: String
-    val bazenRadius: String
-    val bazenHloubka: String
-    val bazenZakryti: String
-    val bazenZakrytiPevna: String
-    val bazenZakrytiPolykarbonat: String
-    val bazenTeplota: String
-    val zdrojeTopneTeleso: String
-    val zdrojeElektrokotel: String
-    val zdrojePlynKotel: String
-    val zdrojeKrb: String
-    val zdrojeNove: String
-    val zdrojeNovy: String
-    val zdrojeStavajici: String
-    val zdrojeTvDoZasuvky: String
-    val zdrojeTvZRegulace: String
-    val jePotrebaZadatJmenoAPrijmeni: String
-    val jePotrebaZadatZastupce: String
-    val jePotrebaZadatEmail: String
-    val jePotrebaZadatPrijmeni: String
-    val jePotrebaZadatJmeno: String
-    val prihlaseni: String
-    val prihlaseniPotrebaInternet: String
-    val prihlaseniJsemZamestanec: String
-    val prihlaseniNejsemZamestanec: String
-    val prihlaseniVasZastupce: String
-    val prihlaseniVaseJmeno: String
-    val prihlaseniVasePrijmeni: String
-    val prihlaseniVaseIco: String
-    val prihlaseniVasEmail: String
-    val prihlaseniVyberSe: String
-    val prihlaseniVybranyJmenoPrijmeni: (String, String) -> String
-    val prihlaseniVybranyEmail: (String) -> String
-    val prihlaseniVybranyKod: (String) -> String
-    val menuVybranyJmenoPrijmeni: (String, String) -> String
-    val menuVybranyEmail: (String) -> String
-    val menuVybranyIco: (String) -> String
-    val menuVybranyKod: (String) -> String
-    val prihlaseniJmenoPrijmeni: String
-    val prihlaseniEmail: String
-    val prihlaseniKod: String
-    val prihlaseniIco: String
-    val exportOdesilani: String
-    val exportEmailSeOdesila: String
-    val exportEmailUspesneOdeslan: String
-    val exportChceteOdeslat: String
-    val exportOpravduChceteOdeslatNa: (String) -> String
-    val exportEmailNeodeslan: (String) -> String
-    val exportOpravduOdstranitData: String
-    val fotkySpravaFotek: String
-    val fotkyVyfotit: String
-    val fotkyVybratZGalerie: String
-    val fotkyFotka: String
-    val fotkyPridat: String
-    val fotkyMaximalneFotek: String
-    val fotkyMaximalneFotekPresazeno: String
-    val odstranitVse: String
-    val totoJeChyba: String
-    val podrobnejsiInfo: String
-    val exportNejstePripojeni: String
-    val prihlaseniDoplnitInfo: String
-    val aktualizovat: String
-    val vyberteFirmu: String
-    val naStenu: String
-    val naIzolovanouStenu: String
-    val prislusenstvi: String
-    val prislusenstviHadice: String
-    val prislusenstviDrzakProTc: String
-    val prislusenstviPokojovaJednotka: String
-    val prislusenstviTopnyKabel: String
-    val prislusenstviPokojoveCidlo: String
-    val mena: String
-    val nejstePrihlaseni: String
-    val odhlasitSe: String
-    val fotkyZadneFotky: String
-    val potrebaInternet: String
-    val zpet: String
-    val vybratJednotky: String
+    val yes: String
+    val no: String
+    val cancel: String
+    val units: UnitsStrings
+        get() = object : UnitsStrings {
+            override val kW = "kW"
+            override val kWh = "kWh"
+            override val m2 = "m²"
+            override val q = "q"
+            override val m3 = "m³"
+            override val dm3 = "dm³"
+            override val m = "m"
+            override val degreeCelsius = "°C"
+        }
+    val noneFeminine: String
+    val noneMasculine: String
+    val noneNeuter: String
+    val choose: String
+    val otherNeuter: String
+    val otherMasculine: String
+    val currency: String
+    val internetConnectionNeeded: String
+    val back: String
+    val chooseUnits: String
+}
+
+interface KontaktyStrings {
+    val contacts: String
+    val surname: String
+    val name: String
+    val street: String
+    val city: String
+    val zip: String
+    val phone: String
+    val email: String
+    val chooseAssemblyCompanyHere: String
+    val chooseCompany: String
+    val chooseAssemblyCompany: String
+    val searchCompany: String
+    val crn: String
+}
+
+interface DetailObjektuStrings {
+    val objectDetail: String
+    val heatLoss: String
+    val heatNeedsForHeating: String
+    val heatNeedsForHotWater: String
+    val area: String
+    val volume: String
+    val costs: String
+    val type: String
+    val usage: String
+    val type2: String
+    val usage2: String
+}
+
+interface SystemStrings {
+    val system: String
+    val hPType: String
+    val airToWater: String
+    val groundToWater: String
+    val hPModel: String
+    val storeType: String
+    val storeVolume: String
+    val tankType: String
+    val tankVolume: String
+    val indoorUnitType: String
+    val heatingSystem: String
+    val heatingSystem1circuit: String
+    val heatingSystem2circuits: String
+    val heatingSystem3circuits: String
+    val heatingSystemInvertor: String
+    val hotWaterCirculation: String
+    val poolHeating: String
+}
+
+interface BazenStrings {
+    val pool: String
+    val usagePeriod: String
+    val periodYearlong: String
+    val periodSeasonal: String
+    val location: String
+    val locationOutdoor: String
+    val locationIndoor: String
+    val waterType: String
+    val freshType: String
+    val saltType: String
+    val shape: String
+    val shapeRectangle: String
+    val shapeOval: String
+    val shapeCircle: String
+    val length: String
+    val width: String
+    val radius: String
+    val depth: String
+    val coverage: String
+    val covaregeSolid: String
+    val coveragePolycarbonate: String
+    val temperature: String
+}
+
+interface DoplnkoveZdrojeStrings {
+    val hotWater: String
+    val heating: String
+    val sources: String
+    val heatingElement: String
+    val electricBoiler: String
+    val gasBoiler: String
+    val fireplace: String
+    val newNeuter: String
+    val newMasculine: String
+    val existing: String
+    val toSocket: String
+    val fromRegulation: String
+}
+
+interface PrislusenstviStrings {
+    val accessories: String
+    val hose: String
+    val wallSupportBracket: String
+    val roomUnit: String
+    val heatingCable: String
+    val roomSensor: String
+    val onWall: String
+    val onIsolatedWall: String
+}
+
+interface PrihlaseniStrings {
+    val logIn: String
+    val internetNeeded: String
+    val iAmEmploee: String
+    val iAmNotEmploee: String
+    val yourRepresentative: String
+    val yourName: String
+    val yourSurname: String
+    val yourCrn: String
+    val yourEmail: String
+    val chooseYourself: String
+    val selectedFullName: (String, String) -> String
+    val selectedEmail: (String) -> String
+    val selectedCode: (String) -> String
+    val selectedCrn: (String) -> String
+    val nameAndSurname: String
+    val email: String
+    val code: String
+    val crn: String
+    val addMoreInfo: String
+    val representativeNeeded: String
+    val emailNeeded: String
+    val surnameNeeded: String
+    val nameNeeded: String
+    val youAreNotLoggedIn: String
+    val logOut: String
+}
+
+interface FotkyStrings {
+    val photosManager: String
+    val takePhoto: String
+    val choosePhoto: String
+    val photo: String
+    val add: String
+    val maxPhotosReached: String
+    val maxPhotosOvershoot: String
+    val noPhotos: String
+    val remove: String
+}
+
+interface ExportStrings {
+    val sending: String
+    val emailIsBeingSend: String
+    val emailSuccessfullySent: String
+    val doYouWantToSend: String
+    val doYouReallyWantToSend: (String) -> String
+    val emailNotSent: (String) -> String
+    val doYouRellyWantToRemoveData: String
+    val youAreOffline: String
+    val errorReported: String
+    val send: String
+    val nameAndSurnameNeeded: String
+    val removeAll: String
+    val thisIsTheIssue: String
+    val moreInfo: String
+}
+
+interface UnitsStrings {
+    val kW: String
+    val kWh: String
+    val m2: String
+    val q: String
+    val m3: String
+    val dm3: String
+    val m: String
+    val degreeCelsius: String
 }
 
 object Locales {
@@ -179,24 +224,10 @@ val StringMap: Map<LanguageTag, Strings> = mapOf(
     Locales.CS to CsStrings,
 )
 
-fun interface StringsProvider {
-    fun provideStrings(
-        defaultLanguageTag: LanguageTag,
-        currentLanguageTag: LanguageTag,
-    ): Strings
-}
-
-context(StringsProvider) val strings: Strings get() = strings()
-fun StringsProvider.strings(
+val strings: Strings get() = strings()
+fun strings(
     defaultLanguageTag: LanguageTag = Locales.CS,
     currentLanguageTag: LanguageTag = Locale.current.toLanguageTag(),
-) = provideStrings(defaultLanguageTag, currentLanguageTag)
-
-data object GenericStringsProvider : StringsProvider {
-    override fun provideStrings(defaultLanguageTag: LanguageTag, currentLanguageTag: LanguageTag) =
-        StringMap[currentLanguageTag]
-            ?: StringMap[defaultLanguageTag]
-            ?: throw IllegalArgumentException()
-}
-
-val strings: Strings @Composable get() = GenericStringsProvider.run { strings }
+) = StringMap[currentLanguageTag]
+    ?: StringMap[defaultLanguageTag]
+    ?: throw IllegalArgumentException()

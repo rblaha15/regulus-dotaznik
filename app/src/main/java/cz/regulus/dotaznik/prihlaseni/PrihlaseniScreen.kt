@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import cz.regulus.dotaznik.Uzivatel
+import cz.regulus.dotaznik.User
 import cz.regulus.dotaznik.strings.strings
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -55,42 +55,41 @@ import org.koin.core.parameter.parametersOf
 
 @Destination
 @Composable
-fun PrihlaseniSceen(
+fun LogInScreen(
     navigator: DestinationsNavigator,
 ) {
-
     val viewModel = koinViewModel<PrihlaseniViewModel> {
         parametersOf(navigator::navigateUp)
     }
 
-    val zastupci by viewModel.zastupci.collectAsStateWithLifecycle()
-    val zamestanci by viewModel.zamestnanci.collectAsStateWithLifecycle()
-    val novyClovek by viewModel.novyClovek.collectAsStateWithLifecycle()
-    val zamestanec by viewModel.jeZamestnanec.collectAsStateWithLifecycle()
+    val representatives by viewModel.representatives.collectAsStateWithLifecycle()
+    val employees by viewModel.employees.collectAsStateWithLifecycle()
+    val newUser by viewModel.newUser.collectAsStateWithLifecycle()
+    val isEmployee by viewModel.isEmployee.collectAsStateWithLifecycle()
 
-    Prihlaseni(
-        zastupci = zastupci,
-        zamestnanci = zamestanci,
-        zamestanec = zamestanec,
-        zmenitJsemZamestnanec = viewModel::zmenitZdaJeZamestnanec,
-        novyClovek = novyClovek,
-        upravitCloveka = viewModel::upravitNovehoCloveka,
-        potvrdit = viewModel::potvrdit,
-        zrusit = viewModel::zrusit,
+    LogIn(
+        representatives = representatives,
+        employees = employees,
+        isEmployee = isEmployee,
+        changeBeingEmployee = viewModel::changeBeingEmployee,
+        newUser = newUser,
+        editUser = viewModel::editNewUser,
+        confirm = viewModel::confirm,
+        cancel = viewModel::cancel,
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Prihlaseni(
-    zastupci: List<Zamestnanec>,
-    zamestnanci: List<Zamestnanec>,
-    zamestanec: Boolean,
-    zmenitJsemZamestnanec: (Boolean) -> Unit,
-    novyClovek: Uzivatel?,
-    upravitCloveka: ((Uzivatel?) -> Uzivatel?) -> Unit,
-    potvrdit: (chyba: (String) -> Unit) -> Unit,
-    zrusit: () -> Unit,
+fun LogIn(
+    representatives: List<Employee>,
+    employees: List<Employee>,
+    isEmployee: Boolean,
+    changeBeingEmployee: (Boolean) -> Unit,
+    newUser: User?,
+    editUser: ((User?) -> User?) -> Unit,
+    confirm: (chyba: (String) -> Unit) -> Unit,
+    cancel: () -> Unit,
 ) {
     val snackbarState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -116,15 +115,15 @@ fun Prihlaseni(
             ) {
                 TextButton(
                     onClick = {
-                        zrusit()
+                        cancel()
                     }
                 ) {
-                    Text(text = strings.zrusit)
+                    Text(text = strings.cancel)
                 }
                 Spacer(Modifier.weight(1F))
                 Button(
                     onClick = {
-                        potvrdit {
+                        confirm {
                             scope.launch {
                                 snackbarState.showSnackbar(it)
                             }
@@ -136,7 +135,7 @@ fun Prihlaseni(
             }
         }
     ) { paddingValues ->
-        if (zamestnanci.isEmpty()) LinearProgressIndicator(
+        if (employees.isEmpty()) LinearProgressIndicator(
             Modifier
                 .fillMaxWidth()
                 .padding(paddingValues)
@@ -151,7 +150,7 @@ fun Prihlaseni(
         ) {
             Surface(
                 onClick = {
-                    zmenitJsemZamestnanec(true)
+                    changeBeingEmployee(true)
                 },
                 shape = CircleShape,
             ) {
@@ -159,17 +158,17 @@ fun Prihlaseni(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
-                        selected = zamestanec,
+                        selected = isEmployee,
                         onClick = {
-                            zmenitJsemZamestnanec(true)
+                            changeBeingEmployee(true)
                         },
                     )
-                    Text(text = strings.prihlaseniJsemZamestanec)
+                    Text(text = strings.logIn.iAmEmploee)
                 }
             }
             Surface(
                 onClick = {
-                    zmenitJsemZamestnanec(false)
+                    changeBeingEmployee(false)
                 },
                 shape = CircleShape,
             ) {
@@ -177,20 +176,20 @@ fun Prihlaseni(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
-                        selected = !zamestanec,
+                        selected = !isEmployee,
                         onClick = {
-                            zmenitJsemZamestnanec(false)
+                            changeBeingEmployee(false)
                         },
                     )
-                    Text(text = strings.prihlaseniNejsemZamestanec)
+                    Text(text = strings.logIn.iAmNotEmploee)
                 }
             }
-            if (zamestanec) {
-                val seznam = remember {
-                    listOf("") + zamestnanci.map { it.celeJmeno }
+            if (isEmployee) {
+                val list = remember {
+                    listOf("") + employees.map { it.wholeName }
                 }
                 var expanded by rememberSaveable { mutableStateOf(false) }
-                var vybrano by rememberSaveable { mutableStateOf(seznam.first()) }
+                var chosen by rememberSaveable { mutableStateOf(list.first()) }
 
                 ExposedDropdownMenuBox(
                     expanded = expanded,
@@ -200,9 +199,9 @@ fun Prihlaseni(
                     OutlinedTextField(
                         modifier = Modifier.menuAnchor(),
                         readOnly = true,
-                        value = vybrano,
+                        value = chosen,
                         onValueChange = {},
-                        label = { Text(strings.prihlaseniVyberSe) },
+                        label = { Text(strings.logIn.chooseYourself) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                     )
@@ -210,14 +209,14 @@ fun Prihlaseni(
                         expanded = expanded,
                         onDismissRequest = { expanded = false },
                     ) {
-                        seznam.drop(1).forEach { moznost ->
+                        list.drop(1).forEach { option ->
                             DropdownMenuItem(
-                                text = { Text(moznost) },
+                                text = { Text(option) },
                                 onClick = {
-                                    upravitCloveka { clovek ->
-                                        zamestnanci.find { it.celeJmeno == moznost }?.vytvoritUzivatele(true) ?: clovek
+                                    editUser { user ->
+                                        employees.find { it.wholeName == option }?.createUser(true) ?: user
                                     }
-                                    vybrano = moznost
+                                    chosen = option
                                     expanded = false
                                 },
                                 contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
@@ -225,20 +224,20 @@ fun Prihlaseni(
                         }
                     }
                 }
-                if (novyClovek != null) {
+                if (newUser != null) {
                     Text(
-                        text = strings.prihlaseniVybranyJmenoPrijmeni(novyClovek.jmeno, novyClovek.prijmeni),
+                        text = strings.logIn.selectedFullName(newUser.name, newUser.surname),
                         Modifier.padding(top = 8.dp)
                     )
-                    Text(text = strings.prihlaseniVybranyKod(novyClovek.cisloKo))
-                    Text(text = strings.prihlaseniVybranyEmail(novyClovek.email))
+                    Text(text = strings.logIn.selectedCode(newUser.koNumber))
+                    Text(text = strings.logIn.selectedEmail(newUser.email))
                 }
             } else {
-                val seznam = remember {
-                    listOf("") + zastupci.map { it.celeJmeno }
+                val list = remember {
+                    listOf("") + representatives.map { it.wholeName }
                 }
                 var expanded by rememberSaveable { mutableStateOf(false) }
-                var vybrano by rememberSaveable { mutableStateOf(seznam.first()) }
+                var chosen by rememberSaveable { mutableStateOf(list.first()) }
 
                 ExposedDropdownMenuBox(
                     expanded = expanded,
@@ -248,9 +247,9 @@ fun Prihlaseni(
                     OutlinedTextField(
                         modifier = Modifier.menuAnchor(),
                         readOnly = true,
-                        value = vybrano,
+                        value = chosen,
                         onValueChange = {},
-                        label = { Text(strings.prihlaseniVasZastupce) },
+                        label = { Text(strings.logIn.yourRepresentative) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                     )
@@ -258,14 +257,14 @@ fun Prihlaseni(
                         expanded = expanded,
                         onDismissRequest = { expanded = false },
                     ) {
-                        seznam.drop(1).forEach { moznost ->
+                        list.drop(1).forEach { option ->
                             DropdownMenuItem(
-                                text = { Text(moznost) },
+                                text = { Text(option) },
                                 onClick = {
-                                    upravitCloveka { clovek ->
-                                        zamestnanci.find { it.celeJmeno == moznost }?.vytvoritUzivatele(false) ?: clovek
+                                    editUser { user ->
+                                        employees.find { it.wholeName == option }?.createUser(false) ?: user
                                     }
-                                    vybrano = moznost
+                                    chosen = option
                                     expanded = false
                                 },
                                 contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
@@ -273,21 +272,21 @@ fun Prihlaseni(
                         }
                     }
                 }
-                if (novyClovek != null) {
-                    Text(text = strings.prihlaseniDoplnitInfo, Modifier.padding(top = 8.dp))
+                if (newUser != null) {
+                    Text(text = strings.logIn.addMoreInfo, Modifier.padding(top = 8.dp))
                     val focusManager = LocalFocusManager.current
                     OutlinedTextField(
-                        value = novyClovek.jmeno,
+                        value = newUser.name,
                         onValueChange = {
-                            upravitCloveka { clovek ->
-                                clovek?.copy(jmeno = it)
+                            editUser { user ->
+                                user?.copy(name = it)
                             }
                         },
                         Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp),
                         label = {
-                            Text(text = strings.prihlaseniVaseJmeno)
+                            Text(text = strings.logIn.yourName)
                         },
                         keyboardActions = KeyboardActions {
                             focusManager.moveFocus(FocusDirection.Down)
@@ -299,17 +298,17 @@ fun Prihlaseni(
                         ),
                     )
                     OutlinedTextField(
-                        value = novyClovek.prijmeni,
+                        value = newUser.surname,
                         onValueChange = {
-                            upravitCloveka { clovek ->
-                                clovek?.copy(prijmeni = it)
+                            editUser { edit ->
+                                edit?.copy(surname = it)
                             }
                         },
                         Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp),
                         label = {
-                            Text(text = strings.prihlaseniVasePrijmeni)
+                            Text(text = strings.logIn.yourSurname)
                         },
                         keyboardActions = KeyboardActions {
                             focusManager.moveFocus(FocusDirection.Down)
@@ -321,17 +320,17 @@ fun Prihlaseni(
                         ),
                     )
                     OutlinedTextField(
-                        value = novyClovek.email,
+                        value = newUser.email,
                         onValueChange = {
-                            upravitCloveka { clovek ->
-                                clovek?.copy(email = it)
+                            editUser { user ->
+                                user?.copy(email = it)
                             }
                         },
                         Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp),
                         label = {
-                            Text(text = strings.prihlaseniVasEmail)
+                            Text(text = strings.logIn.yourEmail)
                         },
                         keyboardActions = KeyboardActions {
                             focusManager.moveFocus(FocusDirection.Down)
@@ -343,24 +342,24 @@ fun Prihlaseni(
                     )
                     val keyboardController = LocalSoftwareKeyboardController.current
                     OutlinedTextField(
-                        value = novyClovek.ico,
+                        value = newUser.crn,
                         onValueChange = {
                             if (it.isBlank()) return@OutlinedTextField
                             it.toIntOrNull() ?: return@OutlinedTextField
-                            upravitCloveka { clovek ->
-                                clovek?.copy(ico = it.substring(0, it.length.coerceAtMost(8)))
+                            editUser { user ->
+                                user?.copy(crn = it.substring(0, it.length.coerceAtMost(8)))
                             }
                         },
                         Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp),
                         label = {
-                            Text(text = strings.prihlaseniVaseIco)
+                            Text(text = strings.logIn.yourCrn)
                         },
                         keyboardActions = KeyboardActions {
                             focusManager.clearFocus()
                             keyboardController?.hide()
-                            potvrdit {
+                            confirm {
                                 scope.launch {
                                     snackbarState.showSnackbar(it)
                                 }
