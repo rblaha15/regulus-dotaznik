@@ -2,7 +2,7 @@ package cz.regulus.dotaznik.strings
 
 val SkStrings = object : Strings {
     override val appName = "Regulus dotazník"
-    override val contacts = object : KontaktyStrings {
+    override val contacts = object : ContactsStrings {
         override val contacts = "Kontakty a miesto realizácie"
         override val surname = "Priezvisko"
         override val name = "Meno"
@@ -17,7 +17,7 @@ val SkStrings = object : Strings {
         override val searchCompany = "Vyberte montážnu firmu"
         override val crn = "Vyhledat firmu"
     }
-    override val objectDetail = object : DetailObjektuStrings {
+    override val objectDetail = object : ObjectDetailStrings {
         override val objectDetail = "Detail objektu"
         override val heatLoss = "Tepelná strata"
         override val heatNeedsForHeating = "Potreba tepla – kúrenie"
@@ -49,7 +49,7 @@ val SkStrings = object : Strings {
         override val airToWater = "vzduch/voda"
         override val groundToWater = "zem/voda"
     }
-    override val pool = object : BazenStrings {
+    override val pool = object : PoolStrings {
         override val pool = "Bazén"
         override val usagePeriod = "Doba využívania"
         override val periodYearlong = "celoročne"
@@ -73,7 +73,7 @@ val SkStrings = object : Strings {
         override val coveragePolycarbonate = "polykarbonát"
         override val temperature = "požadovaná teplota"
     }
-    override val additionalSources = object : DoplnkoveZdrojeStrings {
+    override val additionalSources = object : AdditionalSourcesStrings {
         override val sources = "Doplnkové zdroje"
         override val hotWater = "Teplá voda"
         override val heating = "Kúrenie"
@@ -98,7 +98,7 @@ val SkStrings = object : Strings {
         override val onWall = "Na stěnu"
         override val onIsolatedWall = "Na izolovanou stěnu"
     }
-    override val logIn = object : PrihlaseniStrings {
+    override val logIn = object : AccessoriesStrings {
         override val logIn = "Prihlásenie"
         override val internetNeeded = "Pre prihlásenie je potrebné pripojenie k internetu!"
         override val iAmEmploee = "Som zamestanec Regulusu"
@@ -125,7 +125,7 @@ val SkStrings = object : Strings {
         override val youAreNotLoggedIn = "Nie ste prihlásený!"
         override val logOut = "Odhlásiť sa"
     }
-    override val photos = object : FotkyStrings {
+    override val photos = object : PhotosStrings {
         override val photosManager = "Správa fotiek"
         override val takePhoto = "Odfotiť"
         override val choosePhoto = "Vybrať z galérie"

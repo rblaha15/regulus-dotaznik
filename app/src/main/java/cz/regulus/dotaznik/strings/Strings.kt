@@ -6,14 +6,14 @@ typealias LanguageTag = String
 
 interface Strings {
     val appName: String
-    val contacts: KontaktyStrings
-    val objectDetail: DetailObjektuStrings
+    val contacts: ContactsStrings
+    val objectDetail: ObjectDetailStrings
     val system: SystemStrings
-    val pool: BazenStrings
-    val additionalSources: DoplnkoveZdrojeStrings
+    val pool: PoolStrings
+    val additionalSources: AdditionalSourcesStrings
     val accessories: PrislusenstviStrings
-    val logIn: PrihlaseniStrings
-    val photos: FotkyStrings
+    val logIn: AccessoriesStrings
+    val photos: PhotosStrings
     val export: ExportStrings
     val note: String
     val open: String
@@ -45,7 +45,7 @@ interface Strings {
     val chooseUnits: String
 }
 
-interface KontaktyStrings {
+interface ContactsStrings {
     val contacts: String
     val surname: String
     val name: String
@@ -61,7 +61,7 @@ interface KontaktyStrings {
     val crn: String
 }
 
-interface DetailObjektuStrings {
+interface ObjectDetailStrings {
     val objectDetail: String
     val heatLoss: String
     val heatNeedsForHeating: String
@@ -95,7 +95,7 @@ interface SystemStrings {
     val poolHeating: String
 }
 
-interface BazenStrings {
+interface PoolStrings {
     val pool: String
     val usagePeriod: String
     val periodYearlong: String
@@ -120,7 +120,7 @@ interface BazenStrings {
     val temperature: String
 }
 
-interface DoplnkoveZdrojeStrings {
+interface AdditionalSourcesStrings {
     val hotWater: String
     val heating: String
     val sources: String
@@ -146,7 +146,7 @@ interface PrislusenstviStrings {
     val onIsolatedWall: String
 }
 
-interface PrihlaseniStrings {
+interface AccessoriesStrings {
     val logIn: String
     val internetNeeded: String
     val iAmEmploee: String
@@ -174,7 +174,7 @@ interface PrihlaseniStrings {
     val logOut: String
 }
 
-interface FotkyStrings {
+interface PhotosStrings {
     val photosManager: String
     val takePhoto: String
     val choosePhoto: String
