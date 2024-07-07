@@ -865,6 +865,7 @@ data class Sites(
                 override fun changeChosenIndex(chosenIndex: Int?): Widget.HasChooser = copy(chosenIndex = chosenIndex)
                 override fun getLabel(sites: Sites) = strings.additionalSources.heatingElement
                 override fun getOptions(sites: Sites) = listOf(strings.additionalSources.existing, strings.additionalSources.newNeuter)
+                override fun getDefaultIndex(sites: Sites) = 1
             }
 
             @Serializable
