@@ -18,8 +18,8 @@ android {
         applicationId = "cz.regulus.dotaznik"
         minSdk = 21
         targetSdk = 34
-        versionCode = 10
-        versionName = "5.1.0-alpha.1"
+        versionCode = 11
+        versionName = "5.1.0-alpha.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

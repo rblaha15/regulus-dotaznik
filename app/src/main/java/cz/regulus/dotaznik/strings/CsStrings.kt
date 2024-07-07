@@ -2,7 +2,7 @@ package cz.regulus.dotaznik.strings
 
 val CsStrings = object : Strings {
     override val appName = "Regulus dotazník"
-    override val contacts = object : KontaktyStrings {
+    override val contacts = object : ContactsStrings {
         override val contacts = "Kontakty a místo realizace"
         override val surname = "Příjmení"
         override val name = "Jméno"
@@ -17,7 +17,7 @@ val CsStrings = object : Strings {
         override val searchCompany = "Vyhledat firmu"
         override val crn = "IČO monážní firmy"
     }
-    override val objectDetail = object : DetailObjektuStrings {
+    override val objectDetail = object : ObjectDetailStrings {
         override val objectDetail = "Detail objektu"
         override val heatLoss = "Tepelná ztráta"
         override val heatNeedsForHeating = "Potřeba tepla – vytápění"
@@ -49,7 +49,7 @@ val CsStrings = object : Strings {
         override val airToWater = "vzduch/voda"
         override val groundToWater = "země/voda"
     }
-    override val pool = object : BazenStrings {
+    override val pool = object : PoolStrings {
         override val pool = "Bazén"
         override val usagePeriod = "Doba využívání"
         override val periodYearlong = "celeroční"
@@ -73,7 +73,7 @@ val CsStrings = object : Strings {
         override val coveragePolycarbonate = "polykarbonát"
         override val temperature = "Požadovaná teplota"
     }
-    override val additionalSources = object : DoplnkoveZdrojeStrings {
+    override val additionalSources = object : AdditionalSourcesStrings {
         override val sources = "Doplňkové zdroje"
         override val hotWater = "Teplá voda"
         override val heating = "Topení"
@@ -98,7 +98,7 @@ val CsStrings = object : Strings {
         override val onWall = "Na stěnu"
         override val onIsolatedWall = "Na izolovanou stěnu"
     }
-    override val logIn = object : PrihlaseniStrings {
+    override val logIn = object : AccessoriesStrings {
         override val logIn = "Přihlášení"
         override val internetNeeded = "Pro přihlášení je potřeba připojení k internetu!"
         override val iAmEmploee = "Jsem zaměstanec Regulusu"
@@ -125,7 +125,7 @@ val CsStrings = object : Strings {
         override val surnameNeeded = "Je potřeba vyplnit příjmení"
         override val nameNeeded = "Je potřeba vypllnit jméno"
     }
-    override val photos = object : FotkyStrings {
+    override val photos = object : PhotosStrings {
         override val photosManager = "Správa fotek"
         override val takePhoto = "Vyfotit"
         override val choosePhoto = "Vybrat z galerie"

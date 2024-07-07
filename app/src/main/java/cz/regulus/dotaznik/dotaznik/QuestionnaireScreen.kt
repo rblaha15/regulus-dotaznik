@@ -563,8 +563,8 @@ fun Questionnaire(
                                             sites = sites,
                                             companies = companies,
                                             widget = vec,
-                                            editWidget = { novaVec ->
-                                                editSites(sites.copySite(stranka.copyWidget(novaVec)))
+                                            editWidget = { newWidget ->
+                                                editSites(sites.copySite(stranka.copyWidget(newWidget)))
                                             },
                                         )
                                     }
