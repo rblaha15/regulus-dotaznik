@@ -16,6 +16,13 @@ val CsStrings = object : Strings {
         override val chooseAssemblyCompany = "Vyberte montážní firmu"
         override val searchCompany = "Vyhledat firmu"
         override val crn = "IČO monážní firmy"
+        override val demandOrigin = "Původ poptávky"
+        override val originQuestionEmail = "Dotaz poslaný emailem od koncového zákazníka"
+        override val originQuestionExhibition = "Dotaz z výstavy"
+        override val originQuestionInPerson = "Dotaz při osobní návštěvě u koncového zákazníka"
+        override val originDistributionCompany = "Poptávka od distribuční firmy"
+        override val originAssemlbleres = "Poptávka od montážníků"
+        override val originDesigner = "Poptávka od projektanta"
     }
     override val objectDetail = object : ObjectDetailStrings {
         override val objectDetail = "Detail objektu"
@@ -88,17 +95,16 @@ val CsStrings = object : Strings {
         override val fromRegulation = "ovládané z regulace"
 
     }
-    override val accessories = object : PrislusenstviStrings {
+    override val accessories = object : AccessoriesStrings {
         override val accessories = "Příslušenství"
         override val hose = "Hadice"
         override val wallSupportBracket = "Držák pro TČ"
-        override val roomUnit = "Pokojová jednotka"
+        override val roomUnitsAndSensors = "Pokojové jednotky a čidla"
         override val heatingCable = "Topný kabel"
-        override val roomSensor = "Pokojové čidlo"
         override val onWall = "Na stěnu"
         override val onIsolatedWall = "Na izolovanou stěnu"
     }
-    override val logIn = object : AccessoriesStrings {
+    override val logIn = object : LogInStrings {
         override val logIn = "Přihlášení"
         override val internetNeeded = "Pro přihlášení je potřeba připojení k internetu!"
         override val iAmEmploee = "Jsem zaměstanec Regulusu"
@@ -141,6 +147,8 @@ val CsStrings = object : Strings {
         override val emailIsBeingSend = "Email se odesílá"
         override val emailSuccessfullySent = "Email byl úspěšně odeslán!"
         override val doYouWantToSend = "Odeslat?"
+        override val missingField = "Nevyplněné pole"
+        override val pleaseFillInField = { field: String -> "Pro odeslání prosím vyplňte $field." }
         override val doYouReallyWantToSend = { email: String -> "Opravdu chcete odeslat email na \"$email\"?" }
         override val emailNotSent = { chyba: String -> "Omlouvám se, ale email se nepodařilo odeslat. $chyba" }
         override val doYouRellyWantToRemoveData = "Chcete odstranit všechna data?"
@@ -169,4 +177,6 @@ val CsStrings = object : Strings {
     override val internetConnectionNeeded = "Je potřeba připojení k internetu"
     override val back = "Zpět"
     override val chooseUnits = "Vybrat jednotky"
+    override val remove = "Odebrat"
+    override val add = "Přidat"
 }

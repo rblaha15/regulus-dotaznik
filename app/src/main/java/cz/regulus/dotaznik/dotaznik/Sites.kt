@@ -12,14 +12,24 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import cz.regulus.dotaznik.BuildConfig
 import cz.regulus.dotaznik.Products
 import cz.regulus.dotaznik.User
+import cz.regulus.dotaznik.dotaznik.Sites.Site.Contacts.DemandOrigin
 import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.CheckBox
 import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.CheckBoxWithChooser
 import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Chooser
+import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getChecked
+import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getChosen
+import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getChosen2
+import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getChosenUnit
+import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getText
+import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getValuesWithAmounts
 import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.DoubleChooser
+import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.DropdownWithAmount
+import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.HasMaxSumOfNumbers
 import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.HasTitle
-import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Jine
+import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Other
 import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.TextField
 import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.TextFieldWithUnits
 import cz.regulus.dotaznik.strings.strings
@@ -70,10 +80,10 @@ data class Sites(
             interface HasTextField : Widget {
                 fun getSuffix(sites: Sites) = ""
                 fun getKeyboard(sites: Sites) = KeyboardOptions(imeAction = ImeAction.Next)
+                fun getPlaceholder(sites: Sites): String = ""
 
                 val text: String? get() = null
                 fun changeText(text: String?): HasTextField
-                fun getText(sites: Sites) = text ?: getDefaultText(sites)
                 fun getDefaultText(sites: Sites) = ""
             }
 
@@ -82,36 +92,53 @@ data class Sites(
 
                 val chosenUnitIndex: Int? get() = null
                 fun changeChosenUnitIndex(chosenUnitIndex: Int?): HasUnits
-                fun getChosenUnit(sites: Sites) = chosenUnitIndex?.let { getUnits(sites)[it] } ?: getDefaultUnit(sites)
-                fun getDefaultUnit(sites: Sites) = getUnits(sites)[getDefaultUnitIndex(sites)]
                 fun getDefaultUnitIndex(sites: Sites) = 0
             }
 
             interface HasChooser : Widget {
                 fun getOptions(sites: Sites): List<String>
+                fun getPlaceholder(sites: Sites): String = ""
 
                 val chosenIndex: Int? get() = null
                 fun changeChosenIndex(chosenIndex: Int?): HasChooser
-                fun getChosen(sites: Sites) = chosenIndex?.let { getOptions(sites)[it] } ?: getDefault(sites)
-                fun getDefault(sites: Sites) = getOptions(sites)[getDefaultIndex(sites)]
                 fun getDefaultIndex(sites: Sites) = 0
             }
 
             interface HasFollowUpChooser : Widget {
                 fun getOptions2(sites: Sites): List<String>
+                fun getPlaceholder2(sites: Sites): String = ""
 
                 val chosenIndex2: Int? get() = null
                 fun changeChosenIndex2(chosenIndex2: Int?): HasFollowUpChooser
-                fun getChosen2(sites: Sites) = chosenIndex2?.let { getOptions2(sites)[it] } ?: getDefault2(sites)
-                fun getDefault2(sites: Sites) = getOptions2(sites)[getDefaultIndex2(sites)]
                 fun getDefaultIndex2(sites: Sites) = 0
             }
 
             interface HasCheckBox : Widget {
                 val checked: Boolean? get() = null
                 fun changeChecked(checked: Boolean?): HasCheckBox
-                fun getChecked(sites: Sites) = checked ?: getDefaultChecked(sites)
                 fun getDefaultChecked(sites: Sites) = false
+            }
+
+            interface HasDropdown : Widget {
+                fun getItems(sites: Sites): List<String>
+                fun getPlaceholder(sites: Sites): String = ""
+            }
+
+            interface HasAmount : Widget, HasDropdown {
+                fun getMinimumAmount(sites: Sites): GetFunction1<Int, Int> = get { 0 }
+                fun getMaximumAmount(sites: Sites): GetFunction1<Int, Int>
+                fun getDefaultAmount(sites: Sites): GetFunction1<Int, Int> = get { 0 }
+
+                val amounts: Map<Int, Int>? get() = null
+                fun changeAmounts(numbers: Map<Int, Int>?): HasAmount
+            }
+
+            interface HasMaxSumOfNumbers : Widget, HasAmount {
+                fun getMaxSum(sites: Sites): Int
+                override fun getMaximumAmount(sites: Sites) = get {
+                    val left = getMaxSum(sites) - getCurrentSum(sites)
+                    (getAmount(sites)[it] + left).coerceAtLeast(getMinimumAmount(sites)[it])
+                }
             }
 
             interface HasTitle : Widget {
@@ -137,11 +164,56 @@ data class Sites(
             sealed interface CheckBoxWithChooser : HasCheckBox, HasChooser, HasLabel
 
             @Serializable
-            sealed interface Jine : Widget
+            sealed interface DropdownWithAmount : HasDropdown, HasAmount, HasLabel
+
+            @Serializable
+            sealed interface Other : Widget
+
+            @Suppress("MemberVisibilityCanBePrivate", "unused")
+            companion object {
+                fun HasTextField.getText(sites: Sites) = text ?: getDefaultText(sites)
+
+                fun HasUnits.getDefaultUnit(sites: Sites) = getUnits(sites)[getDefaultUnitIndex(sites)]
+                fun HasUnits.getChosenUnit(sites: Sites) = chosenUnitIndex?.let { getUnits(sites)[it] } ?: getDefaultUnit(sites)
+                fun HasUnits.getChosenUnitIndex(sites: Sites) = chosenUnitIndex ?: getDefaultUnitIndex(sites)
+
+                fun HasChooser.getDefault(sites: Sites) = getOptions(sites)[getDefaultIndex(sites)]
+                fun HasChooser.getChosen(sites: Sites) = chosenIndex?.let { getOptions(sites)[it] } ?: getDefault(sites)
+                fun HasChooser.getChosenIndex(sites: Sites) = chosenIndex ?: getDefaultIndex(sites)
+
+                fun HasFollowUpChooser.getDefault2(sites: Sites) = getOptions2(sites)[getDefaultIndex2(sites)]
+                fun HasFollowUpChooser.getChosen2(sites: Sites) = chosenIndex2?.let { getOptions2(sites)[it] } ?: getDefault2(sites)
+                fun HasFollowUpChooser.getChosenIndex2(sites: Sites) = chosenIndex2 ?: getDefaultIndex2(sites)
+
+                fun HasCheckBox.getChecked(sites: Sites) = checked ?: getDefaultChecked(sites)
+
+                fun HasAmount.changeNumber(sites: Sites, index: Int, number: Int) = changeAmounts(
+                    getAmounts(sites) + (index to number.coerceIn(getMinimumAmount(sites)[index]..getMaximumAmount(sites)[index]))
+                )
+                fun HasAmount.getAmounts(sites: Sites) = getDefaultNumbers(sites) + (amounts ?: emptyMap())
+                fun HasAmount.getAmount(sites: Sites) = get { index ->
+                    getAmounts(sites)[index] ?: getDefaultAmount(sites)[index]
+                }
+                fun HasAmount.getDefaultNumbers(sites: Sites) = List(getItemCount(sites)) { index ->
+                    index to getDefaultAmount(sites)[index]
+                }.toMap()
+                fun HasAmount.getValuesWithAmounts(sites: Sites) = this
+                    .getAmounts(sites)
+                    .filterValues { it > 0 }
+                    .map { (index, amount) ->
+                    "${amount}x ${getItems(sites)[index]}"
+                    }
+                    .joinToString(", ")
+
+                fun HasMaxSumOfNumbers.getCurrentSum(sites: Sites): Int = getAmounts(sites).values.sum()
+
+                fun HasDropdown.getItemCount(sites: Sites) = getItems(sites).size
+            }
         }
 
         @Serializable
         data class Contacts(
+            val demandOrigin: DemandOrigin = DemandOrigin(),
             val surname: Surname = Surname(),
             val name: Name = Name(),
             val street: Street = Street(),
@@ -153,6 +225,7 @@ data class Sites(
             val note: Note = Note(),
         ) : Site {
             override fun copyWidget(newWidget: Widget) = when (newWidget) {
+                is DemandOrigin -> copy(demandOrigin = newWidget)
                 is Email -> copy(email = newWidget)
                 is AssemblyCompany -> copy(assemblyCompany = newWidget)
                 is Name -> copy(name = newWidget)
@@ -174,6 +247,28 @@ data class Sites(
                 override fun getKeyboard(sites: Sites) = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Words
                 )
+            }
+
+            @Serializable
+            data class DemandOrigin(
+                override val chosenIndex: Int? = null,
+            ) : Chooser {
+                override fun getOptions(sites: Sites) = listOf("") + getOrigins().keys.toList()
+                override fun getLabel(sites: Sites) = strings.contacts.demandOrigin + "*"
+                override fun getPlaceholder(sites: Sites) = strings.choose
+                override fun changeChosenIndex(chosenIndex: Int?): Widget.HasChooser =
+                    copy(chosenIndex = chosenIndex?.takeUnless { it == 0 })
+                private fun getOrigins() = listOfNotNull(
+                    strings.contacts.originQuestionEmail to "_dotazEmail",
+                    strings.contacts.originQuestionExhibition to "_dotaznikVYS",
+                    strings.contacts.originQuestionInPerson to "_dotazOsobně",
+                    strings.contacts.originDistributionCompany to "_poptávkaDis",
+                    strings.contacts.originAssemlbleres to "_poptávkaMF",
+                    strings.contacts.originDesigner to "_poptávkaPROJ",
+                    if (BuildConfig.DEBUG) "Zkoušení funkčnosti aplikace, prosím, nepoužívejte tuto možnost v reálných poptávkách (DEBUG)" to "_debugApp" else null,
+                ).toMap()
+
+                fun getCode(sites: Sites) = getOrigins()[getChosen(sites)]
             }
 
             @Serializable
@@ -245,7 +340,7 @@ data class Sites(
             @Serializable
             data class AssemblyCompany(
                 val crn: String = "",
-            ) : Jine {
+            ) : Other {
                 fun ico(ico: String) = copy(crn = ico)
             }
 
@@ -263,6 +358,7 @@ data class Sites(
             override fun getName(sites: Sites) = strings.contacts.contacts
             override fun getIcon(sites: Sites) = Icons.Default.Person
             override fun getWidgets(sites: Sites) = listOf(
+                listOf(demandOrigin),
                 listOf(surname, name, street, city, zip, phone, email),
                 listOf(assemblyCompany),
                 listOf(note),
@@ -510,10 +606,10 @@ data class Sites(
 
                 override fun getOptions2(sites: Sites) =
                     if (sites.system.thermalStoreType.getChosen(sites) == strings.noneFeminine) emptyList()
-                else {
+                    else {
                         val chosen = sites.system.thermalStoreType.getChosen(sites)
                         sites.products.thermalStores[chosen].orEmpty()
-                }
+                    }
 
                 override fun changeChosenIndex(chosenIndex: Int?): Widget.HasChooser = copy(chosenIndex = chosenIndex)
                 override fun changeChosenIndex2(chosenIndex2: Int?): Widget.HasFollowUpChooser = copy(chosenIndex2 = chosenIndex2)
@@ -999,16 +1095,14 @@ data class Sites(
             val hose: Hose = Hose(),
             val heatingCable: HeatingCable = HeatingCable(),
             val wallSupportBracket: WallSupportBracket = WallSupportBracket(),
-            val roomUnit: RoomUnit = RoomUnit(),
-            val roomSensor: RoomSensor = RoomSensor(),
+            val roomUnitsAndSensors: RoomUnitsAndSensors = RoomUnitsAndSensors(),
             val note: Note = Note(),
         ) : Site {
             override fun copyWidget(newWidget: Widget) = when (newWidget) {
                 is Note -> copy(note = newWidget)
                 is WallSupportBracket -> copy(wallSupportBracket = newWidget)
                 is Hose -> copy(hose = newWidget)
-                is RoomUnit -> copy(roomUnit = newWidget)
-                is RoomSensor -> copy(roomSensor = newWidget)
+                is RoomUnitsAndSensors -> copy(roomUnitsAndSensors = newWidget)
                 is HeatingCable -> copy(heatingCable = newWidget)
                 else -> this
             }
@@ -1048,25 +1142,20 @@ data class Sites(
             }
 
             @Serializable
-            data class RoomUnit(
-                override val checked: Boolean? = null,
-            ) : CheckBoxWithChooser {
-                override fun changeChecked(checked: Boolean?): Widget.HasCheckBox = copy(checked = checked)
-                override fun changeChosenIndex(chosenIndex: Int?): Widget.HasChooser = this
-                override fun getLabel(sites: Sites) = strings.accessories.roomUnit
-                override fun getOptions(sites: Sites) = listOf("RC 25")
-            }
-
-
-            @Serializable
-            data class RoomSensor(
-                override val checked: Boolean? = null,
-                override val chosenIndex: Int? = null,
-            ) : CheckBoxWithChooser {
-                override fun changeChecked(checked: Boolean?): Widget.HasCheckBox = copy(checked = checked)
-                override fun changeChosenIndex(chosenIndex: Int?): Widget.HasChooser = copy(chosenIndex = chosenIndex)
-                override fun getLabel(sites: Sites) = strings.accessories.roomSensor
-                override fun getOptions(sites: Sites) = listOf("RS 10", "RSW 30 - WiFi")
+            data class RoomUnitsAndSensors(
+                override val amounts: Map<Int, Int>? = null,
+            ) : DropdownWithAmount, HasMaxSumOfNumbers {
+                override fun changeAmounts(numbers: Map<Int, Int>?): Widget.HasAmount = copy(amounts = numbers)
+                override fun getPlaceholder(sites: Sites) = strings.noneNeuter
+                override fun getLabel(sites: Sites) = strings.accessories.roomUnitsAndSensors
+                override fun getItems(sites: Sites) = listOf("RC 25", "RDC", "RS 10", "RSW 30 - WiFi")
+                override fun getMaxSum(sites: Sites) = when (sites.system.heatingSystem.getChosen(sites)) {
+                    strings.system.heatingSystem1circuit -> 1
+                    strings.system.heatingSystem2circuits -> 2
+                    strings.system.heatingSystem3circuits -> 3
+                    strings.system.heatingSystemInvertor -> 1
+                    else -> Int.MAX_VALUE
+                }
             }
 
             @Serializable
@@ -1087,8 +1176,7 @@ data class Sites(
                     hose,
                     heatingCable,
                     wallSupportBracket,
-                    roomUnit,
-                    roomSensor,
+                    roomUnitsAndSensors,
                 ),
                 listOf(note),
             )
@@ -1096,13 +1184,32 @@ data class Sites(
     }
 }
 
-context(Sites) fun Chooser.toXmlEntry() = getChosen(this@Sites)
-context(Sites) fun DoubleChooser.toXmlEntry() = "${getChosen(this@Sites)} ${getChosen2(this@Sites)}"
-context(Sites) fun TextField.toXmlEntry() = getText(this@Sites)
-context(Sites) fun TextFieldWithUnits.toXmlEntry() = getText(this@Sites)
-context(Sites) fun TextFieldWithUnits.toXmlEntry2() = getChosenUnit(this@Sites)
-context(Sites) fun CheckBox.toXmlEntry() = if (getChecked(this@Sites)) "Ano" else "Ne"
-context(Sites) fun CheckBoxWithChooser.toXmlEntry() = if (getChecked(this@Sites)) getChosen(this@Sites) else "Ne"
+fun interface GetFunction1<K, V> {
+    operator fun get(index: K): V
+}
+
+fun interface GetFunction2<K1, K2, V> {
+    operator fun get(i1: K1, i2: K2): V
+}
+
+@Style1
+fun <T> get(function: (Int) -> T): GetFunction1<Int, T> = GetFunction1(function)
+
+@DslMarker
+annotation class Style1
+
+@DslMarker
+annotation class Style3
+
+context(Sites) @Style3 fun Chooser.toXmlEntry() = getChosen(this@Sites)
+context(Sites) @Style3 fun DoubleChooser.toXmlEntry() = "${getChosen(this@Sites)} ${getChosen2(this@Sites)}"
+context(Sites) @Style3 fun TextField.toXmlEntry() = getText(this@Sites)
+context(Sites) @Style3 fun TextFieldWithUnits.toXmlEntry() = getText(this@Sites)
+context(Sites) @Style3 fun TextFieldWithUnits.toXmlEntry2() = getChosenUnit(this@Sites)
+context(Sites) @Style3 fun CheckBox.toXmlEntry() = if (getChecked(this@Sites)) "Ano" else "Ne"
+context(Sites) @Style3 fun CheckBoxWithChooser.toXmlEntry() = if (getChecked(this@Sites)) getChosen(this@Sites) else "Ne"
+context(Sites) @Style3 fun DropdownWithAmount.toXmlEntry() = getValuesWithAmounts(this@Sites)
+context(Sites) @Style3 fun DemandOrigin.toXmlEntry() = getCode(this@Sites)
 
 context(Sites) fun String.emptyUnlessChecked(widget: Sites.Site.Widget.HasCheckBox) = if (widget.getChecked(this@Sites)) this else ""
 
@@ -1112,26 +1219,43 @@ fun Sites.createXml(
 ) = """<?xml version="1.0" encoding="utf-8"?>
 <?xml-stylesheet type="text/xsl" href="dotaznik_app.xsl"?>
 
-<!-- Tento soubor byl vygenerován automaticky aplikací Regulus Dotazník; verze: 2.2 -->
+<!-- 
+Tento soubor byl vygenerován automaticky aplikací Regulus Dotazník
+Verze dokumentu: 2.3 (Zaveden ve verzi aplikace 5.1.0)
+Verze aplikace: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) (${BuildConfig.BUILD_TYPE})
+-->
+
+<!--
+Změny ve verzi 2.3 oproti verzi 2.2:
+- Přidán kód1 (/xml/system/kod1)
+  - Možnosti jsou: _dotazEmail, _dotaznikVYS, _dotazOsobně, _poptávkaDis, _poptávkaMF, _poptávkaPROJ 
+  - V DEBUG verzi aplikace lze zadat i možnost _debug, ta by se ale nikdy neměla objevit v opravdových poptávkách
+- Pokojová čidla a jednotky sjednoceny do jednoho pole (/xml/prislusenstvi/pokojova_cidla_a_jednotky)
+  - Nyní mohou obsahovat více možností, oddělených čárkou
+  - Každá možnost má před sebou vždy specifikován počet položek pomocí písmene x 
+  - Název žádné jednotky ani čidla neobsahuje čárku
+  - Příklad: `<pokojove_cidlo>1x RS 10, 2x RDC</pokojove_cidlo>`
+-->
 
 <xml>
     <system>
+        <kod1>${contacts.demandOrigin.toXmlEntry()}</kod1>
         <resi_tc>Ano</resi_tc>
         <cislo_ko>${user.koNumber}</cislo_ko>
         <odesilatel>${user.email}</odesilatel>
         <odberatel_ico>${user.crn}</odberatel_ico>
     </system>
     <kontakt>
-        <jmeno>${contacts.name.text}</jmeno>
-        <prijmeni>${contacts.surname.text}</prijmeni>
-        <telefon>${contacts.phone.text}</telefon>
-        <email>${contacts.email.text}</email>
-        <ulice>${contacts.street.text}</ulice>
+        <jmeno>${contacts.name.toXmlEntry()}</jmeno>
+        <prijmeni>${contacts.surname.toXmlEntry()}</prijmeni>
+        <telefon>${contacts.phone.toXmlEntry()}</telefon>
+        <email>${contacts.email.toXmlEntry()}</email>
+        <ulice>${contacts.street.toXmlEntry()}</ulice>
         <psc>${
     if (contacts.zip.toXmlEntry().length != 5) ""
     else contacts.zip.toXmlEntry().substring(0, 3) + " " + contacts.zip.toXmlEntry().substring(3, 5)
 }</psc>
-        <mesto>${contacts.city.text}</mesto>
+        <mesto>${contacts.city.toXmlEntry()}</mesto>
         <partner_ico>${contacts.assemblyCompany.crn}</partner_ico>
     </kontakt>
     <detailobjektu>
@@ -1190,8 +1314,7 @@ fun Sites.createXml(
         <hadice>${accessories.hose.toXmlEntry()}</hadice>
         <topny_kabel>${accessories.heatingCable.toXmlEntry()}</topny_kabel>
         <drzak_na_tc>${accessories.wallSupportBracket.toXmlEntry()}</drzak_na_tc>
-        <pokojova_jednotka>${accessories.roomUnit.toXmlEntry()}</pokojova_jednotka>
-        <pokojove_cidlo>${accessories.roomSensor.toXmlEntry()}</pokojove_cidlo>
+        <pokojova_cidla_a_jednotky>${accessories.roomUnitsAndSensors.toXmlEntry()}</pokojova_cidla_a_jednotky>
     </prislusenstvi>
     <poznamka>
         <kontakty>${contacts.note.toXmlEntry()}</kontakty>

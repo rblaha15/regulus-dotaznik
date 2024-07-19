@@ -11,8 +11,8 @@ interface Strings {
     val system: SystemStrings
     val pool: PoolStrings
     val additionalSources: AdditionalSourcesStrings
-    val accessories: PrislusenstviStrings
-    val logIn: AccessoriesStrings
+    val accessories: AccessoriesStrings
+    val logIn: LogInStrings
     val photos: PhotosStrings
     val export: ExportStrings
     val note: String
@@ -43,6 +43,8 @@ interface Strings {
     val internetConnectionNeeded: String
     val back: String
     val chooseUnits: String
+    val remove: String
+    val add: String
 }
 
 interface ContactsStrings {
@@ -59,6 +61,13 @@ interface ContactsStrings {
     val chooseAssemblyCompany: String
     val searchCompany: String
     val crn: String
+    val demandOrigin: String
+    val originQuestionEmail: String
+    val originQuestionExhibition: String
+    val originQuestionInPerson: String
+    val originDistributionCompany: String
+    val originAssemlbleres: String
+    val originDesigner: String
 }
 
 interface ObjectDetailStrings {
@@ -135,18 +144,17 @@ interface AdditionalSourcesStrings {
     val fromRegulation: String
 }
 
-interface PrislusenstviStrings {
+interface AccessoriesStrings {
     val accessories: String
     val hose: String
     val wallSupportBracket: String
-    val roomUnit: String
+    val roomUnitsAndSensors: String
     val heatingCable: String
-    val roomSensor: String
     val onWall: String
     val onIsolatedWall: String
 }
 
-interface AccessoriesStrings {
+interface LogInStrings {
     val logIn: String
     val internetNeeded: String
     val iAmEmploee: String
@@ -191,6 +199,8 @@ interface ExportStrings {
     val emailIsBeingSend: String
     val emailSuccessfullySent: String
     val doYouWantToSend: String
+    val missingField: String
+    val pleaseFillInField: (String) -> String
     val doYouReallyWantToSend: (String) -> String
     val emailNotSent: (String) -> String
     val doYouRellyWantToRemoveData: String

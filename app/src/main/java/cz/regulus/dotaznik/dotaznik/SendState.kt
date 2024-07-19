@@ -3,6 +3,10 @@ package cz.regulus.dotaznik.dotaznik
 sealed interface SendState {
     data object Nothing : SendState
 
+    data class MissingField(
+        val fieldLabel: String,
+    ) : SendState
+
     data class ConfirmSend(
         val email: String,
     ) : SendState

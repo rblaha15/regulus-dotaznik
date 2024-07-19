@@ -10,17 +10,20 @@ import androidx.compose.animation.core.FloatTweenSpec
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DeleteForever
@@ -28,8 +31,10 @@ import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
@@ -44,7 +49,6 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -242,12 +246,15 @@ fun Questionnaire(
                             ),
                         )
 
-                        OutlinedButton(
+                        TextButton(
                             onClick = {
                                 removeAll()
                             },
                             Modifier.padding(all = 8.dp),
+                            contentPadding = ButtonDefaults.TextButtonWithIconContentPadding,
                         ) {
+                            Icon(Icons.Default.DeleteForever, null, Modifier.size(ButtonDefaults.IconSize))
+                            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
                             Text(strings.export.removeAll)
                         }
 
@@ -255,8 +262,11 @@ fun Questionnaire(
                             onClick = {
                                 logOut()
                             },
-                            Modifier.padding(all = 8.dp),
+                            Modifier.padding(horizontal = 8.dp),
+                            contentPadding = ButtonDefaults.TextButtonWithIconContentPadding,
                         ) {
+                            Icon(Icons.AutoMirrored.Default.Logout, null, Modifier.size(ButtonDefaults.IconSize))
+                            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
                             Text(strings.logIn.logOut)
                         }
 
@@ -267,7 +277,7 @@ fun Questionnaire(
                         )
                         if (isDebug) Text(
                             "Toto je DEBUG verze aplikace. Žádný email nebude odeslán firmě Regulus, pouze Vám na email specifikovaný výše.",
-                            Modifier.padding(8.dp),
+                            Modifier.padding(horizontal = 8.dp),
                             fontSize = 12.sp
                         )
                     }
@@ -276,209 +286,17 @@ fun Questionnaire(
         },
         drawerState = drawerState,
     ) {
-        when (sendState) {
-            SendState.Nothing -> Unit
-            is SendState.ConfirmSend -> AlertDialog(
-                onDismissRequest = {
-                    changeState(false)
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            changeState(true)
-                        }
-                    ) {
-                        Text(strings.yes)
-                    }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = {
-                            changeState(false)
-                        }
-                    ) {
-                        Text(strings.no)
-                    }
-                },
-                title = {
-                    Text(text = strings.export.doYouWantToSend)
-                },
-                icon = {
-                    Icon(Icons.AutoMirrored.Default.Send, null)
-                },
-                text = {
-                    Text(text = strings.export.doYouReallyWantToSend(sendState.email))
-                },
-            )
+        ShowSendDialogs(sendState, changeState)
 
-            SendState.Sending -> AlertDialog(
-                onDismissRequest = {},
-                confirmButton = {},
-                dismissButton = {},
-                text = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        CircularProgressIndicator()
-                        Text(text = strings.export.sending, Modifier.padding(8.dp))
-                    }
-                },
-            )
-
-            SendState.Success -> AlertDialog(
-                onDismissRequest = {
-                    changeState(true)
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            changeState(true)
-                        }
-                    ) {
-                        Text(strings.ok)
-                    }
-                },
-                title = {
-                    Text(text = strings.export.emailSuccessfullySent)
-                },
-                icon = {
-                    Icon(Icons.Default.Check, null)
-                },
-            )
-
-            SendState.ConfirmDataRemoval -> AlertDialog(
-                onDismissRequest = {
-                    changeState(false)
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            changeState(true)
-                        }
-                    ) {
-                        Text(strings.yes)
-                    }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = {
-                            changeState(false)
-                        }
-                    ) {
-                        Text(strings.no)
-                    }
-                },
-                title = {
-                    Text(text = strings.export.removeAll)
-                },
-                icon = {
-                    Icon(Icons.Default.DeleteForever, null)
-                },
-                text = {
-                    Text(text = strings.export.doYouRellyWantToRemoveData)
-                },
-            )
-
-            SendState.Error.Offline -> AlertDialog(
-                onDismissRequest = {
-                    changeState(false)
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            changeState(false)
-                        }
-                    ) {
-                        Text(strings.ok)
-                    }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = {
-                            changeState(true)
-                        }
-                    ) {
-                        Text(strings.export.moreInfo)
-                    }
-                },
-                title = {
-                    Text(text = strings.export.emailNotSent(""))
-                },
-                icon = {
-                    Icon(Icons.Default.WifiOff, null)
-                },
-                text = {
-                    Text(text = strings.export.youAreOffline)
-                },
-            )
-
-            SendState.Error.Other -> AlertDialog(
-                onDismissRequest = {
-                    changeState(false)
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            changeState(false)
-                        }
-                    ) {
-                        Text(strings.ok)
-                    }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = {
-                            changeState(true)
-                        }
-                    ) {
-                        Text(strings.export.moreInfo)
-                    }
-                },
-                title = {
-                    Text(text = strings.export.emailNotSent(""))
-                },
-                icon = {
-                    Icon(Icons.Default.ErrorOutline, null)
-                },
-                text = {
-                    Text(text = strings.export.errorReported)
-                },
-            )
-
-            is SendState.Error.Details -> AlertDialog(
-                onDismissRequest = {
-                    changeState(false)
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            changeState(false)
-                        }
-                    ) {
-                        Text(strings.ok)
-                    }
-                },
-                title = {
-                    Text(text = strings.export.emailNotSent(strings.export.thisIsTheIssue))
-                },
-                icon = {
-                    Icon(Icons.Default.ErrorOutline, null)
-                },
-                text = {
-                    Text(text = sendState.error, Modifier.verticalScroll(rememberScrollState()))
-                },
-            )
-        }
-
-        val aktualniStranka = remember(pagerState.currentPage, sites) { sites?.vse?.get(pagerState.currentPage) }
-        if (aktualniStranka != null && sites != null) Scaffold(
+        val currentSite = remember(pagerState.currentPage, sites) { sites?.vse?.get(pagerState.currentPage) }
+        if (currentSite != null && sites != null) Scaffold(
             Modifier
                 .imePadding()
                 .navigationBarsPadding(),
             topBar = {
                 CenterAlignedTopAppBar(
                     title = {
-                        Text(aktualniStranka.getName(sites))
+                        Text(currentSite.getName(sites))
                     },
                     navigationIcon = {
                         IconButton(
@@ -511,7 +329,7 @@ fun Questionnaire(
                 Modifier
                     .padding(paddingValues),
                 pageSpacing = 8.dp,
-                key = { sites.vse[it].getName(sites) }
+                key = { sites.vse[it].getName(sites) },
             ) { i ->
                 Scaffold(
                     floatingActionButton = {
@@ -543,7 +361,7 @@ fun Questionnaire(
                         Modifier
                             .fillMaxSize()
                     ) {
-                        val stranka by remember(sites.vse, i) {
+                        val site by remember(sites.vse, i) {
                             derivedStateOf {
                                 sites.vse[i]
                             }
@@ -553,8 +371,8 @@ fun Questionnaire(
                                 .weight(1F)
                                 .verticalScroll(rememberScrollState())
                         ) {
-                            stranka.getWidgets(sites).dropLast(1).forEachIndexed { i, veci ->
-                                veci.forEach { vec ->
+                            site.getWidgets(sites).dropLast(1).forEachIndexed { i, widgets ->
+                                widgets.forEach { widget ->
                                     Surface(
                                         Modifier.fillMaxWidth(),
                                         color = if (i % 2 == 0) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant,
@@ -562,9 +380,9 @@ fun Questionnaire(
                                         Widget(
                                             sites = sites,
                                             companies = companies,
-                                            widget = vec,
+                                            widget = widget,
                                             editWidget = { newWidget ->
-                                                editSites(sites.copySite(stranka.copyWidget(newWidget)))
+                                                editSites(sites.copySite(site.copyWidget(newWidget)))
                                             },
                                         )
                                     }
@@ -575,9 +393,9 @@ fun Questionnaire(
                         Widget(
                             sites = sites,
                             companies = companies,
-                            widget = stranka.getWidgets(sites).last().last(),
+                            widget = site.getWidgets(sites).last().last(),
                             editWidget = { newWidget ->
-                                editSites(sites.copySite(stranka.copyWidget(newWidget)))
+                                editSites(sites.copySite(site.copyWidget(newWidget)))
                             },
                         )
                     }
@@ -586,6 +404,239 @@ fun Questionnaire(
         }
         else LinearProgressIndicator()
     }
+}
+
+@Composable
+private fun ShowSendDialogs(sendState: SendState, changeState: (moveOn: Boolean) -> Unit) = when (sendState) {
+    SendState.Nothing -> Unit
+    is SendState.ConfirmSend -> AlertDialog(
+        onDismissRequest = {
+            changeState(false)
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    changeState(true)
+                }
+            ) {
+                Text(strings.yes)
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    changeState(false)
+                }
+            ) {
+                Text(strings.no)
+            }
+        },
+        title = {
+            Text(text = strings.export.doYouWantToSend)
+        },
+        icon = {
+            Icon(Icons.AutoMirrored.Default.Send, null)
+        },
+        text = {
+            Text(text = strings.export.doYouReallyWantToSend(sendState.email))
+        },
+    )
+
+    SendState.Sending -> AlertDialog(
+        onDismissRequest = {},
+        confirmButton = {},
+        dismissButton = {},
+        text = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                CircularProgressIndicator()
+                Text(text = strings.export.sending, Modifier.padding(8.dp))
+            }
+        },
+    )
+
+    is SendState.MissingField -> AlertDialog(
+        onDismissRequest = {
+            changeState(false)
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    changeState(false)
+                }
+            ) {
+                Text(strings.ok)
+            }
+        },
+        title = {
+            Text(text = strings.export.missingField)
+        },
+        icon = {
+            Icon(Icons.Default.WarningAmber, null)
+        },
+        text = {
+            Text(text = strings.export.pleaseFillInField(sendState.fieldLabel))
+        },
+    )
+
+    SendState.Sending -> AlertDialog(
+        onDismissRequest = {},
+        confirmButton = {},
+        dismissButton = {},
+        text = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                CircularProgressIndicator()
+                Text(text = strings.export.sending, Modifier.padding(8.dp))
+            }
+        },
+    )
+
+    SendState.Success -> AlertDialog(
+        onDismissRequest = {
+            changeState(true)
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    changeState(true)
+                }
+            ) {
+                Text(strings.ok)
+            }
+        },
+        title = {
+            Text(text = strings.export.emailSuccessfullySent)
+        },
+        icon = {
+            Icon(Icons.Default.Check, null)
+        },
+    )
+
+    SendState.ConfirmDataRemoval -> AlertDialog(
+        onDismissRequest = {
+            changeState(false)
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    changeState(true)
+                }
+            ) {
+                Text(strings.yes)
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    changeState(false)
+                }
+            ) {
+                Text(strings.no)
+            }
+        },
+        title = {
+            Text(text = strings.export.removeAll)
+        },
+        icon = {
+            Icon(Icons.Default.DeleteForever, null)
+        },
+        text = {
+            Text(text = strings.export.doYouRellyWantToRemoveData)
+        },
+    )
+
+    SendState.Error.Offline -> AlertDialog(
+        onDismissRequest = {
+            changeState(false)
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    changeState(false)
+                }
+            ) {
+                Text(strings.ok)
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    changeState(true)
+                }
+            ) {
+                Text(strings.export.moreInfo)
+            }
+        },
+        title = {
+            Text(text = strings.export.emailNotSent(""))
+        },
+        icon = {
+            Icon(Icons.Default.WifiOff, null)
+        },
+        text = {
+            Text(text = strings.export.youAreOffline)
+        },
+    )
+
+    SendState.Error.Other -> AlertDialog(
+        onDismissRequest = {
+            changeState(false)
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    changeState(false)
+                }
+            ) {
+                Text(strings.ok)
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    changeState(true)
+                }
+            ) {
+                Text(strings.export.moreInfo)
+            }
+        },
+        title = {
+            Text(text = strings.export.emailNotSent(""))
+        },
+        icon = {
+            Icon(Icons.Default.ErrorOutline, null)
+        },
+        text = {
+            Text(text = strings.export.errorReported)
+        },
+    )
+
+    is SendState.Error.Details -> AlertDialog(
+        onDismissRequest = {
+            changeState(false)
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    changeState(false)
+                }
+            ) {
+                Text(strings.ok)
+            }
+        },
+        title = {
+            Text(text = strings.export.emailNotSent(strings.export.thisIsTheIssue))
+        },
+        icon = {
+            Icon(Icons.Default.ErrorOutline, null)
+        },
+        text = {
+            Text(text = sendState.error, Modifier.verticalScroll(rememberScrollState()))
+        },
+    )
 }
 
 private fun Sites?.orEmpty() = this ?: Sites()

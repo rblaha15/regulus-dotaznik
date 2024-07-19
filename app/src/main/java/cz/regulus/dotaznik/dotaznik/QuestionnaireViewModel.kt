@@ -8,6 +8,7 @@ import com.sun.mail.util.MailConnectException
 import cz.regulus.dotaznik.BuildConfig
 import cz.regulus.dotaznik.Repository
 import cz.regulus.dotaznik.User
+import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getChosenIndex
 import cz.regulus.dotaznik.userOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -74,6 +75,7 @@ class QuestionnaireViewModel(
         if (moveOn) viewModelScope.launch(Dispatchers.IO) {
             when (sendState.value) {
                 SendState.Nothing -> askForConfirmation()
+                is SendState.MissingField -> Unit
                 is SendState.ConfirmSend -> sendEmail()
                 SendState.Sending -> Unit
                 SendState.Success -> askForRemoval()
@@ -93,7 +95,12 @@ class QuestionnaireViewModel(
     }
 
     private suspend fun askForConfirmation() {
-        _sendState.value = SendState.ConfirmSend(recipientAdress())
+        val sites = repo.sites.first()
+        val demandOrigin = sites.contacts.demandOrigin
+
+        _sendState.value = if (demandOrigin.getChosenIndex(sites) == 0) SendState.MissingField(
+            demandOrigin.getLabel(sites)
+        ) else SendState.ConfirmSend(recipientAdress())
     }
 
     private val session = Session.getInstance(

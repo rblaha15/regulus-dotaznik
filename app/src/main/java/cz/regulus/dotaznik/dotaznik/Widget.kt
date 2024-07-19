@@ -10,7 +10,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -18,6 +20,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -42,6 +45,13 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.changeNumber
+import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getAmount
+import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getChecked
+import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getChosen
+import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getChosenUnit
+import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getText
+import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getValuesWithAmounts
 import cz.regulus.dotaznik.strings.strings
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,6 +87,7 @@ fun Widget(
                 label = {
                     Text(widget.getLabel(sites))
                 },
+                placeholder = { Text(widget.getPlaceholder(sites)) },
                 trailingIcon = {
                     Text(text = widget.getSuffix(sites))
                 },
@@ -102,6 +113,7 @@ fun Widget(
                 label = {
                     Text(widget.getLabel(sites))
                 },
+                placeholder = { Text(widget.getPlaceholder(sites)) },
                 trailingIcon = {
                     var expanded by remember { mutableStateOf(false) }
                     DropdownMenu(
@@ -155,7 +167,9 @@ fun Widget(
             Modifier.fillMaxWidth()
         ) {
             BasicChooser(widget, focusManager, editWidget, sites)
-            if (widget.getOptions2(sites).isNotEmpty()) BasicChooser(widget.getSecondChooser(), focusManager, editWidget, sites)
+            if (widget.getOptions2(sites).isNotEmpty()) BasicChooser(widget.getSecondChooser(), focusManager, editWidget, sites) {
+                widget.changeChosenIndex2(it).also(::println)
+            }
         }
 
         is Sites.Site.Widget.CheckBox -> Row(
@@ -220,6 +234,7 @@ fun Widget(
                     value = if (widget.getChecked(sites)) widget.getChosen(sites) else "",
                     onValueChange = {},
                     label = { Text(widget.getLabel(sites)) },
+                    placeholder = { Text(widget.getPlaceholder(sites)) },
                     trailingIcon = {
                         if (widget.getChecked(sites))
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
@@ -249,6 +264,74 @@ fun Widget(
                                 focusManager.clearFocus()
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                        )
+                    }
+                }
+            }
+        }
+
+        is Sites.Site.Widget.DropdownWithAmount -> Row(
+            Modifier.fillMaxWidth()
+        ) {
+            var expanded by rememberSaveable { mutableStateOf(false) }
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded },
+                Modifier
+                    .weight(1F),
+            ) {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+                    readOnly = true,
+                    value = widget.getValuesWithAmounts(sites),
+                    placeholder = { Text(widget.getPlaceholder(sites)) },
+                    onValueChange = {},
+                    label = { Text(widget.getLabel(sites)) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    keyboardActions = KeyboardActions {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    },
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = {
+                        expanded = false
+                        focusManager.clearFocus()
+                    },
+                    Modifier.exposedDropdownSize(),
+                ) {
+                    widget.getItems(sites).forEachIndexed { i, item ->
+                        DropdownMenuItem(
+                            text = { Text(item) },
+                            onClick = {},
+                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                            trailingIcon = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    IconButton(
+                                        onClick = {
+                                            editWidget(widget.changeNumber(sites, i, widget.getAmount(sites)[i] - 1))
+                                        },
+                                        enabled = widget.getMinimumAmount(sites)[i] < widget.getAmount(sites)[i],
+                                    ) {
+                                        Icon(Icons.Default.Remove, strings.remove)
+                                    }
+                                    Text(widget.getAmount(sites)[i].toString())
+                                    IconButton(
+                                        onClick = {
+                                            editWidget(widget.changeNumber(sites, i, widget.getAmount(sites)[i] + 1))
+                                        },
+                                        enabled = widget.getAmount(sites)[i] < widget.getMaximumAmount(sites)[i],
+                                    ) {
+                                        Icon(Icons.Default.Add, strings.add)
+                                    }
+                                }
+                            },
                         )
                     }
                 }
@@ -354,14 +437,16 @@ fun Widget(
 }
 
 private fun <U> U.getSecondChooser(): HasChooserAndLabel
-        where U : Sites.Site.Widget.HasChooser, U : Sites.Site.Widget.HasLabel, U : Sites.Site.Widget.HasFollowUpChooser =
+        where U : Sites.Site.Widget.HasLabel, U : Sites.Site.Widget.HasFollowUpChooser =
     object : HasChooserAndLabel {
         override fun getOptions(sites: Sites) = getOptions2(sites)
+        override val chosenIndex: Int? = chosenIndex2
 
-        override fun changeChosenIndex(chosenIndex: Int?): Sites.Site.Widget.HasChooser =
-            changeChosenIndex2(chosenIndex) as Sites.Site.Widget.HasChooser
+        @Deprecated("", ReplaceWith(""), DeprecationLevel.ERROR)
+        override fun changeChosenIndex(chosenIndex: Int?) = error("Should not be called")
 
         override fun getLabel(sites: Sites) = this@getSecondChooser.getLabel(sites)
+        override fun getPlaceholder(sites: Sites) = this@getSecondChooser.getPlaceholder2(sites)
     }
 
 private interface HasChooserAndLabel : Sites.Site.Widget.HasChooser, Sites.Site.Widget.HasLabel
@@ -374,6 +459,7 @@ private fun <T> BasicChooser(
     focusManager: FocusManager,
     editWidget: (Sites.Site.Widget) -> Unit,
     sites: Sites,
+    changeChosenIndex: (Int) -> Sites.Site.Widget = { it: Int -> widget.changeChosenIndex(it) },
 ) where T : Sites.Site.Widget.HasChooser, T : Sites.Site.Widget.HasLabel {
     var expanded by rememberSaveable { mutableStateOf(false) }
     ExposedDropdownMenuBox(
@@ -391,6 +477,7 @@ private fun <T> BasicChooser(
             value = widget.getChosen(sites),
             onValueChange = {},
             label = { Text(widget.getLabel(sites)) },
+            placeholder = { Text(widget.getPlaceholder(sites)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
             keyboardActions = KeyboardActions {
@@ -404,11 +491,11 @@ private fun <T> BasicChooser(
                 focusManager.clearFocus()
             },
         ) {
-            widget.getOptions(sites).forEachIndexed { i, moznost ->
+            widget.getOptions(sites).withIndex().filter { it.value.isNotBlank() }.forEach { (i, moznost) ->
                 DropdownMenuItem(
                     text = { Text(moznost) },
                     onClick = {
-                        editWidget(widget.changeChosenIndex(i))
+                        editWidget(changeChosenIndex(i))
                         expanded = false
                         focusManager.clearFocus()
                     },

@@ -16,6 +16,13 @@ val SkStrings = object : Strings {
         override val chooseAssemblyCompany = "Vybrat firmu"
         override val searchCompany = "Vyberte montážnu firmu"
         override val crn = "Vyhledat firmu"
+        override val demandOrigin = "Pôvod dopytu"
+        override val originQuestionEmail = "Otázka poslaná emailom od koncového zákazníka"
+        override val originQuestionExhibition = "Otázka z výstavy"
+        override val originQuestionInPerson = "Otázka pri osobnej návšteve u koncového zákazníka"
+        override val originDistributionCompany = "Dopyt od distribučnej firmy"
+        override val originAssemlbleres = "Dopyt od montážnikov"
+        override val originDesigner = "Dopyt od projektanta"
     }
     override val objectDetail = object : ObjectDetailStrings {
         override val objectDetail = "Detail objektu"
@@ -88,17 +95,16 @@ val SkStrings = object : Strings {
         override val fromRegulation = "ovládané z regulácie"
 
     }
-    override val accessories = object : PrislusenstviStrings {
+    override val accessories = object : AccessoriesStrings {
         override val accessories = "Příslušenství"
         override val hose = "Hadice"
         override val wallSupportBracket = "Držák pro TČ"
-        override val roomUnit = "Pokojová jednotka"
+        override val roomUnitsAndSensors = "Pokojové jednotky a čidla"
         override val heatingCable = "Topný kabel"
-        override val roomSensor = "Pokojové čidlo"
         override val onWall = "Na stěnu"
         override val onIsolatedWall = "Na izolovanou stěnu"
     }
-    override val logIn = object : AccessoriesStrings {
+    override val logIn = object : LogInStrings {
         override val logIn = "Prihlásenie"
         override val internetNeeded = "Pre prihlásenie je potrebné pripojenie k internetu!"
         override val iAmEmploee = "Som zamestanec Regulusu"
@@ -130,7 +136,7 @@ val SkStrings = object : Strings {
         override val takePhoto = "Odfotiť"
         override val choosePhoto = "Vybrať z galérie"
         override val photo = "Fotka"
-        override val add = "TODO"
+        override val add = "Pridať fotku"
         override val maxPhotosReached = "Môžete pridať maximálne 5 fotiek"
         override val maxPhotosOvershoot = "Pretože môžete pridať maximálne 5 fotiek, neboli všetky vybrané fotky vložené"
         override val noPhotos = "Zatiaľ ste nepridali žiadne fotky"
@@ -138,6 +144,8 @@ val SkStrings = object : Strings {
     }
     override val export = object : ExportStrings {
         override val sending = "Odosielanie"
+        override val missingField = "Nevyplnené pole"
+        override val pleaseFillInField = { field: String -> "Pre odoslanie prosím vyplňte $field." }
         override val emailIsBeingSend = "Email sa odosiela"
         override val emailSuccessfullySent = "Email bol úspešne odoslaný!"
         override val doYouWantToSend = "Odoslať?"
@@ -169,4 +177,6 @@ val SkStrings = object : Strings {
     override val internetConnectionNeeded = "Je potrebné pripojenie k internetu"
     override val back = "Späť"
     override val chooseUnits = "Vybrať jednotky"
+    override val remove = "Odobrať"
+    override val add = "Pridať"
 }
