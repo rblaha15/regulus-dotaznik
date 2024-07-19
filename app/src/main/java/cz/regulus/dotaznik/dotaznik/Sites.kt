@@ -604,12 +604,10 @@ data class Sites(
                     strings.noneFeminine,
                 ) + sites.products.thermalStores.keys
 
-                override fun getOptions2(sites: Sites) =
-                    if (sites.system.thermalStoreType.getChosen(sites) == strings.noneFeminine) emptyList()
-                    else {
-                        val chosen = sites.system.thermalStoreType.getChosen(sites)
-                        sites.products.thermalStores[chosen].orEmpty()
-                    }
+                override fun getOptions2(sites: Sites): List<String> {
+                    val chosen = sites.system.thermalStoreType.getChosen(sites)
+                    return sites.products.thermalStores[chosen] ?: listOf("")
+                }
 
                 override fun changeChosenIndex(chosenIndex: Int?): Widget.HasChooser = copy(chosenIndex = chosenIndex)
                 override fun changeChosenIndex2(chosenIndex2: Int?): Widget.HasFollowUpChooser = copy(chosenIndex2 = chosenIndex2)
