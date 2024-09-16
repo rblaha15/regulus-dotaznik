@@ -1,9 +1,5 @@
 package cz.regulus.dotaznik.spravaFotek
 
-import android.net.Uri
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -21,8 +17,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PhotoLibrary
@@ -53,7 +49,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -61,54 +56,38 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import cz.regulus.dotaznik.R
-import cz.regulus.dotaznik.composeString
-import cz.regulus.dotaznik.toText
+import cz.regulus.dotaznik.strings.strings
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-var callback1 = { _: Boolean -> }
-var callback2 = { _: List<Uri> -> }
-
 @Destination
 @Composable
-fun FotkyScreen(
+fun PhotosScreen(
     navigator: DestinationsNavigator,
 ) {
     val launcher1 =
-        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
-            callback1(it)
-        }
+        rememberResultLauncher(ActivityResultContracts.TakePicture())
 
     val launcher2 =
-        rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) {
-            callback2(it)
-        }
+        rememberResultLauncher(ActivityResultContracts.PickMultipleVisualMedia())
 
-    val viewModel = koinViewModel<FotkyViewModel> {
+    val viewModel = koinViewModel<PhotosViewModel> {
         parametersOf(
-            object : FotkyViewModel.Launchers {
-                override fun getTakePicture(callback: (Boolean) -> Unit): ManagedActivityResultLauncher<Uri, Boolean> {
-                    callback1 = callback
-                    return launcher1
-                }
-
-                override fun getPickMultipleMedia(callback: (List<Uri>) -> Unit): ManagedActivityResultLauncher<PickVisualMediaRequest, List<Uri>> {
-                    callback2 = callback
-                    return launcher2
-                }
-            }
+            PhotosViewModel.Launchers(
+                takePicture = launcher1,
+                pickMultipleMedia = launcher2,
+            )
         )
     }
 
-    val fotky by viewModel.fotky.collectAsStateWithLifecycle()
+    val photos by viewModel.photos.collectAsStateWithLifecycle()
 
     Fotky(
-        fotky = fotky,
-        vyfotit = viewModel::vyfotit,
-        vybrat = viewModel::vybrat,
-        odebrat = viewModel::odebrat,
+        photos = photos,
+        takePicture = viewModel::takePicture,
+        choose = viewModel::choosePhoto,
+        remove = viewModel::removePhoto,
         navigateUp = navigator::navigateUp
     )
 }
@@ -116,14 +95,13 @@ fun FotkyScreen(
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun Fotky(
-    fotky: List<Pair<Int, ImageBitmap>>,
-    vyfotit: ((Int) -> Unit) -> Unit,
-    vybrat: ((Int) -> Unit) -> Unit,
-    odebrat: (Int) -> Unit,
+    photos: List<Pair<Int, ImageBitmap>>,
+    takePicture: ((String) -> Unit) -> Unit,
+    choose: ((String) -> Unit) -> Unit,
+    remove: (Int) -> Unit,
     navigateUp: () -> Unit,
 ) {
     val snackbarState = remember { SnackbarHostState() }
-    val resources = LocalContext.current.resources
     val scope = rememberCoroutineScope()
     val cameraPermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
     var expanded by remember { mutableStateOf(false) }
@@ -135,7 +113,7 @@ fun Fotky(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(R.string.fotky_sprava_fotek.toText().composeString())
+                    Text(strings.photos.photosManager)
                 },
                 navigationIcon = {
                     IconButton(
@@ -143,7 +121,7 @@ fun Fotky(
                             navigateUp()
                         }
                     ) {
-                        Icon(Icons.Default.ArrowBack, R.string.zpet.toText().composeString())
+                        Icon(Icons.AutoMirrored.Default.ArrowBack, strings.back)
                     }
                 }
             )
@@ -153,17 +131,15 @@ fun Fotky(
                 horizontalAlignment = Alignment.End,
             ) {
                 val rotation by animateFloatAsState(if (expanded) 135F else 0F, label = "fab rotation")
-                var wait by rememberSaveable { mutableStateOf(false) }
+                var isPermissionDialogOpen by rememberSaveable { mutableStateOf(false) }
 
-                LaunchedEffect(wait, cameraPermissionState.status.isGranted) {
-                    if (wait) {
-                        wait = false
-                        if (cameraPermissionState.status.isGranted) {
-                            expanded = false
-                            vyfotit {
-                                scope.launch {
-                                    snackbarState.showSnackbar(resources.getString(it))
-                                }
+                LaunchedEffect(isPermissionDialogOpen, cameraPermissionState.status) {
+                    if (isPermissionDialogOpen && cameraPermissionState.status.isGranted) {
+                        isPermissionDialogOpen = false
+                        expanded = false
+                        takePicture {
+                            scope.launch {
+                                snackbarState.showSnackbar(it)
                             }
                         }
                     }
@@ -184,32 +160,35 @@ fun Fotky(
                             ) {
                                 Surface(
                                     onClick = {
+                                        isPermissionDialogOpen = false
                                         if (cameraPermissionState.status.isGranted) {
                                             expanded = false
-                                            vyfotit {
+                                            takePicture {
                                                 scope.launch {
-                                                    snackbarState.showSnackbar(resources.getString(it))
+                                                    snackbarState.showSnackbar(it)
                                                 }
                                             }
                                         } else {
-                                            wait = true
+                                            isPermissionDialogOpen = true
                                             cameraPermissionState.launchPermissionRequest()
                                         }
                                     },
                                     shape = CircleShape
                                 ) {
-                                    Text(R.string.fotky_vyfotit.toText().composeString(), Modifier.padding(8.dp), style = MaterialTheme.typography.labelMedium)
+                                    Text(strings.photos.takePhoto, Modifier.padding(8.dp), style = MaterialTheme.typography.labelMedium)
                                 }
                                 SmallFloatingActionButton(
                                     onClick = {
+                                        isPermissionDialogOpen = false
                                         if (cameraPermissionState.status.isGranted) {
                                             expanded = false
-                                            vyfotit {
+                                            takePicture {
                                                 scope.launch {
-                                                    snackbarState.showSnackbar(resources.getString(it))
+                                                    snackbarState.showSnackbar(it)
                                                 }
                                             }
                                         } else {
+                                            isPermissionDialogOpen = true
                                             cameraPermissionState.launchPermissionRequest()
                                         }
                                     },
@@ -234,22 +213,22 @@ fun Fotky(
                                 Surface(
                                     onClick = {
                                         expanded = false
-                                        vybrat {
+                                        choose {
                                             scope.launch {
-                                                snackbarState.showSnackbar(resources.getString(it))
+                                                snackbarState.showSnackbar(it)
                                             }
                                         }
                                     },
                                     shape = CircleShape
                                 ) {
-                                    Text(R.string.fotky_vybrat_z_galerie.toText().composeString(), Modifier.padding(8.dp), style = MaterialTheme.typography.labelMedium)
+                                    Text(strings.photos.choosePhoto, Modifier.padding(8.dp), style = MaterialTheme.typography.labelMedium)
                                 }
                                 SmallFloatingActionButton(
                                     onClick = {
                                         expanded = false
-                                        vybrat {
+                                        choose {
                                             scope.launch {
-                                                snackbarState.showSnackbar(resources.getString(it))
+                                                snackbarState.showSnackbar(it)
                                             }
                                         }
                                     },
@@ -269,7 +248,7 @@ fun Fotky(
                 ) {
                     Icon(
                         Icons.Default.Add,
-                        R.string.fotky_fotka.toText().composeString(),
+                        strings.photos.photo,
                         Modifier.rotate(rotation)
                     )
                 }
@@ -281,7 +260,7 @@ fun Fotky(
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            items(fotky, key = { (id, _) -> id }) { (id, image) ->
+            items(photos, key = { (id, _) -> id }) { (id, image) ->
                 ElevatedCard(
                     Modifier
                         .padding(8.dp)
@@ -295,18 +274,18 @@ fun Fotky(
                         Image(image, null, Modifier.weight(1F))
                         OutlinedButton(
                             onClick = {
-                                odebrat(id)
+                                remove(id)
                             },
                             Modifier.padding(8.dp)
                         ) {
                             Icon(Icons.Default.Delete, null, Modifier.padding(end = ButtonDefaults.IconSpacing))
-                            Text(R.string.odstranit.toText().composeString())
+                            Text(strings.photos.remove)
                         }
                     }
                 }
             }
-            if (fotky.isEmpty()) item {
-                Text(R.string.fotky_zadne_fotky.toText().composeString(), Modifier.padding(8.dp))
+            if (photos.isEmpty()) item {
+                Text(strings.photos.noPhotos, Modifier.padding(8.dp))
             }
         }
         AnimatedVisibility(
