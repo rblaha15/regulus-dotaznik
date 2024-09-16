@@ -13,6 +13,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_r"
         android:name="cz.regulus.dotaznik.App"
+        android:label="Regulus Dotazník"
         android:roundIcon="@mipmap/ic_r_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
