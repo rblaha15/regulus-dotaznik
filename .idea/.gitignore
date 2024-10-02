@@ -5,3 +5,5 @@
 /misc.xml
 /compiler.xml
 /kotlinc.xml
+/modules.xml
+/deploymentTargetSelector.xml
