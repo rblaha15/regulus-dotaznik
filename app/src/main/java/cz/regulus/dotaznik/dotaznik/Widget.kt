@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -54,7 +55,6 @@ import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getText
 import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getValuesWithAmounts
 import cz.regulus.dotaznik.strings.strings
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Widget(
     sites: Sites,
@@ -65,374 +65,436 @@ fun Widget(
     val show = widget.showWidget(sites)
     val focusManager = LocalFocusManager.current
     if (show) when (widget) {
-        is Sites.Site.Widget.HasTitle -> {
-            Text(
-                text = widget.getTitle(sites),
-                Modifier.padding(all = 8.dp),
-                style = MaterialTheme.typography.headlineSmall,
-            )
-        }
+        is Sites.Site.Widget.HasTitle -> Title(widget, sites)
+        is Sites.Site.Widget.TextField -> TextField(widget, sites, editWidget, focusManager)
+        is Sites.Site.Widget.TextFieldWithUnits -> TextFieldWithUnits(widget, sites, editWidget, focusManager)
+        is Sites.Site.Widget.Chooser -> Chooser(widget, focusManager, editWidget, sites)
+        is Sites.Site.Widget.DoubleChooser -> DoubleChooser(widget, focusManager, editWidget, sites)
+        is Sites.Site.Widget.CheckBox -> Checkbox(widget, sites, editWidget)
+        is Sites.Site.Widget.CheckBoxWithChooser -> CheckboxWithChooser(widget, sites, editWidget, focusManager)
+        is Sites.Site.Widget.DropdownWithAmount -> DropdownWithAmount(widget, sites, focusManager, editWidget)
+        is Sites.Site.Contacts.AssemblyCompany -> AssemblyCompany(widget, companies, editWidget, focusManager)
+        else -> {}
+    }
+}
 
-        is Sites.Site.Widget.TextField -> {
-            var text by remember { mutableStateOf(widget.getText(sites)) }
-            OutlinedTextField(
-                value = text,
-                onValueChange = {
-                    text = it
-                    editWidget(widget.changeText(it))
-                },
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-                label = {
-                    Text(widget.getLabel(sites))
-                },
-                placeholder = { Text(widget.getPlaceholder(sites)) },
-                trailingIcon = {
-                    Text(text = widget.getSuffix(sites))
-                },
-                singleLine = true,
-                keyboardActions = KeyboardActions {
-                    focusManager.moveFocus(FocusDirection.Down)
-                },
-                keyboardOptions = widget.getKeyboard(sites),
-            )
-        }
+@Composable
+private fun Title(
+    widget: Sites.Site.Widget.HasTitle,
+    sites: Sites,
+) = Text(
+    text = widget.getTitle(sites),
+    Modifier.padding(all = 8.dp),
+    style = MaterialTheme.typography.headlineSmall,
+)
 
-        is Sites.Site.Widget.TextFieldWithUnits -> {
-            var text by remember { mutableStateOf(widget.getText(sites)) }
-            OutlinedTextField(
-                value = text,
-                onValueChange = {
-                    text = it
-                    editWidget(widget.changeText(it))
+@Composable
+private fun TextField(
+    widget: Sites.Site.Widget.TextField,
+    sites: Sites,
+    editWidget: (Sites.Site.Widget) -> Unit,
+    focusManager: FocusManager,
+) {
+    var text by remember { mutableStateOf(widget.getText(sites)) }
+    OutlinedTextField(
+        value = text,
+        onValueChange = {
+            text = it
+            editWidget(widget.changeText(it))
+        },
+        Modifier
+            .fillMaxWidth()
+            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+        label = {
+            Text(widget.getLabel(sites))
+        },
+        placeholder = { Text(widget.getPlaceholder(sites)) },
+        trailingIcon = {
+            Text(text = widget.getSuffix(sites))
+        },
+        singleLine = true,
+        keyboardActions = KeyboardActions {
+            focusManager.moveFocus(FocusDirection.Down)
+        },
+        keyboardOptions = widget.getKeyboard(sites),
+    )
+}
+
+@Composable
+private fun TextFieldWithUnits(
+    widget: Sites.Site.Widget.TextFieldWithUnits,
+    sites: Sites,
+    editWidget: (Sites.Site.Widget) -> Unit,
+    focusManager: FocusManager,
+) {
+    var text by remember { mutableStateOf(widget.getText(sites)) }
+    OutlinedTextField(
+        value = text,
+        onValueChange = {
+            text = it
+            editWidget(widget.changeText(it))
+        },
+        Modifier
+            .fillMaxWidth()
+            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+        label = {
+            Text(widget.getLabel(sites))
+        },
+        placeholder = { Text(widget.getPlaceholder(sites)) },
+        trailingIcon = {
+            var expanded by remember { mutableStateOf(false) }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = {
+                    expanded = false
                 },
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-                label = {
-                    Text(widget.getLabel(sites))
+                Modifier,
+            ) {
+                widget.getUnits(sites).forEachIndexed { i, it ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(it)
+                        },
+                        onClick = {
+                            editWidget(widget.changeChosenUnitIndex(i))
+                            expanded = false
+                        }
+                    )
+                }
+            }
+            Surface(
+                onClick = {
+                    expanded = true
                 },
-                placeholder = { Text(widget.getPlaceholder(sites)) },
-                trailingIcon = {
-                    var expanded by remember { mutableStateOf(false) }
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = {
+                Modifier.padding(all = 4.dp),
+                shape = CircleShape,
+                color = Color.Unspecified,
+            ) {
+                Row(
+                    Modifier,
+                ) {
+                    Text(widget.getChosenUnit(sites))
+                    Icon(Icons.Default.ArrowDropDown, strings.chooseUnits)
+                }
+            }
+        },
+        singleLine = true,
+        keyboardActions = KeyboardActions {
+            focusManager.moveFocus(FocusDirection.Down)
+        },
+        keyboardOptions = widget.getKeyboard(sites),
+    )
+}
+
+@Composable
+private fun Chooser(
+    widget: Sites.Site.Widget.Chooser,
+    focusManager: FocusManager,
+    editWidget: (Sites.Site.Widget) -> Unit,
+    sites: Sites,
+) = Row(
+    Modifier.fillMaxWidth()
+) {
+    BasicChooser(widget, focusManager, editWidget, sites)
+}
+
+@Composable
+private fun DoubleChooser(
+    widget: Sites.Site.Widget.DoubleChooser,
+    focusManager: FocusManager,
+    editWidget: (Sites.Site.Widget) -> Unit,
+    sites: Sites,
+) = Row(
+    Modifier.fillMaxWidth()
+) {
+    BasicChooser(widget, focusManager, editWidget, sites)
+    if (widget.getOptions2(sites).isNotEmpty()) BasicChooser(widget.getSecondChooser(), focusManager, editWidget, sites) {
+        widget.changeChosenIndex2(it).also(::println)
+    }
+}
+
+@Composable
+private fun Checkbox(
+    widget: Sites.Site.Widget.CheckBox,
+    sites: Sites,
+    editWidget: (Sites.Site.Widget) -> Unit,
+) = Row(
+    Modifier
+        .fillMaxWidth()
+        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+    verticalAlignment = Alignment.CenterVertically,
+) {
+    Checkbox(
+        checked = widget.getChecked(sites),
+        onCheckedChange = {
+            editWidget(widget.changeChecked(it))
+        },
+    )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(CircleShape)
+                .clickable {
+                    editWidget(widget.changeChecked(!widget.getChecked(sites)))
+                }
+                .padding(TextFieldDefaults.contentPaddingWithoutLabel()),
+        ) {
+            Text(widget.getLabel(sites))
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun CheckboxWithChooser(
+    widget: Sites.Site.Widget.CheckBoxWithChooser,
+    sites: Sites,
+    editWidget: (Sites.Site.Widget) -> Unit,
+    focusManager: FocusManager,
+) = Row(
+    Modifier
+        .fillMaxWidth()
+        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+    verticalAlignment = Alignment.CenterVertically,
+) {
+    Checkbox(
+        checked = widget.getChecked(sites),
+        onCheckedChange = {
+            editWidget(widget.changeChecked(it))
+        },
+    )
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = {
+            if (!widget.getChecked(sites)) editWidget(widget.changeChecked(true))
+            else expanded = !expanded
+        },
+        Modifier
+            .fillMaxWidth(),
+    ) {
+        OutlinedTextField(
+            modifier = Modifier
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                .fillMaxWidth()
+                .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+            readOnly = true,
+            value = if (widget.getChecked(sites)) widget.getChosen(sites) else "",
+            onValueChange = {},
+            label = { Text(widget.getLabel(sites)) },
+            placeholder = { Text(widget.getPlaceholder(sites)) },
+            trailingIcon = {
+                if (widget.getChecked(sites))
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
+                disabledLabelColor = LocalContentColor.current,
+                disabledBorderColor = Color.Transparent,
+            ),
+            enabled = widget.getChecked(sites),
+            keyboardActions = KeyboardActions {
+                focusManager.moveFocus(FocusDirection.Down)
+            },
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = {
+                expanded = false
+                focusManager.clearFocus()
+            },
+        ) {
+            widget.getOptions(sites).forEachIndexed { i, moznost ->
+                DropdownMenuItem(
+                    text = { Text(moznost) },
+                    onClick = {
+                        editWidget(widget.changeChosenIndex(i))
+                        expanded = false
+                        focusManager.clearFocus()
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun AssemblyCompany(
+    widget: Sites.Site.Contacts.AssemblyCompany,
+    companies: List<Company>,
+    editWidget: (Sites.Site.Widget) -> Unit,
+    focusManager: FocusManager,
+) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    val chosenCompany by remember(widget) {
+        derivedStateOf {
+            companies.find { it.crn == widget.crn }
+        }
+    }
+    var text by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue(widget.crn)) }
+    val filteredCompanies by remember(companies, text) {
+        derivedStateOf {
+            companies.filter { company ->
+                text.text.forComparing().split(" ").all { wordOfText ->
+                    company.name.forComparing().split(" ").any { wordOfCompany ->
+                        wordOfCompany.startsWith(wordOfText)
+                    }
+                } || company.crn.startsWith(text.text)
+            }
+        }
+    }
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = {
+            expanded = !expanded
+        },
+        Modifier
+            .fillMaxWidth(),
+    ) {
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(MenuAnchorType.PrimaryEditable)
+                .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+            value = text,
+            onValueChange = {
+                text = it
+                expanded = it.text.toIntOrNull()?.toString()?.length != 8
+                if (it.text.toIntOrNull()?.toString()?.length == 8)
+                    editWidget(widget.ico(it.text))
+                else
+                    editWidget(widget.ico(""))
+            },
+            label = { Text(strings.contacts.crn) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+            supportingText = {
+                if (text.text.isBlank()) {
+                    Text(text = "Můžete zadat název firmy pro vyhledávání")
+                } else if (chosenCompany != null) {
+                    Text(text = "Detekováno: ${chosenCompany!!.name}")
+                } else if (text.text.toIntOrNull()?.toString()?.length != 8) {
+                    Text(text = "Pozor! Nejedná se o IČO, hodnota nebude uložena")
+                } else {
+                    Text(text = "Validní IČO")
+                }
+            },
+            singleLine = true,
+            keyboardActions = KeyboardActions {
+                focusManager.moveFocus(FocusDirection.Down)
+            },
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Next,
+            ),
+            isError = text.text.toIntOrNull()?.toString()?.length != 8 && text.text.isNotBlank(),
+        )
+        ExposedDropdownMenu(
+            expanded = expanded && filteredCompanies.isNotEmpty(),
+            onDismissRequest = { expanded = false },
+        ) {
+            DropdownMenuItem(
+                text = { Text(strings.contacts.chooseAssemblyCompanyHere) },
+                onClick = {},
+                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                enabled = false,
+            )
+            filteredCompanies
+                .forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text("${option.name} - ${option.crn}") },
+                        onClick = {
+                            text = TextFieldValue(
+                                text = option.crn,
+                                selection = TextRange(8)
+                            )
+                            editWidget(widget.ico(option.crn))
                             expanded = false
                         },
-                        Modifier,
-                    ) {
-                        widget.getUnits(sites).forEachIndexed { i, it ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(it)
-                                },
-                                onClick = {
-                                    editWidget(widget.changeChosenUnitIndex(i))
-                                    expanded = false
-                                }
-                            )
-                        }
-                    }
-                    Surface(
-                        onClick = {
-                            expanded = true
-                        },
-                        Modifier.padding(all = 4.dp),
-                        shape = CircleShape,
-                        color = Color.Unspecified,
-                    ) {
-                        Row(
-                            Modifier,
-                        ) {
-                            Text(widget.getChosenUnit(sites))
-                            Icon(Icons.Default.ArrowDropDown, strings.chooseUnits)
-                        }
-                    }
-                },
-                singleLine = true,
-                keyboardActions = KeyboardActions {
-                    focusManager.moveFocus(FocusDirection.Down)
-                },
-                keyboardOptions = widget.getKeyboard(sites),
-            )
-        }
-
-        is Sites.Site.Widget.Chooser -> Row {
-            BasicChooser(widget, focusManager, editWidget, sites)
-        }
-
-        is Sites.Site.Widget.DoubleChooser -> Row(
-            Modifier.fillMaxWidth()
-        ) {
-            BasicChooser(widget, focusManager, editWidget, sites)
-            if (widget.getOptions2(sites).isNotEmpty()) BasicChooser(widget.getSecondChooser(), focusManager, editWidget, sites) {
-                widget.changeChosenIndex2(it).also(::println)
-            }
-        }
-
-        is Sites.Site.Widget.CheckBox -> Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Checkbox(
-                checked = widget.getChecked(sites),
-                onCheckedChange = {
-                    editWidget(widget.changeChecked(it))
-                },
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(CircleShape)
-                        .clickable {
-                            editWidget(widget.changeChecked(!widget.getChecked(sites)))
-                        }
-                        .padding(TextFieldDefaults.contentPaddingWithoutLabel()),
-                ) {
-                    Text(widget.getLabel(sites))
-                }
-            }
-        }
-
-        is Sites.Site.Widget.CheckBoxWithChooser -> Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Checkbox(
-                checked = widget.getChecked(sites),
-                onCheckedChange = {
-                    editWidget(widget.changeChecked(it))
-                },
-            )
-            var expanded by rememberSaveable { mutableStateOf(false) }
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = {
-                    if (!widget.getChecked(sites)) editWidget(widget.changeChecked(true))
-                    else expanded = !expanded
-                },
-                Modifier
-                    .fillMaxWidth(),
-            ) {
-                OutlinedTextField(
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
-                        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-                    readOnly = true,
-                    value = if (widget.getChecked(sites)) widget.getChosen(sites) else "",
-                    onValueChange = {},
-                    label = { Text(widget.getLabel(sites)) },
-                    placeholder = { Text(widget.getPlaceholder(sites)) },
-                    trailingIcon = {
-                        if (widget.getChecked(sites))
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                    },
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
-                        disabledLabelColor = LocalContentColor.current,
-                        disabledBorderColor = Color.Transparent,
-                    ),
-                    enabled = widget.getChecked(sites),
-                    keyboardActions = KeyboardActions {
-                        focusManager.moveFocus(FocusDirection.Down)
-                    },
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = {
-                        expanded = false
-                        focusManager.clearFocus()
-                    },
-                ) {
-                    widget.getOptions(sites).forEachIndexed { i, moznost ->
-                        DropdownMenuItem(
-                            text = { Text(moznost) },
-                            onClick = {
-                                editWidget(widget.changeChosenIndex(i))
-                                expanded = false
-                                focusManager.clearFocus()
-                            },
-                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                        )
-                    }
-                }
-            }
-        }
-
-        is Sites.Site.Widget.DropdownWithAmount -> Row(
-            Modifier.fillMaxWidth()
-        ) {
-            var expanded by rememberSaveable { mutableStateOf(false) }
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded },
-                Modifier
-                    .weight(1F),
-            ) {
-                OutlinedTextField(
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
-                        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-                    readOnly = true,
-                    value = widget.getValuesWithAmounts(sites),
-                    placeholder = { Text(widget.getPlaceholder(sites)) },
-                    onValueChange = {},
-                    label = { Text(widget.getLabel(sites)) },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                    keyboardActions = KeyboardActions {
-                        focusManager.moveFocus(FocusDirection.Down)
-                    },
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = {
-                        expanded = false
-                        focusManager.clearFocus()
-                    },
-                    Modifier.exposedDropdownSize(),
-                ) {
-                    widget.getItems(sites).forEachIndexed { i, item ->
-                        DropdownMenuItem(
-                            text = { Text(item) },
-                            onClick = {},
-                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                            trailingIcon = {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    IconButton(
-                                        onClick = {
-                                            editWidget(widget.changeNumber(sites, i, widget.getAmount(sites)[i] - 1))
-                                        },
-                                        enabled = widget.getMinimumAmount(sites)[i] < widget.getAmount(sites)[i],
-                                    ) {
-                                        Icon(Icons.Default.Remove, strings.remove)
-                                    }
-                                    Text(widget.getAmount(sites)[i].toString())
-                                    IconButton(
-                                        onClick = {
-                                            editWidget(widget.changeNumber(sites, i, widget.getAmount(sites)[i] + 1))
-                                        },
-                                        enabled = widget.getAmount(sites)[i] < widget.getMaximumAmount(sites)[i],
-                                    ) {
-                                        Icon(Icons.Default.Add, strings.add)
-                                    }
-                                }
-                            },
-                        )
-                    }
-                }
-            }
-        }
-
-        is Sites.Site.Contacts.AssemblyCompany -> {
-
-            var expanded by rememberSaveable { mutableStateOf(false) }
-            val chosenCompany by remember(widget) {
-                derivedStateOf {
-                    companies.find { it.crn == widget.crn }
-                }
-            }
-            var text by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue(widget.crn)) }
-            val filteredCompanies by remember(companies, text) {
-                derivedStateOf {
-                    companies.filter { company ->
-                        text.text.forComparing().split(" ").all { wordOfText ->
-                            company.name.forComparing().split(" ").any { wordOfCompany ->
-                                wordOfCompany.startsWith(wordOfText)
-                            }
-                        } || company.crn.startsWith(text.text)
-                    }
-                }
-            }
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = {
-                    expanded = !expanded
-                },
-                Modifier
-                    .fillMaxWidth(),
-            ) {
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor()
-                        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-                    value = text,
-                    onValueChange = {
-                        text = it
-                        expanded = it.text.toIntOrNull()?.toString()?.length != 8
-                        if (it.text.toIntOrNull()?.toString()?.length == 8)
-                            editWidget(widget.ico(it.text))
-                        else
-                            editWidget(widget.ico(""))
-                    },
-                    label = { Text(strings.contacts.crn) },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                    supportingText = {
-                        if (text.text.isBlank()) {
-                            Text(text = "Můžete zadat název firmy pro vyhledávání")
-                        } else if (chosenCompany != null) {
-                            Text(text = "Detekováno: ${chosenCompany!!.name}")
-                        } else if (text.text.toIntOrNull()?.toString()?.length != 8) {
-                            Text(text = "Pozor! Nejedná se o IČO, hodnota nebude uložena")
-                        } else {
-                            Text(text = "Validní IČO")
-                        }
-                    },
-                    singleLine = true,
-                    keyboardActions = KeyboardActions {
-                        focusManager.moveFocus(FocusDirection.Down)
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Next,
-                    ),
-                    isError = text.text.toIntOrNull()?.toString()?.length != 8 && text.text.isNotBlank(),
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded && filteredCompanies.isNotEmpty(),
-                    onDismissRequest = { expanded = false },
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(strings.contacts.chooseAssemblyCompanyHere) },
-                        onClick = {},
                         contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                        enabled = false,
                     )
-                    filteredCompanies
-                        .forEach { option ->
-                            DropdownMenuItem(
-                                text = { Text("${option.name} - ${option.crn}") },
-                                onClick = {
-                                    text = TextFieldValue(
-                                        text = option.crn,
-                                        selection = TextRange(8)
-                                    )
-                                    editWidget(widget.ico(option.crn))
-                                    expanded = false
-                                },
-                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                            )
-                        }
                 }
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun DropdownWithAmount(
+    widget: Sites.Site.Widget.DropdownWithAmount,
+    sites: Sites,
+    focusManager: FocusManager,
+    editWidget: (Sites.Site.Widget) -> Unit,
+) = Row(
+    Modifier.fillMaxWidth()
+) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        Modifier
+            .weight(1F),
+    ) {
+        OutlinedTextField(
+            modifier = Modifier
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                .fillMaxWidth()
+                .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+            readOnly = true,
+            value = widget.getValuesWithAmounts(sites),
+            placeholder = { Text(widget.getPlaceholder(sites)) },
+            onValueChange = {},
+            label = { Text(widget.getLabel(sites)) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+            keyboardActions = KeyboardActions {
+                focusManager.moveFocus(FocusDirection.Down)
+            },
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = {
+                expanded = false
+                focusManager.clearFocus()
+            },
+            Modifier.exposedDropdownSize(),
+        ) {
+            widget.getItems(sites).forEachIndexed { i, item ->
+                DropdownMenuItem(
+                    text = { Text(item) },
+                    onClick = {},
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                    trailingIcon = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    editWidget(widget.changeNumber(sites, i, widget.getAmount(sites)[i] - 1))
+                                },
+                                enabled = widget.getMinimumAmount(sites)[i] < widget.getAmount(sites)[i],
+                            ) {
+                                Icon(Icons.Default.Remove, strings.remove)
+                            }
+                            Text(widget.getAmount(sites)[i].toString())
+                            IconButton(
+                                onClick = {
+                                    editWidget(widget.changeNumber(sites, i, widget.getAmount(sites)[i] + 1))
+                                },
+                                enabled = widget.getAmount(sites)[i] < widget.getMaximumAmount(sites)[i],
+                            ) {
+                                Icon(Icons.Default.Add, strings.add)
+                            }
+                        }
+                    },
+                )
             }
         }
-
-        else -> {}
     }
 }
 
@@ -470,7 +532,7 @@ private fun <T> BasicChooser(
     ) {
         OutlinedTextField(
             modifier = Modifier
-                .menuAnchor()
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                 .fillMaxWidth()
                 .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
             readOnly = true,
