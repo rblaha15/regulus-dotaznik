@@ -145,6 +145,7 @@ class QuestionnaireViewModel(
         try {
             Transport.send(MimeMessage(session).apply {
                 setFrom(InternetAddress(EmailCredentials.EMAIL, "Aplikace Regulus"))
+                replyTo = arrayOf(InternetAddress(user.email))
 
                 subject = "REGULUS – Apka – OSOBA: $name $surname"
 
