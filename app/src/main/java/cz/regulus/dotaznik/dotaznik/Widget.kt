@@ -3,7 +3,6 @@ package cz.regulus.dotaznik.dotaznik
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
@@ -12,6 +11,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
@@ -27,6 +27,7 @@ import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -39,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextRange
@@ -50,6 +50,7 @@ import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.changeNumber
 import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getAmount
 import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getChecked
 import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getChosen
+import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getChosen2
 import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getChosenUnit
 import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getText
 import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getValuesWithAmounts
@@ -63,17 +64,16 @@ fun Widget(
     editWidget: (Sites.Site.Widget) -> Unit,
 ) {
     val show = widget.showWidget(sites)
-    val focusManager = LocalFocusManager.current
     if (show) when (widget) {
         is Sites.Site.Widget.HasTitle -> Title(widget, sites)
-        is Sites.Site.Widget.TextField -> TextField(widget, sites, editWidget, focusManager)
-        is Sites.Site.Widget.TextFieldWithUnits -> TextFieldWithUnits(widget, sites, editWidget, focusManager)
-        is Sites.Site.Widget.Chooser -> Chooser(widget, focusManager, editWidget, sites)
-        is Sites.Site.Widget.DoubleChooser -> DoubleChooser(widget, focusManager, editWidget, sites)
+        is Sites.Site.Widget.TextField -> TextField(widget, sites, editWidget)
+        is Sites.Site.Widget.TextFieldWithUnits -> TextFieldWithUnits(widget, sites, editWidget)
+        is Sites.Site.Widget.Chooser -> Chooser(widget, editWidget, sites)
+        is Sites.Site.Widget.DoubleChooser -> DoubleChooser(widget, editWidget, sites)
         is Sites.Site.Widget.CheckBox -> Checkbox(widget, sites, editWidget)
-        is Sites.Site.Widget.CheckBoxWithChooser -> CheckboxWithChooser(widget, sites, editWidget, focusManager)
-        is Sites.Site.Widget.DropdownWithAmount -> DropdownWithAmount(widget, sites, focusManager, editWidget)
-        is Sites.Site.Contacts.AssemblyCompany -> AssemblyCompany(widget, companies, editWidget, focusManager)
+        is Sites.Site.Widget.CheckBoxWithChooser -> CheckboxWithChooser(widget, sites, editWidget)
+        is Sites.Site.Widget.DropdownWithAmount -> DropdownWithAmount(widget, sites, editWidget)
+        is Sites.Site.Contacts.AssemblyCompany -> AssemblyCompany(widget, companies, editWidget)
         else -> {}
     }
 }
@@ -93,9 +93,9 @@ private fun TextField(
     widget: Sites.Site.Widget.TextField,
     sites: Sites,
     editWidget: (Sites.Site.Widget) -> Unit,
-    focusManager: FocusManager,
 ) {
     var text by remember { mutableStateOf(widget.getText(sites)) }
+    val focusManager = LocalFocusManager.current
     OutlinedTextField(
         value = text,
         onValueChange = {
@@ -125,9 +125,9 @@ private fun TextFieldWithUnits(
     widget: Sites.Site.Widget.TextFieldWithUnits,
     sites: Sites,
     editWidget: (Sites.Site.Widget) -> Unit,
-    focusManager: FocusManager,
 ) {
     var text by remember { mutableStateOf(widget.getText(sites)) }
+    val focusManager = LocalFocusManager.current
     OutlinedTextField(
         value = text,
         onValueChange = {
@@ -186,30 +186,53 @@ private fun TextFieldWithUnits(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Chooser(
     widget: Sites.Site.Widget.Chooser,
-    focusManager: FocusManager,
     editWidget: (Sites.Site.Widget) -> Unit,
     sites: Sites,
 ) = Row(
     Modifier.fillMaxWidth()
 ) {
-    BasicChooser(widget, focusManager, editWidget, sites)
+    CoreChooser(
+        value = widget.getChosen(sites),
+        options = widget.getOptions(sites),
+        onClick = { i, _ ->
+            editWidget(widget.changeChosenIndex(i))
+        },
+        label = widget.getLabel(sites),
+        placeholder = widget.getPlaceholder(sites),
+    )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DoubleChooser(
     widget: Sites.Site.Widget.DoubleChooser,
-    focusManager: FocusManager,
     editWidget: (Sites.Site.Widget) -> Unit,
     sites: Sites,
 ) = Row(
     Modifier.fillMaxWidth()
 ) {
-    BasicChooser(widget, focusManager, editWidget, sites)
-    if (widget.getOptions2(sites).isNotEmpty()) BasicChooser(widget.getSecondChooser(), focusManager, editWidget, sites) {
-        widget.changeChosenIndex2(it).also(::println)
+    CoreChooser(
+        value = widget.getChosen(sites),
+        options = widget.getOptions(sites),
+        onClick = { i, _ ->
+            editWidget(widget.changeChosenIndex(i))
+        },
+        label = widget.getLabel(sites),
+        placeholder = widget.getPlaceholder(sites),
+    )
+    if (widget.getOptions2(sites).isNotEmpty()) {
+        CoreChooser(
+            value = widget.getChosen2(sites),
+            options = widget.getOptions2(sites),
+            onClick = { i, _ ->
+                editWidget(widget.changeChosenIndex2(i).also(::println))
+            },
+            placeholder = widget.getPlaceholder2(sites),
+        )
     }
 }
 
@@ -255,69 +278,71 @@ private fun CheckboxWithChooser(
     widget: Sites.Site.Widget.CheckBoxWithChooser,
     sites: Sites,
     editWidget: (Sites.Site.Widget) -> Unit,
-    focusManager: FocusManager,
-) = Row(
-    Modifier
-        .fillMaxWidth()
-        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-    verticalAlignment = Alignment.CenterVertically,
 ) {
-    Checkbox(
-        checked = widget.getChecked(sites),
-        onCheckedChange = {
-            editWidget(widget.changeChecked(it))
-        },
-    )
-    var expanded by rememberSaveable { mutableStateOf(false) }
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = {
-            if (!widget.getChecked(sites)) editWidget(widget.changeChecked(true))
-            else expanded = !expanded
-        },
+    val focusManager = LocalFocusManager.current
+    Row(
         Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        OutlinedTextField(
-            modifier = Modifier
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                .fillMaxWidth()
-                .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-            readOnly = true,
-            value = if (widget.getChecked(sites)) widget.getChosen(sites) else "",
-            onValueChange = {},
-            label = { Text(widget.getLabel(sites)) },
-            placeholder = { Text(widget.getPlaceholder(sites)) },
-            trailingIcon = {
-                if (widget.getChecked(sites))
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-            },
-            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
-                disabledLabelColor = LocalContentColor.current,
-                disabledBorderColor = Color.Transparent,
-            ),
-            enabled = widget.getChecked(sites),
-            keyboardActions = KeyboardActions {
-                focusManager.moveFocus(FocusDirection.Down)
+        Checkbox(
+            checked = widget.getChecked(sites),
+            onCheckedChange = {
+                editWidget(widget.changeChecked(it))
             },
         )
-        ExposedDropdownMenu(
+        var expanded by rememberSaveable { mutableStateOf(false) }
+        ExposedDropdownMenuBox(
             expanded = expanded,
-            onDismissRequest = {
-                expanded = false
-                focusManager.clearFocus()
+            onExpandedChange = {
+                if (!widget.getChecked(sites)) editWidget(widget.changeChecked(true))
+                else expanded = !expanded
             },
+            Modifier
+                .fillMaxWidth(),
         ) {
-            widget.getOptions(sites).forEachIndexed { i, moznost ->
-                DropdownMenuItem(
-                    text = { Text(moznost) },
-                    onClick = {
-                        editWidget(widget.changeChosenIndex(i))
-                        expanded = false
-                        focusManager.clearFocus()
-                    },
-                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                )
+            OutlinedTextField(
+                modifier = Modifier
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                    .fillMaxWidth()
+                    .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+                readOnly = true,
+                value = if (widget.getChecked(sites)) widget.getChosen(sites) else "",
+                onValueChange = {},
+                label = { Text(widget.getLabel(sites)) },
+                placeholder = { Text(widget.getPlaceholder(sites)) },
+                trailingIcon = {
+                    if (widget.getChecked(sites))
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
+                    disabledLabelColor = LocalContentColor.current,
+                    disabledBorderColor = Color.Transparent,
+                ),
+                enabled = widget.getChecked(sites),
+                keyboardActions = KeyboardActions {
+                    focusManager.moveFocus(FocusDirection.Down)
+                },
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = {
+                    expanded = false
+                    focusManager.clearFocus()
+                },
+            ) {
+                widget.getOptions(sites).forEachIndexed { i, moznost ->
+                    DropdownMenuItem(
+                        text = { Text(moznost) },
+                        onClick = {
+                            editWidget(widget.changeChosenIndex(i))
+                            expanded = false
+                            focusManager.clearFocus()
+                        },
+                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                    )
+                }
             }
         }
     }
@@ -329,7 +354,6 @@ private fun AssemblyCompany(
     widget: Sites.Site.Contacts.AssemblyCompany,
     companies: List<Company>,
     editWidget: (Sites.Site.Widget) -> Unit,
-    focusManager: FocusManager,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val chosenCompany by remember(widget) {
@@ -349,6 +373,7 @@ private fun AssemblyCompany(
             }
         }
     }
+    val focusManager = LocalFocusManager.current
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = {
@@ -428,7 +453,6 @@ private fun AssemblyCompany(
 private fun DropdownWithAmount(
     widget: Sites.Site.Widget.DropdownWithAmount,
     sites: Sites,
-    focusManager: FocusManager,
     editWidget: (Sites.Site.Widget) -> Unit,
 ) = Row(
     Modifier.fillMaxWidth()
@@ -440,6 +464,7 @@ private fun DropdownWithAmount(
         Modifier
             .weight(1F),
     ) {
+        val focusManager = LocalFocusManager.current
         OutlinedTextField(
             modifier = Modifier
                 .menuAnchor(MenuAnchorType.PrimaryNotEditable)
@@ -513,35 +538,37 @@ private fun <U> U.getSecondChooser(): HasChooserAndLabel
 
 private interface HasChooserAndLabel : Sites.Site.Widget.HasChooser, Sites.Site.Widget.HasLabel
 
-context(RowScope)
+@ExperimentalMaterial3Api
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun <T> BasicChooser(
-    widget: T,
-    focusManager: FocusManager,
-    editWidget: (Sites.Site.Widget) -> Unit,
-    sites: Sites,
-    changeChosenIndex: (Int) -> Sites.Site.Widget = { it: Int -> widget.changeChosenIndex(it) },
-) where T : Sites.Site.Widget.HasChooser, T : Sites.Site.Widget.HasLabel {
-    var expanded by rememberSaveable { mutableStateOf(false) }
+fun CoreChooser(
+    value: String,
+    options: List<String>,
+    onClick: (Int, String) -> Unit,
+    modifier: Modifier = Modifier,
+    label: String = "",
+    placeholder: String = "",
+    colors: TextFieldColors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
-        Modifier
-            .weight(1F),
+        modifier,
     ) {
         OutlinedTextField(
             modifier = Modifier
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                 .fillMaxWidth()
-                .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable),
             readOnly = true,
-            value = widget.getChosen(sites),
+            value = value,
             onValueChange = {},
-            label = { Text(widget.getLabel(sites)) },
-            placeholder = { Text(widget.getPlaceholder(sites)) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+            label = { Text(label) },
+            placeholder = { Text(placeholder) },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            colors = colors,
             keyboardActions = KeyboardActions {
                 focusManager.moveFocus(FocusDirection.Down)
             },
@@ -553,15 +580,18 @@ private fun <T> BasicChooser(
                 focusManager.clearFocus()
             },
         ) {
-            widget.getOptions(sites).withIndex().filter { it.value.isNotBlank() }.forEach { (i, moznost) ->
+            options.forEachIndexed { i, option ->
                 DropdownMenuItem(
-                    text = { Text(moznost) },
+                    text = { Text(option) },
                     onClick = {
-                        editWidget(changeChosenIndex(i))
+                        onClick(i, option)
                         expanded = false
                         focusManager.clearFocus()
                     },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                    leadingIcon = {
+                        if (option == value) Icon(Icons.Default.Check, null)
+                    }
                 )
             }
         }
