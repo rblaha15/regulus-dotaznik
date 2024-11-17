@@ -88,8 +88,8 @@ class QuestionnaireViewModel(
         else _sendState.value = SendState.Nothing
     }
 
-    private suspend fun recipientAdress() = when {
-        isDebug -> repo.authenticationState.first().userOrNull!!.email
+    private fun recipientAdress(user: User) = when {
+        isDebug -> user.email
         Locale.getDefault().language == Locale("sk").language -> "obchod@regulus.sk"
         else -> "poptavky@regulus.cz"
     }
@@ -100,7 +100,7 @@ class QuestionnaireViewModel(
 
         _sendState.value = if (demandOrigin.getChosenIndex(sites) == 0) SendState.MissingField(
             demandOrigin.getLabel(sites)
-        ) else SendState.ConfirmSend(recipientAdress())
+        ) else SendState.ConfirmSend(recipientAdress(repo.authenticationState.first().userOrNull!!))
     }
 
     private val session = Session.getInstance(
@@ -145,12 +145,13 @@ class QuestionnaireViewModel(
         try {
             Transport.send(MimeMessage(session).apply {
                 setFrom(InternetAddress(EmailCredentials.EMAIL, "Aplikace Regulus"))
+                replyTo = arrayOf(InternetAddress(user.email))
 
                 subject = "REGULUS – Apka – OSOBA: $name $surname"
 
                 addRecipient(
                     Message.RecipientType.TO,
-                    InternetAddress(recipientAdress())
+                    InternetAddress(recipientAdress(user))
                 )
                 if (!isDebug) {
                     addRecipient(
