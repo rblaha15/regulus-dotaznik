@@ -261,7 +261,7 @@ data class Sites(
                 override fun getLabel(sites: Sites) = strings.contacts.demandOrigin + "*"
                 override fun getPlaceholder(sites: Sites) = strings.choose
                 override fun changeChosenIndex(chosenIndex: Int?): Widget.HasChooser =
-                    copy(chosenIndex = chosenIndex?.takeUnless { it == 0 })
+                    copy(chosenIndex = chosenIndex)
                 private fun getOrigins() = listOfNotNull(
                     strings.contacts.originQuestionEmail to "_dotazEmail",
                     strings.contacts.originQuestionExhibition to "_dotaznikVYS",
@@ -269,7 +269,7 @@ data class Sites(
                     strings.contacts.originDistributionCompany to "_poptávkaDis",
                     strings.contacts.originAssemlbleres to "_poptávkaMF",
                     strings.contacts.originDesigner to "_poptávkaPROJ",
-                    if (BuildConfig.DEBUG) "Zkoušení funkčnosti aplikace, prosím, nepoužívejte tuto možnost v reálných poptávkách (DEBUG)" to "_debugApp" else null,
+                    if (BuildConfig.DEBUG) "Zkoušení funkčnosti aplikace, prosím, nepoužívejte tuto možnost v reálných poptávkách (DEBUG)" to "" else null,
                 ).toMap()
 
                 fun getCode(sites: Sites) = getOrigins()[getChosen(sites)]
