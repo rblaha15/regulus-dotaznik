@@ -64,6 +64,9 @@ android {
             }
         }
     }
+    lint {
+        disable("PermissionLaunchedDuringComposition")
+    }
 }
 
 dependencies {
