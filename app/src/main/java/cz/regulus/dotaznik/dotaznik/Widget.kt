@@ -1,599 +1,162 @@
 package cz.regulus.dotaznik.dotaznik
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.selection.toggleable
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
-import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.changeNumber
-import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getAmount
-import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getChecked
-import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getChosen
-import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getChosen2
-import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getChosenUnit
-import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getText
-import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getValuesWithAmounts
-import cz.regulus.dotaznik.strings.strings
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@Composable
-fun Widget(
-    sites: Sites,
-    companies: List<Company>,
-    widget: Sites.Site.Widget,
-    editWidget: (Sites.Site.Widget) -> Unit,
-) {
-    val show = widget.showWidget(sites)
-    if (show) when (widget) {
-        is Sites.Site.Widget.HasTitle -> Title(widget, sites)
-        is Sites.Site.Widget.TextField -> TextField(widget, sites, editWidget)
-        is Sites.Site.Widget.TextFieldWithUnits -> TextFieldWithUnits(widget, sites, editWidget)
-        is Sites.Site.Widget.Chooser -> Chooser(widget, editWidget, sites)
-        is Sites.Site.Widget.DoubleChooser -> DoubleChooser(widget, editWidget, sites)
-        is Sites.Site.Widget.CheckBox -> Checkbox(widget, sites, editWidget)
-        is Sites.Site.Widget.CheckBoxWithChooser -> CheckboxWithChooser(widget, sites, editWidget)
-        is Sites.Site.Widget.DropdownWithAmount -> DropdownWithAmount(widget, sites, editWidget)
-        is Sites.Site.Contacts.AssemblyCompany -> AssemblyCompany(widget, companies, editWidget)
-        else -> {}
+@Serializable
+sealed interface Widget {
+    fun showWidget(sites: Sites) = true
+}
+
+interface HasLabel : Widget {
+    fun getLabel(sites: Sites): String
+}
+
+interface HasTextField : Widget {
+    fun getSuffix(sites: Sites) = ""
+    fun getKeyboard(sites: Sites) = KeyboardOptions(imeAction = ImeAction.Next)
+    fun getPlaceholder(sites: Sites): String = ""
+
+    val text: String? get() = null
+    fun changeText(text: String?): HasTextField
+    fun getDefaultText(sites: Sites) = ""
+}
+
+interface HasUnits : Widget {
+    fun getUnits(sites: Sites): List<String>
+
+    val chosenUnitIndex: Int? get() = null
+    fun changeChosenUnitIndex(chosenUnitIndex: Int?): HasUnits
+    fun getDefaultUnitIndex(sites: Sites) = 0
+}
+
+interface HasChooser : Widget {
+    fun getOptions(sites: Sites): List<String>
+    fun getPlaceholder(sites: Sites): String = ""
+
+    val chosenIndex: Int? get() = null
+    fun changeChosenIndex(chosenIndex: Int?): HasChooser
+    fun getDefaultIndex(sites: Sites) = 0
+}
+
+interface HasFollowUpChooser : Widget {
+    fun getOptions2(sites: Sites): List<String>
+    fun getPlaceholder2(sites: Sites): String = ""
+
+    val chosenIndex2: Int? get() = null
+    fun changeChosenIndex2(chosenIndex2: Int?): HasFollowUpChooser
+    fun getDefaultIndex2(sites: Sites) = 0
+}
+
+interface HasCheckBox : Widget {
+    val checked: Boolean? get() = null
+    fun changeChecked(checked: Boolean?): HasCheckBox
+    fun getDefaultChecked(sites: Sites) = false
+}
+
+interface HasDropdown : Widget {
+    fun getItems(sites: Sites): List<String>
+    fun getPlaceholder(sites: Sites): String = ""
+}
+
+interface HasAmount : Widget, HasDropdown {
+    fun getMinimumAmount(sites: Sites): GetFunction1<Int, Int> = get { 0 }
+    fun getMaximumAmount(sites: Sites): GetFunction1<Int, Int>
+    fun getDefaultAmount(sites: Sites): GetFunction1<Int, Int> = get { 0 }
+
+    val amounts: Map<Int, Int>? get() = null
+    fun changeAmounts(numbers: Map<Int, Int>?): HasAmount
+}
+
+interface HasMaxSumOfNumbers : Widget, HasAmount {
+    fun getMaxSum(sites: Sites): Int
+    override fun getMaximumAmount(sites: Sites) = get {
+        val left = getMaxSum(sites) - getCurrentSum(sites)
+        (getAmount(sites)[it] + left).coerceAtLeast(getMinimumAmount(sites)[it])
     }
 }
 
-@Composable
-private fun Title(
-    widget: Sites.Site.Widget.HasTitle,
-    sites: Sites,
-) = Text(
-    text = widget.getTitle(sites),
-    Modifier.padding(all = 8.dp),
-    style = MaterialTheme.typography.headlineSmall,
+interface HasTitle : Widget {
+    fun getTitle(sites: Sites): String
+}
+
+@Serializable @SerialName("TextField") sealed interface TextField : HasTextField, HasLabel
+@Serializable @SerialName("TextFieldWithUnits") sealed interface TextFieldWithUnits : HasTextField, HasUnits, HasLabel
+@Serializable @SerialName("Chooser") sealed interface Chooser : HasChooser, HasLabel
+@Serializable @SerialName("DoubleChooser") sealed interface DoubleChooser : HasChooser, HasFollowUpChooser, HasLabel
+@Serializable @SerialName("CheckBox") sealed interface CheckBox : HasCheckBox, HasLabel
+@Serializable @SerialName("CheckBoxWithChooser") sealed interface CheckBoxWithChooser : HasCheckBox, HasChooser, HasLabel
+@Serializable @SerialName("DropdownWithAmount") sealed interface DropdownWithAmount : HasDropdown, HasAmount, HasLabel
+@Serializable @SerialName("Other") sealed interface Other : Widget
+
+fun interface GetFunction1<K, V> {
+    operator fun get(index: K): V
+}
+
+fun interface GetFunction2<K1, K2, V> {
+    operator fun get(i1: K1, i2: K2): V
+}
+
+@Style1
+fun <T> get(function: (Int) -> T): GetFunction1<Int, T> = GetFunction1(function)
+
+@DslMarker
+annotation class Style1
+
+@DslMarker
+annotation class Style3
+
+context(Sites) @Style3 fun Chooser.toXmlEntry() = getChosen(this@Sites)
+context(Sites) @Style3 fun DoubleChooser.toXmlEntry() = "${getChosen(this@Sites)} ${getChosen2(this@Sites)}"
+context(Sites) @Style3 fun TextField.toXmlEntry() = getText(this@Sites)
+context(Sites) @Style3 fun TextFieldWithUnits.toXmlEntry() = getText(this@Sites)
+context(Sites) @Style3 fun TextFieldWithUnits.toXmlEntry2() = getChosenUnit(this@Sites)
+context(Sites) @Style3 fun CheckBox.toXmlEntry() = if (getChecked(this@Sites)) "Ano" else "Ne"
+context(Sites) @Style3 fun CheckBoxWithChooser.toXmlEntry() = if (getChecked(this@Sites)) getChosen(this@Sites) else "Ne"
+context(Sites) @Style3 fun DropdownWithAmount.toXmlEntry() = getValuesWithAmounts(this@Sites)
+context(Sites) @Style3 fun Contacts.DemandOrigin.toXmlEntry() = getCode(this@Sites)
+context(Sites) fun String.emptyUnlessChecked(widget: HasCheckBox) = if (widget.getChecked(this@Sites)) this else ""
+
+fun HasTextField.getText(sites: Sites) = text ?: getDefaultText(sites)
+
+fun HasUnits.getDefaultUnit(sites: Sites) = getUnits(sites)[getDefaultUnitIndex(sites)]
+fun HasUnits.getChosenUnit(sites: Sites) = chosenUnitIndex?.let { getUnits(sites)[it] } ?: getDefaultUnit(sites)
+fun HasUnits.getChosenUnitIndex(sites: Sites) = chosenUnitIndex ?: getDefaultUnitIndex(sites)
+
+fun HasChooser.getShowPlaceholder(sites: Sites) = getPlaceholder(sites).isNotEmpty()
+fun HasChooser.getDefault(sites: Sites) =
+    if (getShowPlaceholder(sites)) "" else getOptions(sites)[getDefaultIndex(sites)]
+fun HasChooser.getChosen(sites: Sites) = chosenIndex?.let { getOptions(sites).getOrNull(it) } ?: getDefault(sites)
+fun HasChooser.getChosenIndex(sites: Sites) = chosenIndex ?: getDefaultIndex(sites)
+
+fun HasFollowUpChooser.getShowPlaceholder2(sites: Sites) = getPlaceholder2(sites).isNotEmpty()
+fun HasFollowUpChooser.getDefault2(sites: Sites) =
+    if (getShowPlaceholder2(sites)) "" else getOptions2(sites)[getDefaultIndex2(sites)]
+fun HasFollowUpChooser.getChosen2(sites: Sites) = chosenIndex2?.let { getOptions2(sites).getOrNull(it) } ?: getDefault2(sites)
+fun HasFollowUpChooser.getChosenIndex2(sites: Sites) = chosenIndex2 ?: getDefaultIndex2(sites)
+
+fun HasCheckBox.getChecked(sites: Sites) = checked ?: getDefaultChecked(sites)
+
+fun HasAmount.changeNumber(sites: Sites, index: Int, number: Int) = changeAmounts(
+    getAmounts(sites) + (index to number.coerceIn(getMinimumAmount(sites)[index]..getMaximumAmount(sites)[index]))
 )
-
-@Composable
-private fun TextField(
-    widget: Sites.Site.Widget.TextField,
-    sites: Sites,
-    editWidget: (Sites.Site.Widget) -> Unit,
-) {
-    var text by remember { mutableStateOf(widget.getText(sites)) }
-    val focusManager = LocalFocusManager.current
-    OutlinedTextField(
-        value = text,
-        onValueChange = {
-            text = it
-            editWidget(widget.changeText(it))
-        },
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-        label = {
-            Text(widget.getLabel(sites))
-        },
-        placeholder = { Text(widget.getPlaceholder(sites)) },
-        trailingIcon = {
-            Text(text = widget.getSuffix(sites))
-        },
-        singleLine = true,
-        keyboardActions = KeyboardActions {
-            focusManager.moveFocus(FocusDirection.Down)
-        },
-        keyboardOptions = widget.getKeyboard(sites),
-    )
+fun HasAmount.getAmounts(sites: Sites) = getDefaultNumbers(sites) + (amounts ?: emptyMap())
+fun HasAmount.getAmount(sites: Sites) = get { index ->
+    getAmounts(sites)[index] ?: getDefaultAmount(sites)[index]
 }
-
-@Composable
-private fun TextFieldWithUnits(
-    widget: Sites.Site.Widget.TextFieldWithUnits,
-    sites: Sites,
-    editWidget: (Sites.Site.Widget) -> Unit,
-) {
-    var text by remember { mutableStateOf(widget.getText(sites)) }
-    val focusManager = LocalFocusManager.current
-    OutlinedTextField(
-        value = text,
-        onValueChange = {
-            text = it
-            editWidget(widget.changeText(it))
-        },
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-        label = {
-            Text(widget.getLabel(sites))
-        },
-        placeholder = { Text(widget.getPlaceholder(sites)) },
-        trailingIcon = {
-            var expanded by remember { mutableStateOf(false) }
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = {
-                    expanded = false
-                },
-                Modifier,
-            ) {
-                widget.getUnits(sites).forEachIndexed { i, it ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(it)
-                        },
-                        onClick = {
-                            editWidget(widget.changeChosenUnitIndex(i))
-                            expanded = false
-                        }
-                    )
-                }
-            }
-            Surface(
-                onClick = {
-                    expanded = true
-                },
-                Modifier.padding(all = 4.dp),
-                shape = CircleShape,
-                color = Color.Unspecified,
-            ) {
-                Row(
-                    Modifier,
-                ) {
-                    Text(widget.getChosenUnit(sites))
-                    Icon(Icons.Default.ArrowDropDown, strings.chooseUnits)
-                }
-            }
-        },
-        singleLine = true,
-        keyboardActions = KeyboardActions {
-            focusManager.moveFocus(FocusDirection.Down)
-        },
-        keyboardOptions = widget.getKeyboard(sites),
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun Chooser(
-    widget: Sites.Site.Widget.Chooser,
-    editWidget: (Sites.Site.Widget) -> Unit,
-    sites: Sites,
-) = CoreChooser(
-    value = widget.getChosen(sites),
-    options = widget.getOptions(sites),
-    onClick = { i, _ ->
-        editWidget(widget.changeChosenIndex(i))
-    },
-    Modifier
-        .fillMaxWidth()
-        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-    label = widget.getLabel(sites),
-    placeholder = widget.getPlaceholder(sites),
-)
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun DoubleChooser(
-    widget: Sites.Site.Widget.DoubleChooser,
-    editWidget: (Sites.Site.Widget) -> Unit,
-    sites: Sites,
-) = Row(
-    Modifier
-        .fillMaxWidth()
-        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-) {
-    CoreChooser(
-        value = widget.getChosen(sites),
-        options = widget.getOptions(sites),
-        onClick = { i, _ ->
-            editWidget(widget.changeChosenIndex(i))
-        },
-        Modifier
-            .weight(1F),
-        label = widget.getLabel(sites),
-        placeholder = widget.getPlaceholder(sites),
-    )
-    if (widget.getOptions2(sites).isNotEmpty()) {
-        CoreChooser(
-            value = widget.getChosen2(sites),
-            options = widget.getOptions2(sites),
-            onClick = { i, _ ->
-                editWidget(widget.changeChosenIndex2(i))
-            },
-            Modifier
-                .weight(1F)
-                .padding(start = 8.dp),
-            placeholder = widget.getPlaceholder2(sites),
-        )
+fun HasAmount.getDefaultNumbers(sites: Sites) = List(getItemCount(sites)) { index ->
+    index to getDefaultAmount(sites)[index]
+}.toMap()
+fun HasAmount.getValuesWithAmounts(sites: Sites) = this
+    .getAmounts(sites)
+    .filterValues { it > 0 }
+    .map { (index, amount) ->
+        "${amount}x ${getItems(sites)[index]}"
     }
-}
+    .joinToString(", ")
 
-@Composable
-private fun Checkbox(
-    widget: Sites.Site.Widget.CheckBox,
-    sites: Sites,
-    editWidget: (Sites.Site.Widget) -> Unit,
-) = Row(
-    Modifier
-        .fillMaxWidth()
-        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-    verticalAlignment = Alignment.CenterVertically,
-) {
-    var checked by remember { mutableStateOf(widget.getChecked(sites)) }
-    Checkbox(
-        checked = widget.getChecked(sites),
-        onCheckedChange = {
-            checked = it
-            editWidget(widget.changeChecked(it))
-        },
-    )
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(CircleShape)
-                .toggleable(
-                    value = checked,
-                    onValueChange = {
-                        checked = it
-                        editWidget(widget.changeChecked(it))
-                    },
-                )
-                .padding(TextFieldDefaults.contentPaddingWithoutLabel()),
-        ) {
-            Text(widget.getLabel(sites))
-        }
-    }
-}
+fun HasMaxSumOfNumbers.getCurrentSum(sites: Sites): Int = getAmounts(sites).values.sum()
 
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun CheckboxWithChooser(
-    widget: Sites.Site.Widget.CheckBoxWithChooser,
-    sites: Sites,
-    editWidget: (Sites.Site.Widget) -> Unit,
-) = Row(
-    Modifier
-        .fillMaxWidth()
-        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-    verticalAlignment = Alignment.CenterVertically,
-) {
-    val focusManager = LocalFocusManager.current
-    var checked by remember { mutableStateOf(widget.getChecked(sites)) }
-    Checkbox(
-        checked = checked,
-        onCheckedChange = {
-            checked = it
-            editWidget(widget.changeChecked(it))
-        },
-    )
-    var expanded by rememberSaveable { mutableStateOf(false) }
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = {
-            if (!checked) {
-                checked = true
-                editWidget(widget.changeChecked(true))
-            }
-            else expanded = !expanded
-        },
-        Modifier
-            .fillMaxWidth(),
-    ) {
-        OutlinedTextField(
-            modifier = Modifier
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                .fillMaxWidth()
-                .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-            readOnly = true,
-            value = if (checked) widget.getChosen(sites) else "",
-            onValueChange = {},
-            label = { Text(widget.getLabel(sites)) },
-            placeholder = { Text(widget.getPlaceholder(sites)) },
-            trailingIcon = {
-                if (checked)
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-            },
-            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
-                disabledLabelColor = LocalContentColor.current,
-                disabledBorderColor = Color.Transparent,
-            ),
-            enabled = checked,
-            keyboardActions = KeyboardActions {
-                focusManager.moveFocus(FocusDirection.Down)
-            },
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = {
-                expanded = false
-                focusManager.clearFocus()
-            },
-        ) {
-            widget.getOptions(sites).forEachIndexed { i, moznost ->
-                DropdownMenuItem(
-                    text = { Text(moznost) },
-                    onClick = {
-                        editWidget(widget.changeChosenIndex(i))
-                        expanded = false
-                        focusManager.clearFocus()
-                    },
-                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun AssemblyCompany(
-    widget: Sites.Site.Contacts.AssemblyCompany,
-    companies: List<Company>,
-    editWidget: (Sites.Site.Widget) -> Unit,
-) {
-    var expanded by rememberSaveable { mutableStateOf(false) }
-    val chosenCompany by remember(widget) {
-        derivedStateOf {
-            companies.find { it.crn == widget.crn }
-        }
-    }
-    var text by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue(widget.crn)) }
-    val filteredCompanies by remember(companies, text) {
-        derivedStateOf {
-            companies.filter { company ->
-                text.text.forComparing().split(" ").all { wordOfText ->
-                    company.name.forComparing().split(" ").any { wordOfCompany ->
-                        wordOfCompany.startsWith(wordOfText)
-                    }
-                } || company.crn.startsWith(text.text)
-            }
-        }
-    }
-    val focusManager = LocalFocusManager.current
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = {
-            expanded = !expanded
-        },
-        Modifier
-            .fillMaxWidth(),
-    ) {
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(MenuAnchorType.PrimaryEditable)
-                .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-            value = text,
-            onValueChange = {
-                text = it
-                expanded = it.text.toIntOrNull()?.toString()?.length != 8
-                if (it.text.toIntOrNull()?.toString()?.length == 8)
-                    editWidget(widget.ico(it.text))
-                else
-                    editWidget(widget.ico(""))
-            },
-            label = { Text(strings.contacts.crn) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-            supportingText = {
-                if (text.text.isBlank()) {
-                    Text(text = "Můžete zadat název firmy pro vyhledávání")
-                } else if (chosenCompany != null) {
-                    Text(text = "Detekováno: ${chosenCompany!!.name}")
-                } else if (text.text.toIntOrNull()?.toString()?.length != 8) {
-                    Text(text = "Pozor! Nejedná se o IČO, hodnota nebude uložena")
-                } else {
-                    Text(text = "Validní IČO")
-                }
-            },
-            singleLine = true,
-            keyboardActions = KeyboardActions {
-                focusManager.moveFocus(FocusDirection.Down)
-            },
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Next,
-            ),
-            isError = text.text.toIntOrNull()?.toString()?.length != 8 && text.text.isNotBlank(),
-        )
-        ExposedDropdownMenu(
-            expanded = expanded && filteredCompanies.isNotEmpty(),
-            onDismissRequest = { expanded = false },
-        ) {
-            DropdownMenuItem(
-                text = { Text(strings.contacts.chooseAssemblyCompanyHere) },
-                onClick = {},
-                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                enabled = false,
-            )
-            filteredCompanies
-                .forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text("${option.name} - ${option.crn}") },
-                        onClick = {
-                            text = TextFieldValue(
-                                text = option.crn,
-                                selection = TextRange(8)
-                            )
-                            editWidget(widget.ico(option.crn))
-                            expanded = false
-                        },
-                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                    )
-                }
-        }
-    }
-}
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun DropdownWithAmount(
-    widget: Sites.Site.Widget.DropdownWithAmount,
-    sites: Sites,
-    editWidget: (Sites.Site.Widget) -> Unit,
-) = Row(
-    Modifier.fillMaxWidth()
-) {
-    var expanded by rememberSaveable { mutableStateOf(false) }
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
-        Modifier
-            .weight(1F),
-    ) {
-        val focusManager = LocalFocusManager.current
-        OutlinedTextField(
-            modifier = Modifier
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                .fillMaxWidth()
-                .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-            readOnly = true,
-            value = widget.getValuesWithAmounts(sites),
-            placeholder = { Text(widget.getPlaceholder(sites)) },
-            onValueChange = {},
-            label = { Text(widget.getLabel(sites)) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-            keyboardActions = KeyboardActions {
-                focusManager.moveFocus(FocusDirection.Down)
-            },
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = {
-                expanded = false
-                focusManager.clearFocus()
-            },
-            Modifier.exposedDropdownSize(),
-        ) {
-            widget.getItems(sites).forEachIndexed { i, item ->
-                DropdownMenuItem(
-                    text = { Text(item) },
-                    onClick = {},
-                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                    trailingIcon = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            IconButton(
-                                onClick = {
-                                    editWidget(widget.changeNumber(sites, i, widget.getAmount(sites)[i] - 1))
-                                },
-                                enabled = widget.getMinimumAmount(sites)[i] < widget.getAmount(sites)[i],
-                            ) {
-                                Icon(Icons.Default.Remove, strings.remove)
-                            }
-                            Text(widget.getAmount(sites)[i].toString())
-                            IconButton(
-                                onClick = {
-                                    editWidget(widget.changeNumber(sites, i, widget.getAmount(sites)[i] + 1))
-                                },
-                                enabled = widget.getAmount(sites)[i] < widget.getMaximumAmount(sites)[i],
-                            ) {
-                                Icon(Icons.Default.Add, strings.add)
-                            }
-                        }
-                    },
-                )
-            }
-        }
-    }
-}
-
-@ExperimentalMaterial3Api
-@Composable
-fun CoreChooser(
-    value: String,
-    options: List<String>,
-    onClick: (Int, String) -> Unit,
-    modifier: Modifier = Modifier,
-    label: String = "",
-    placeholder: String = "",
-    colors: TextFieldColors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val focusManager = LocalFocusManager.current
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
-        modifier,
-    ) {
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable),
-            readOnly = true,
-            value = value,
-            onValueChange = {},
-            label = { Text(label) },
-            placeholder = { Text(placeholder) },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-            },
-            colors = colors,
-            keyboardActions = KeyboardActions {
-                focusManager.moveFocus(FocusDirection.Down)
-            },
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = {
-                expanded = false
-                focusManager.clearFocus()
-            },
-        ) {
-            options.forEachIndexed { i, option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        onClick(i, option)
-                        expanded = false
-                        focusManager.clearFocus()
-                    },
-                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                    leadingIcon = {
-                        if (option == value) Icon(Icons.Default.Check, null)
-                    }
-                )
-            }
-        }
-    }
-}
+fun HasDropdown.getItemCount(sites: Sites) = getItems(sites).size

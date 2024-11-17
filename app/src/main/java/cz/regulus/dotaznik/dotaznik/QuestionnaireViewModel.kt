@@ -8,7 +8,6 @@ import com.sun.mail.util.MailConnectException
 import cz.regulus.dotaznik.BuildConfig
 import cz.regulus.dotaznik.Repository
 import cz.regulus.dotaznik.User
-import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getChosenIndex
 import cz.regulus.dotaznik.userOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +23,7 @@ import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.Named
 import java.io.File
+import java.lang.System
 import java.util.Locale
 import javax.activation.DataHandler
 import javax.activation.FileDataSource
