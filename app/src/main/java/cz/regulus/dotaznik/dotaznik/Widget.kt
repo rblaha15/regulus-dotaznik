@@ -1,10 +1,10 @@
 package cz.regulus.dotaznik.dotaznik
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -192,19 +192,18 @@ private fun Chooser(
     widget: Sites.Site.Widget.Chooser,
     editWidget: (Sites.Site.Widget) -> Unit,
     sites: Sites,
-) = Row(
-    Modifier.fillMaxWidth()
-) {
-    CoreChooser(
-        value = widget.getChosen(sites),
-        options = widget.getOptions(sites),
-        onClick = { i, _ ->
-            editWidget(widget.changeChosenIndex(i))
-        },
-        label = widget.getLabel(sites),
-        placeholder = widget.getPlaceholder(sites),
-    )
-}
+) = CoreChooser(
+    value = widget.getChosen(sites),
+    options = widget.getOptions(sites),
+    onClick = { i, _ ->
+        editWidget(widget.changeChosenIndex(i))
+    },
+    Modifier
+        .fillMaxWidth()
+        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+    label = widget.getLabel(sites),
+    placeholder = widget.getPlaceholder(sites),
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -213,7 +212,9 @@ private fun DoubleChooser(
     editWidget: (Sites.Site.Widget) -> Unit,
     sites: Sites,
 ) = Row(
-    Modifier.fillMaxWidth()
+    Modifier
+        .fillMaxWidth()
+        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
 ) {
     CoreChooser(
         value = widget.getChosen(sites),
@@ -221,6 +222,8 @@ private fun DoubleChooser(
         onClick = { i, _ ->
             editWidget(widget.changeChosenIndex(i))
         },
+        Modifier
+            .weight(1F),
         label = widget.getLabel(sites),
         placeholder = widget.getPlaceholder(sites),
     )
@@ -229,8 +232,11 @@ private fun DoubleChooser(
             value = widget.getChosen2(sites),
             options = widget.getOptions2(sites),
             onClick = { i, _ ->
-                editWidget(widget.changeChosenIndex2(i).also(::println))
+                editWidget(widget.changeChosenIndex2(i))
             },
+            Modifier
+                .weight(1F)
+                .padding(start = 8.dp),
             placeholder = widget.getPlaceholder2(sites),
         )
     }
@@ -247,9 +253,11 @@ private fun Checkbox(
         .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
     verticalAlignment = Alignment.CenterVertically,
 ) {
+    var checked by remember { mutableStateOf(widget.getChecked(sites)) }
     Checkbox(
         checked = widget.getChecked(sites),
         onCheckedChange = {
+            checked = it
             editWidget(widget.changeChecked(it))
         },
     )
@@ -262,9 +270,13 @@ private fun Checkbox(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(CircleShape)
-                .clickable {
-                    editWidget(widget.changeChecked(!widget.getChecked(sites)))
-                }
+                .toggleable(
+                    value = checked,
+                    onValueChange = {
+                        checked = it
+                        editWidget(widget.changeChecked(it))
+                    },
+                )
                 .padding(TextFieldDefaults.contentPaddingWithoutLabel()),
         ) {
             Text(widget.getLabel(sites))
@@ -278,71 +290,74 @@ private fun CheckboxWithChooser(
     widget: Sites.Site.Widget.CheckBoxWithChooser,
     sites: Sites,
     editWidget: (Sites.Site.Widget) -> Unit,
+) = Row(
+    Modifier
+        .fillMaxWidth()
+        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+    verticalAlignment = Alignment.CenterVertically,
 ) {
     val focusManager = LocalFocusManager.current
-    Row(
+    var checked by remember { mutableStateOf(widget.getChecked(sites)) }
+    Checkbox(
+        checked = checked,
+        onCheckedChange = {
+            checked = it
+            editWidget(widget.changeChecked(it))
+        },
+    )
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = {
+            if (!checked) {
+                checked = true
+                editWidget(widget.changeChecked(true))
+            }
+            else expanded = !expanded
+        },
         Modifier
-            .fillMaxWidth()
-            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
+            .fillMaxWidth(),
     ) {
-        Checkbox(
-            checked = widget.getChecked(sites),
-            onCheckedChange = {
-                editWidget(widget.changeChecked(it))
+        OutlinedTextField(
+            modifier = Modifier
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                .fillMaxWidth()
+                .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+            readOnly = true,
+            value = if (checked) widget.getChosen(sites) else "",
+            onValueChange = {},
+            label = { Text(widget.getLabel(sites)) },
+            placeholder = { Text(widget.getPlaceholder(sites)) },
+            trailingIcon = {
+                if (checked)
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
+                disabledLabelColor = LocalContentColor.current,
+                disabledBorderColor = Color.Transparent,
+            ),
+            enabled = checked,
+            keyboardActions = KeyboardActions {
+                focusManager.moveFocus(FocusDirection.Down)
             },
         )
-        var expanded by rememberSaveable { mutableStateOf(false) }
-        ExposedDropdownMenuBox(
+        ExposedDropdownMenu(
             expanded = expanded,
-            onExpandedChange = {
-                if (!widget.getChecked(sites)) editWidget(widget.changeChecked(true))
-                else expanded = !expanded
+            onDismissRequest = {
+                expanded = false
+                focusManager.clearFocus()
             },
-            Modifier
-                .fillMaxWidth(),
         ) {
-            OutlinedTextField(
-                modifier = Modifier
-                    .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                    .fillMaxWidth()
-                    .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-                readOnly = true,
-                value = if (widget.getChecked(sites)) widget.getChosen(sites) else "",
-                onValueChange = {},
-                label = { Text(widget.getLabel(sites)) },
-                placeholder = { Text(widget.getPlaceholder(sites)) },
-                trailingIcon = {
-                    if (widget.getChecked(sites))
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                },
-                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
-                    disabledLabelColor = LocalContentColor.current,
-                    disabledBorderColor = Color.Transparent,
-                ),
-                enabled = widget.getChecked(sites),
-                keyboardActions = KeyboardActions {
-                    focusManager.moveFocus(FocusDirection.Down)
-                },
-            )
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = {
-                    expanded = false
-                    focusManager.clearFocus()
-                },
-            ) {
-                widget.getOptions(sites).forEachIndexed { i, moznost ->
-                    DropdownMenuItem(
-                        text = { Text(moznost) },
-                        onClick = {
-                            editWidget(widget.changeChosenIndex(i))
-                            expanded = false
-                            focusManager.clearFocus()
-                        },
-                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                    )
-                }
+            widget.getOptions(sites).forEachIndexed { i, moznost ->
+                DropdownMenuItem(
+                    text = { Text(moznost) },
+                    onClick = {
+                        editWidget(widget.changeChosenIndex(i))
+                        expanded = false
+                        focusManager.clearFocus()
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                )
             }
         }
     }
