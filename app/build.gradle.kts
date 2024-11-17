@@ -17,7 +17,7 @@ android {
     defaultConfig {
         applicationId = "cz.regulus.dotaznik"
         minSdk = 21
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 14
         versionName = "5.1.2-RC.1"
 
