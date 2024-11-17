@@ -24,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -304,8 +305,7 @@ private fun CheckboxWithChooser(
             if (!checked) {
                 checked = true
                 editWidget(widget.changeChecked(true))
-            }
-            else expanded = !expanded
+            } else expanded = !expanded
         },
         Modifier
             .fillMaxWidth(),
@@ -500,6 +500,12 @@ private fun DropdownWithAmount(
                 DropdownMenuItem(
                     text = { Text(item) },
                     onClick = {},
+                    enabled = false,
+                    colors = MenuDefaults.itemColors().copy(
+                        disabledTextColor = MenuDefaults.itemColors().textColor,
+                        disabledLeadingIconColor = MenuDefaults.itemColors().leadingIconColor,
+                        disabledTrailingIconColor = MenuDefaults.itemColors().trailingIconColor,
+                    ),
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                     trailingIcon = {
                         Row(
