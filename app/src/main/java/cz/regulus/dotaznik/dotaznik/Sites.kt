@@ -177,11 +177,15 @@ data class Sites(
                 fun HasUnits.getChosenUnit(sites: Sites) = chosenUnitIndex?.let { getUnits(sites)[it] } ?: getDefaultUnit(sites)
                 fun HasUnits.getChosenUnitIndex(sites: Sites) = chosenUnitIndex ?: getDefaultUnitIndex(sites)
 
-                fun HasChooser.getDefault(sites: Sites) = getOptions(sites)[getDefaultIndex(sites)]
+                fun HasChooser.getShowPlaceholder(sites: Sites) = getPlaceholder(sites).isNotEmpty()
+                fun HasChooser.getDefault(sites: Sites) =
+                    if (getShowPlaceholder(sites)) "" else getOptions(sites)[getDefaultIndex(sites)]
                 fun HasChooser.getChosen(sites: Sites) = chosenIndex?.let { getOptions(sites)[it] } ?: getDefault(sites)
                 fun HasChooser.getChosenIndex(sites: Sites) = chosenIndex ?: getDefaultIndex(sites)
 
-                fun HasFollowUpChooser.getDefault2(sites: Sites) = getOptions2(sites)[getDefaultIndex2(sites)]
+                fun HasFollowUpChooser.getShowPlaceholder2(sites: Sites) = getPlaceholder2(sites).isNotEmpty()
+                fun HasFollowUpChooser.getDefault2(sites: Sites) =
+                    if (getShowPlaceholder2(sites)) "" else getOptions2(sites)[getDefaultIndex2(sites)]
                 fun HasFollowUpChooser.getChosen2(sites: Sites) = chosenIndex2?.let { getOptions2(sites)[it] } ?: getDefault2(sites)
                 fun HasFollowUpChooser.getChosenIndex2(sites: Sites) = chosenIndex2 ?: getDefaultIndex2(sites)
 
@@ -201,7 +205,7 @@ data class Sites(
                     .getAmounts(sites)
                     .filterValues { it > 0 }
                     .map { (index, amount) ->
-                    "${amount}x ${getItems(sites)[index]}"
+                        "${amount}x ${getItems(sites)[index]}"
                     }
                     .joinToString(", ")
 
@@ -253,7 +257,7 @@ data class Sites(
             data class DemandOrigin(
                 override val chosenIndex: Int? = null,
             ) : Chooser {
-                override fun getOptions(sites: Sites) = listOf("") + getOrigins().keys.toList()
+                override fun getOptions(sites: Sites) = getOrigins().keys.toList()
                 override fun getLabel(sites: Sites) = strings.contacts.demandOrigin + "*"
                 override fun getPlaceholder(sites: Sites) = strings.choose
                 override fun changeChosenIndex(chosenIndex: Int?): Widget.HasChooser =
