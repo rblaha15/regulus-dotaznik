@@ -180,13 +180,13 @@ data class Sites(
                 fun HasChooser.getShowPlaceholder(sites: Sites) = getPlaceholder(sites).isNotEmpty()
                 fun HasChooser.getDefault(sites: Sites) =
                     if (getShowPlaceholder(sites)) "" else getOptions(sites)[getDefaultIndex(sites)]
-                fun HasChooser.getChosen(sites: Sites) = chosenIndex?.let { getOptions(sites)[it] } ?: getDefault(sites)
+                fun HasChooser.getChosen(sites: Sites) = chosenIndex?.let { getOptions(sites).getOrNull(it) } ?: getDefault(sites)
                 fun HasChooser.getChosenIndex(sites: Sites) = chosenIndex ?: getDefaultIndex(sites)
 
                 fun HasFollowUpChooser.getShowPlaceholder2(sites: Sites) = getPlaceholder2(sites).isNotEmpty()
                 fun HasFollowUpChooser.getDefault2(sites: Sites) =
                     if (getShowPlaceholder2(sites)) "" else getOptions2(sites)[getDefaultIndex2(sites)]
-                fun HasFollowUpChooser.getChosen2(sites: Sites) = chosenIndex2?.let { getOptions2(sites)[it] } ?: getDefault2(sites)
+                fun HasFollowUpChooser.getChosen2(sites: Sites) = chosenIndex2?.let { getOptions2(sites).getOrNull(it) } ?: getDefault2(sites)
                 fun HasFollowUpChooser.getChosenIndex2(sites: Sites) = chosenIndex2 ?: getDefaultIndex2(sites)
 
                 fun HasCheckBox.getChecked(sites: Sites) = checked ?: getDefaultChecked(sites)
