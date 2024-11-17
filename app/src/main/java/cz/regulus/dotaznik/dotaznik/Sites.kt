@@ -1254,7 +1254,7 @@ Změny ve verzi 2.3 oproti verzi 2.2:
         <email>${contacts.email.toXmlEntry()}</email>
         <ulice>${contacts.street.toXmlEntry()}</ulice>
         <psc>${
-    if (contacts.zip.toXmlEntry().length != 5) ""
+    if (contacts.zip.toXmlEntry().length != 5) null.orEmpty()
     else contacts.zip.toXmlEntry().substring(0, 3) + " " + contacts.zip.toXmlEntry().substring(3, 5)
 }</psc>
         <mesto>${contacts.city.toXmlEntry()}</mesto>

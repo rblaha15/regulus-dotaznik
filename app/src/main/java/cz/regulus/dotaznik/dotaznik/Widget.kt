@@ -523,21 +523,6 @@ private fun DropdownWithAmount(
     }
 }
 
-private fun <U> U.getSecondChooser(): HasChooserAndLabel
-        where U : Sites.Site.Widget.HasLabel, U : Sites.Site.Widget.HasFollowUpChooser =
-    object : HasChooserAndLabel {
-        override fun getOptions(sites: Sites) = getOptions2(sites)
-        override val chosenIndex: Int? = chosenIndex2
-
-        @Deprecated("", ReplaceWith(""), DeprecationLevel.ERROR)
-        override fun changeChosenIndex(chosenIndex: Int?) = error("Should not be called")
-
-        override fun getLabel(sites: Sites) = this@getSecondChooser.getLabel(sites)
-        override fun getPlaceholder(sites: Sites) = this@getSecondChooser.getPlaceholder2(sites)
-    }
-
-private interface HasChooserAndLabel : Sites.Site.Widget.HasChooser, Sites.Site.Widget.HasLabel
-
 @ExperimentalMaterial3Api
 @Composable
 fun CoreChooser(
