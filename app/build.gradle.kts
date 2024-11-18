@@ -65,7 +65,7 @@ android {
         }
     }
     lint {
-        disable("PermissionLaunchedDuringComposition")
+        disable += "PermissionLaunchedDuringComposition"
     }
 }
 
