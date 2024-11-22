@@ -257,7 +257,7 @@ private fun Checkbox(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+            .padding(top = 4.dp, bottom = 4.dp, start = 8.dp, end = 8.dp),
     ) {
         Box(
             modifier = Modifier
