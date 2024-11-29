@@ -62,6 +62,7 @@ fun Widget(
         is TextField -> TextField(widget, sites, editWidget)
         is TextFieldWithUnits -> TextFieldWithUnits(widget, sites, editWidget)
         is Chooser -> Chooser(widget, editWidget, sites)
+        is MultiChooser -> MultiChooser(widget, editWidget, sites)
         is DoubleChooser -> DoubleChooser(widget, editWidget, sites)
         is CheckBox -> Checkbox(widget, sites, editWidget)
         is CheckBoxWithChooser -> CheckboxWithChooser(widget, sites, editWidget)
@@ -196,6 +197,29 @@ private fun Chooser(
         .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
     label = widget.getLabel(sites),
     placeholder = widget.getPlaceholder(sites),
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MultiChooser(
+    widget: MultiChooser,
+    editWidget: (Widget) -> Unit,
+    sites: Sites,
+) = CoreChooser(
+    value = widget.getChosen(sites).joinToString(),
+    options = widget.getOptions(sites),
+    onClick = { i, _ ->
+        editWidget(widget.toggleIndex(i))
+    },
+    Modifier
+        .fillMaxWidth()
+        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+    label = widget.getLabel(sites),
+    placeholder = widget.getPlaceholder(sites),
+    isSelected = { i, _ ->
+        i in widget.chosenIndices
+    },
+    close = false,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -543,6 +567,8 @@ fun CoreChooser(
     options: List<String>,
     onClick: (Int, String) -> Unit,
     modifier: Modifier = Modifier,
+    isSelected: ((Int, String) -> Boolean)? = { _, v -> v == value },
+    close: Boolean = true,
     label: String = "",
     placeholder: String = "",
     colors: TextFieldColors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
@@ -583,13 +609,15 @@ fun CoreChooser(
                     text = { Text(option) },
                     onClick = {
                         onClick(i, option)
-                        expanded = false
-                        focusManager.clearFocus()
+                        if (close) {
+                            expanded = false
+                            focusManager.clearFocus()
+                        }
                     },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                    leadingIcon = {
-                        if (option == value) Icon(Icons.Default.Check, null)
-                    }
+                    leadingIcon = isSelected?.let { {
+                        if (it(i, option)) Icon(Icons.Default.Check, null)
+                    } },
                 )
             }
         }

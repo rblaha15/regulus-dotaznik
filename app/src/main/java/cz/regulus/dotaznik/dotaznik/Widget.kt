@@ -41,6 +41,15 @@ interface HasChooser : Widget {
     fun getDefaultIndex(sites: Sites) = 0
 }
 
+interface HasMultiChooser : Widget {
+    fun getOptions(sites: Sites): List<String>
+    fun getPlaceholder(sites: Sites): String = ""
+
+    val chosenIndices: Set<Int> get() = emptySet()
+    fun changeChosenIndices(chosenIndices: Set<Int>): HasMultiChooser
+    fun getDefaultIndices(sites: Sites) = emptySet<Int>()
+}
+
 interface HasFollowUpChooser : Widget {
     fun getOptions2(sites: Sites): List<String>
     fun getPlaceholder2(sites: Sites): String = ""
@@ -85,6 +94,7 @@ interface HasTitle : Widget {
 @Serializable @SerialName("TextField") sealed interface TextField : HasTextField, HasLabel
 @Serializable @SerialName("TextFieldWithUnits") sealed interface TextFieldWithUnits : HasTextField, HasUnits, HasLabel
 @Serializable @SerialName("Chooser") sealed interface Chooser : HasChooser, HasLabel
+@Serializable @SerialName("MultiChooser") sealed interface MultiChooser : HasMultiChooser, HasLabel
 @Serializable @SerialName("DoubleChooser") sealed interface DoubleChooser : HasChooser, HasFollowUpChooser, HasLabel
 @Serializable @SerialName("CheckBox") sealed interface CheckBox : HasCheckBox, HasLabel
 @Serializable @SerialName("CheckBoxWithChooser") sealed interface CheckBoxWithChooser : HasCheckBox, HasChooser, HasLabel
@@ -130,6 +140,14 @@ fun HasChooser.getDefault(sites: Sites) =
     if (getShowPlaceholder(sites)) "" else getOptions(sites)[getDefaultIndex(sites)]
 fun HasChooser.getChosen(sites: Sites) = chosenIndex?.let { getOptions(sites).getOrNull(it) } ?: getDefault(sites)
 fun HasChooser.getChosenIndex(sites: Sites) = chosenIndex ?: getDefaultIndex(sites)
+
+fun HasMultiChooser.getShowPlaceholder(sites: Sites) = getPlaceholder(sites).isNotEmpty()
+fun HasMultiChooser.getDefault(sites: Sites) =
+    if (getShowPlaceholder(sites)) emptyList() else getOptions(sites).slice(getDefaultIndices(sites))
+
+fun HasMultiChooser.getChosen(sites: Sites) = getOptions(sites).slice(chosenIndices)
+fun HasMultiChooser.toggleIndex(index: Int) =
+    if (index in chosenIndices) changeChosenIndices(chosenIndices - index) else changeChosenIndices(chosenIndices + index)
 
 fun HasFollowUpChooser.getShowPlaceholder2(sites: Sites) = getPlaceholder2(sites).isNotEmpty()
 fun HasFollowUpChooser.getDefault2(sites: Sites) =
