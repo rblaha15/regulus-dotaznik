@@ -1,5 +1,6 @@
 package cz.regulus.dotaznik.dotaznik
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -66,6 +67,7 @@ fun Widget(
         is DoubleChooser -> DoubleChooser(widget, editWidget, sites)
         is CheckBox -> Checkbox(widget, sites, editWidget)
         is CheckBoxWithChooser -> CheckboxWithChooser(widget, sites, editWidget)
+        is CheckBoxWithTextField -> CheckBoxWithTextField(widget, sites, editWidget)
         is DropdownWithAmount -> DropdownWithAmount(widget, sites, editWidget)
         is Contacts.AssemblyCompany -> AssemblyCompany(widget, companies, editWidget)
         else -> {}
@@ -377,6 +379,59 @@ private fun CheckboxWithChooser(
             }
         }
     }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun CheckBoxWithTextField(
+    widget: CheckBoxWithTextField,
+    sites: Sites,
+    editWidget: (Widget) -> Unit,
+) = Row(
+    Modifier
+        .fillMaxWidth()
+        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+    verticalAlignment = Alignment.CenterVertically,
+) {
+    val focusManager = LocalFocusManager.current
+    var checked by remember { mutableStateOf(widget.getChecked(sites)) }
+    var text by remember { mutableStateOf(widget.getText(sites)) }
+    Checkbox(
+        checked = checked,
+        onCheckedChange = {
+            checked = it
+            editWidget(widget.changeChecked(it))
+        },
+    )
+    OutlinedTextField(
+        value = if (checked) text else "",
+        onValueChange = {
+            text = it
+            editWidget(widget.changeText(it))
+        },
+        Modifier
+            .fillMaxWidth()
+            .clickable(!checked) {
+                checked = true
+                editWidget(widget.changeChecked(true))
+            }
+            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+        label = { Text(widget.getLabel(sites)) },
+        placeholder = { Text(widget.getPlaceholder(sites)) },
+        trailingIcon = {
+            Text(text = widget.getSuffix(sites))
+        },
+        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
+            disabledLabelColor = LocalContentColor.current,
+            disabledBorderColor = Color.Transparent,
+        ),
+        enabled = checked,
+        keyboardActions = KeyboardActions {
+            focusManager.moveFocus(FocusDirection.Down)
+        },
+        singleLine = true,
+        keyboardOptions = widget.getKeyboard(sites),
+    )
 }
 
 @Composable
