@@ -7,6 +7,7 @@ typealias LanguageTag = String
 interface Strings {
     val appName: String
     val contacts: ContactsStrings
+    val fve: FVEStrings
     val objectDetail: ObjectDetailStrings
     val system: SystemStrings
     val pool: PoolStrings
@@ -68,6 +69,43 @@ interface ContactsStrings {
     val originDistributionCompany: String
     val originAssemlbleres: String
     val originDesigner: String
+    val demandSubject: String
+    val heatPump: String
+    val fve: String
+}
+
+interface FVEStrings {
+    val fve: String
+    val currentSituation: String
+    val currentHeating: String
+    val currentHotWater: String
+    val currentTanks: String
+    val currentConsumption: String
+    val breakerSize: String
+    val tariff: String
+    val breakerBoxLocation: String
+    val requirements: String
+    val requiredPower: String
+    val avaiableAreas: String
+    val size1: String
+    val orientation1: String
+    val slope1: String
+    val size2: String
+    val orientation2: String
+    val slope2: String
+    val size3: String
+    val orientation3: String
+    val slope3: String
+    val size4: String
+    val orientation4: String
+    val slope4: String
+    val roofMaterial: String
+    val battery: String
+    val batteryCapacity: String
+    val water: String
+    val network: String
+    val networkPower: String
+    val charging: String
 }
 
 interface ObjectDetailStrings {

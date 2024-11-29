@@ -8,6 +8,8 @@ import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Pool
+import androidx.compose.material.icons.filled.SolarPower
+import androidx.compose.material3.Typography
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -15,7 +17,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import cz.regulus.dotaznik.BuildConfig
 import cz.regulus.dotaznik.Products
 import cz.regulus.dotaznik.User
-import cz.regulus.dotaznik.dotaznik.Pool.WantsPool
 import cz.regulus.dotaznik.strings.strings
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -26,6 +27,7 @@ import org.intellij.lang.annotations.Language
 @SerialName("Sites")
 data class Sites(
     val contacts: Contacts = Contacts(),
+    val photovoltaicPowerPlant: PhotovoltaicPowerPlant = PhotovoltaicPowerPlant(),
     val objectDetails: ObjectDetails = ObjectDetails(),
     val system: System = System(),
     val pool: Pool = Pool(),
@@ -34,11 +36,12 @@ data class Sites(
     @Transient internal val products: Products = Products(),
 ) {
     val vse = listOf(
-        contacts, objectDetails, system, pool, additionalSources, accessories
+        contacts, photovoltaicPowerPlant, objectDetails, system, pool, additionalSources, accessories
     )
 
     fun copySite(site: Site) = when (site) {
         is Pool -> copy(pool = site)
+        is PhotovoltaicPowerPlant -> copy(photovoltaicPowerPlant = site)
         is ObjectDetails -> copy(objectDetails = site)
         is AdditionalSources -> copy(additionalSources = site)
         is Contacts -> copy(contacts = site)
@@ -61,6 +64,7 @@ sealed interface Site {
 @SerialName("Contacts")
 data class Contacts(
     val demandOrigin: DemandOrigin = DemandOrigin(),
+    val demandSubject: DemandSubject = DemandSubject(),
     val surname: Surname = Surname(),
     val name: Name = Name(),
     val street: Street = Street(),
@@ -73,6 +77,7 @@ data class Contacts(
 ) : Site {
     override fun copyWidget(newWidget: Widget) = when (newWidget) {
         is DemandOrigin -> copy(demandOrigin = newWidget)
+        is DemandSubject -> copy(demandSubject = newWidget)
         is Email -> copy(email = newWidget)
         is AssemblyCompany -> copy(assemblyCompany = newWidget)
         is Name -> copy(name = newWidget)
@@ -92,7 +97,8 @@ data class Contacts(
         override fun changeText(text: String?) = copy(text = text)
         override fun getLabel(sites: Sites) = strings.contacts.surname
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            capitalization = KeyboardCapitalization.Words
+            imeAction = ImeAction.Next,
+            capitalization = KeyboardCapitalization.Words,
         )
     }
 
@@ -120,13 +126,28 @@ data class Contacts(
     }
 
     @Serializable
+    data class DemandSubject(
+        override val chosenIndices: Set<Int> = emptySet(),
+    ) : MultiChooser {
+        override fun getOptions(sites: Sites) = listOf(
+            strings.contacts.heatPump, strings.contacts.fve
+        )
+
+        override fun getLabel(sites: Sites) = strings.contacts.demandSubject
+        override fun getPlaceholder(sites: Sites) = strings.choose
+        override fun changeChosenIndices(chosenIndices: Set<Int>): HasMultiChooser =
+            copy(chosenIndices = chosenIndices)
+    }
+
+    @Serializable
     data class Name(
         override val text: String? = null,
     ) : TextField {
         override fun changeText(text: String?) = copy(text = text)
         override fun getLabel(sites: Sites) = strings.contacts.name
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            capitalization = KeyboardCapitalization.Words
+            imeAction = ImeAction.Next,
+            capitalization = KeyboardCapitalization.Words,
         )
     }
 
@@ -137,7 +158,8 @@ data class Contacts(
         override fun changeText(text: String?) = copy(text = text)
         override fun getLabel(sites: Sites) = strings.contacts.street
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            capitalization = KeyboardCapitalization.Sentences
+            imeAction = ImeAction.Next,
+            capitalization = KeyboardCapitalization.Sentences,
         )
     }
 
@@ -148,7 +170,8 @@ data class Contacts(
         override fun changeText(text: String?) = copy(text = text)
         override fun getLabel(sites: Sites) = strings.contacts.city
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            capitalization = KeyboardCapitalization.Words
+            imeAction = ImeAction.Next,
+            capitalization = KeyboardCapitalization.Words,
         )
     }
 
@@ -159,7 +182,8 @@ data class Contacts(
         override fun changeText(text: String?) = copy(text = text)
         override fun getLabel(sites: Sites) = strings.contacts.zip
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            keyboardType = KeyboardType.Number
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Number,
         )
     }
 
@@ -170,7 +194,8 @@ data class Contacts(
         override fun changeText(text: String?) = copy(text = text)
         override fun getLabel(sites: Sites) = strings.contacts.phone
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            keyboardType = KeyboardType.Phone
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Phone,
         )
     }
 
@@ -181,7 +206,8 @@ data class Contacts(
         override fun changeText(text: String?) = copy(text = text)
         override fun getLabel(sites: Sites) = strings.contacts.email
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            keyboardType = KeyboardType.Email
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Email,
         )
     }
 
@@ -199,16 +225,415 @@ data class Contacts(
         override fun changeText(text: String?) = copy(text = text)
         override fun getLabel(sites: Sites) = strings.note
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            imeAction = ImeAction.Done
+            imeAction = ImeAction.Done,
         )
     }
 
     override fun getName(sites: Sites) = strings.contacts.contacts
     override fun getIcon(sites: Sites) = Icons.Default.Person
     override fun getWidgets(sites: Sites) = listOf(
-        listOf(demandOrigin),
+        listOf(demandOrigin, demandSubject),
         listOf(surname, name, street, city, zip, phone, email),
         listOf(assemblyCompany),
+        listOf(note),
+    )
+}
+
+@Serializable
+@SerialName("PhotovoltaicPowerPlant")
+data class PhotovoltaicPowerPlant(
+    val note: Note = Note(),
+    val currentHeating: CurrentHeating = CurrentHeating(),
+    val currentHotWater: CurrentHotWater = CurrentHotWater(),
+    val currentTanks: CurrentTanks = CurrentTanks(),
+    val currentConsumption: CurrentConsumption = CurrentConsumption(),
+    val breakerSize: BreakerSize = BreakerSize(),
+    val tariff: Tariff = Tariff(),
+    val breakerBoxLocation: BreakerBoxLocation = BreakerBoxLocation(),
+    val requiredPower: RequiredPower = RequiredPower(),
+    val size1: Size1 = Size1(),
+    val orientation1: Orientation1 = Orientation1(),
+    val slope1: Slope1 = Slope1(),
+    val size2: Size2 = Size2(),
+    val orientation2: Orientation2 = Orientation2(),
+    val slope2: Slope2 = Slope2(),
+    val size3: Size3 = Size3(),
+    val orientation3: Orientation3 = Orientation3(),
+    val slope3: Slope3 = Slope3(),
+    val size4: Size4 = Size4(),
+    val orientation4: Orientation4 = Orientation4(),
+    val slope4: Slope4 = Slope4(),
+    val roofMaterial: RoofMaterial = RoofMaterial(),
+    val battery: Battery = Battery(),
+    val water: Water = Water(),
+    val network: Network = Network(),
+    val charging: Charging = Charging(),
+) : Site {
+    override fun copyWidget(newWidget: Widget) = when (newWidget) {
+        is Note -> copy(note = newWidget)
+        is CurrentHeating -> copy(currentHeating = newWidget)
+        is CurrentHotWater -> copy(currentHotWater = newWidget)
+        is CurrentTanks -> copy(currentTanks = newWidget)
+        is CurrentConsumption -> copy(currentConsumption = newWidget)
+        is BreakerSize -> copy(breakerSize = newWidget)
+        is Tariff -> copy(tariff = newWidget)
+        is BreakerBoxLocation -> copy(breakerBoxLocation = newWidget)
+        is RequiredPower -> copy(requiredPower = newWidget)
+        is Size1 -> copy(size1 = newWidget)
+        is Orientation1 -> copy(orientation1 = newWidget)
+        is Slope1 -> copy(slope1 = newWidget)
+        is Size2 -> copy(size2 = newWidget)
+        is Orientation2 -> copy(orientation2 = newWidget)
+        is Slope2 -> copy(slope2 = newWidget)
+        is Size3 -> copy(size3 = newWidget)
+        is Orientation3 -> copy(orientation3 = newWidget)
+        is Slope3 -> copy(slope3 = newWidget)
+        is Size4 -> copy(size4 = newWidget)
+        is Orientation4 -> copy(orientation4 = newWidget)
+        is Slope4 -> copy(slope4 = newWidget)
+        is RoofMaterial -> copy(roofMaterial = newWidget)
+        is Battery -> copy(battery = newWidget)
+        is Water -> copy(water = newWidget)
+        is Network -> copy(network = newWidget)
+        is Charging -> copy(charging = newWidget)
+        else -> this
+    }
+
+    override fun showSite(sites: Sites) = 1 in sites.contacts.demandSubject.chosenIndices
+
+    @Serializable
+    data object TitleCurrent : HasTitle {
+        override fun getTitle(sites: Sites) = strings.fve.currentSituation
+    }
+
+    @Serializable
+    data class CurrentHeating(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.currentHeating
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class CurrentHotWater(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.currentHotWater
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class CurrentTanks(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.currentTanks
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class CurrentConsumption(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.currentConsumption
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class BreakerSize(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.breakerSize
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class Tariff(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.tariff
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class BreakerBoxLocation(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.breakerBoxLocation
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data object TitleRequirements : HasTitle {
+        override fun getTitle(sites: Sites) = strings.fve.requirements
+    }
+
+    @Serializable
+    data class RequiredPower(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.requiredPower
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data object TitleAreas : HasTitle {
+        override fun getTitle(sites: Sites) = strings.fve.avaiableAreas
+        override fun getStyle(sites: Sites) = Typography::titleSmall::get
+    }
+
+    @Serializable
+    data class Size1(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.size1
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class Orientation1(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.orientation1
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class Slope1(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.slope1
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class Size2(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.size2
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class Orientation2(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.orientation2
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class Slope2(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.slope2
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class Size3(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.size3
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class Orientation3(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.orientation3
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class Slope3(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.slope3
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class Size4(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.size4
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class Orientation4(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.orientation4
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class Slope4(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.slope4
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class RoofMaterial(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.roofMaterial
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class Battery(
+        override val checked: Boolean? = null,
+        override val text: String? = null,
+    ) : CheckBoxWithTextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun changeChecked(checked: Boolean?) = copy(checked = checked)
+        override fun getLabel(sites: Sites) = if (getChecked(sites)) strings.fve.batteryCapacity else strings.fve.battery
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class Water(
+        override val checked: Boolean? = null,
+    ) : CheckBox {
+        override fun changeChecked(checked: Boolean?) = copy(checked = checked)
+        override fun getLabel(sites: Sites) = strings.fve.water
+    }
+
+    @Serializable
+    data class Network(
+        override val checked: Boolean? = null,
+        override val text: String? = null,
+    ) : CheckBoxWithTextField {
+        override fun changeChecked(checked: Boolean?) = copy(checked = checked)
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = if (getChecked(sites)) strings.fve.networkPower else strings.fve.network
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class Charging(
+        override val checked: Boolean? = null,
+    ) : CheckBox {
+        override fun changeChecked(checked: Boolean?) = copy(checked = checked)
+        override fun getLabel(sites: Sites) = strings.fve.charging
+    }
+
+    @Serializable
+    data class Note(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.note
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Done,
+        )
+    }
+
+    override fun getName(sites: Sites) = strings.fve.fve
+    override fun getIcon(sites: Sites) = Icons.Default.SolarPower
+    override fun getWidgets(sites: Sites) = listOf(
+        listOf(TitleCurrent, currentHeating, currentHotWater, currentTanks, currentConsumption, breakerSize, tariff, breakerBoxLocation),
+        listOf(TitleRequirements, requiredPower, roofMaterial),
+        listOf(
+            TitleAreas, size1, orientation1, slope1, size2, orientation2, slope2,
+            size3, orientation3, slope3, size4, orientation4, slope4
+        ),
+        listOf(battery, water, network, charging),
         listOf(note),
     )
 }
@@ -243,6 +668,8 @@ data class ObjectDetails(
         else -> this
     }
 
+    override fun showSite(sites: Sites) = 0 in sites.contacts.demandSubject.chosenIndices
+
     @Serializable
     data class HeatLost(
         override val text: String? = null,
@@ -251,7 +678,8 @@ data class ObjectDetails(
         override fun getLabel(sites: Sites) = strings.objectDetail.heatLoss
         override fun getSuffix(sites: Sites) = strings.units.kW
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            keyboardType = KeyboardType.Decimal
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Decimal,
         )
     }
 
@@ -263,7 +691,8 @@ data class ObjectDetails(
         override fun getLabel(sites: Sites) = strings.objectDetail.heatNeedsForHeating
         override fun getSuffix(sites: Sites) = strings.units.kWh
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            keyboardType = KeyboardType.Number
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Number,
         )
     }
 
@@ -275,7 +704,8 @@ data class ObjectDetails(
         override fun getLabel(sites: Sites) = strings.objectDetail.heatNeedsForHotWater
         override fun getSuffix(sites: Sites) = strings.units.kWh
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            keyboardType = KeyboardType.Number
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Number,
         )
     }
 
@@ -287,7 +717,8 @@ data class ObjectDetails(
         override fun getLabel(sites: Sites) = strings.objectDetail.area
         override fun getSuffix(sites: Sites) = strings.units.m2
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            keyboardType = KeyboardType.Number
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Number,
         )
     }
 
@@ -299,7 +730,8 @@ data class ObjectDetails(
         override fun getLabel(sites: Sites) = strings.objectDetail.volume
         override fun getSuffix(sites: Sites) = strings.units.m3
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            keyboardType = KeyboardType.Number
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Number,
         )
     }
 
@@ -311,7 +743,8 @@ data class ObjectDetails(
         override fun getLabel(sites: Sites) = strings.objectDetail.costs
         override fun getSuffix(sites: Sites) = strings.currency
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            keyboardType = KeyboardType.Decimal
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Decimal,
         )
     }
 
@@ -333,7 +766,8 @@ data class ObjectDetails(
         override fun getLabel(sites: Sites) = strings.objectDetail.usage
         override fun getUnits(sites: Sites) = listOf(strings.units.q, strings.units.m3, strings.units.kWh)
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            keyboardType = KeyboardType.Text
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
         )
     }
 
@@ -355,7 +789,8 @@ data class ObjectDetails(
         override fun getLabel(sites: Sites) = strings.objectDetail.usage2
         override fun getUnits(sites: Sites) = listOf(strings.units.q, strings.units.m3, strings.units.kWh)
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            keyboardType = KeyboardType.Text
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
         )
     }
 
@@ -366,7 +801,7 @@ data class ObjectDetails(
         override fun changeText(text: String?) = copy(text = text)
         override fun getLabel(sites: Sites) = strings.note
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            imeAction = ImeAction.Done
+            imeAction = ImeAction.Done,
         )
     }
 
@@ -410,6 +845,8 @@ data class System(
         is WantsPool -> copy(wantsPool = newWidget)
         else -> this
     }
+
+    override fun showSite(sites: Sites) = 0 in sites.contacts.demandSubject.chosenIndices
 
     @Serializable
     data class HPType(
@@ -475,7 +912,8 @@ data class System(
         override fun showWidget(sites: Sites) = sites.system.thermalStoreType.getChosen(sites) != strings.noneFeminine
 
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            keyboardType = KeyboardType.Number
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Number,
         )
     }
 
@@ -499,7 +937,8 @@ data class System(
         override fun getSuffix(sites: Sites) = strings.units.dm3
         override fun showWidget(sites: Sites) = sites.system.waterTankType.getChosen(sites) != strings.noneMasculine
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            keyboardType = KeyboardType.Number
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Number,
         )
     }
 
@@ -527,13 +966,21 @@ data class System(
     }
 
     @Serializable
+    data class WantsPool(
+        override val checked: Boolean? = null,
+    ) : CheckBox {
+        override fun changeChecked(checked: Boolean?) = copy(checked = checked)
+        override fun getLabel(sites: Sites) = strings.system.poolHeating
+    }
+
+    @Serializable
     data class Note(
         override val text: String? = null,
     ) : TextField {
         override fun changeText(text: String?) = copy(text = text)
         override fun getLabel(sites: Sites) = strings.note
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            imeAction = ImeAction.Done
+            imeAction = ImeAction.Done,
         )
     }
 
@@ -581,15 +1028,7 @@ data class Pool(
         else -> this
     }
 
-    override fun showSite(sites: Sites) = sites.system.wantsPool.getChecked(sites)
-
-    @Serializable
-    data class WantsPool(
-        override val checked: Boolean? = null,
-    ) : CheckBox {
-        override fun changeChecked(checked: Boolean?) = copy(checked = checked)
-        override fun getLabel(sites: Sites) = strings.system.poolHeating
-    }
+    override fun showSite(sites: Sites) = 0 in sites.contacts.demandSubject.chosenIndices && sites.system.wantsPool.getChecked(sites)
 
     @Serializable
     data class UsagePeriod(
@@ -650,7 +1089,8 @@ data class Pool(
         override fun showWidget(sites: Sites) = sites.pool.shape.getChosen(sites) != strings.pool.shapeCircle
 
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            keyboardType = KeyboardType.Decimal
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Decimal,
         )
     }
 
@@ -664,7 +1104,8 @@ data class Pool(
         override fun showWidget(sites: Sites) = sites.pool.shape.getChosen(sites) != strings.pool.shapeCircle
 
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            keyboardType = KeyboardType.Decimal
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Decimal,
         )
     }
 
@@ -678,7 +1119,8 @@ data class Pool(
         override fun showWidget(sites: Sites) = sites.pool.shape.getChosen(sites) == strings.pool.shapeCircle
 
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            keyboardType = KeyboardType.Decimal
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Decimal,
         )
     }
 
@@ -690,7 +1132,8 @@ data class Pool(
         override fun getLabel(sites: Sites) = strings.pool.depth
         override fun getSuffix(sites: Sites) = strings.units.m
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            keyboardType = KeyboardType.Decimal
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Decimal,
         )
     }
 
@@ -716,7 +1159,8 @@ data class Pool(
         override fun getLabel(sites: Sites) = strings.pool.temperature
         override fun getSuffix(sites: Sites) = strings.units.degreeCelsius
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            keyboardType = KeyboardType.Number
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Number,
         )
     }
 
@@ -727,29 +1171,16 @@ data class Pool(
         override fun changeText(text: String?) = copy(text = text)
         override fun getLabel(sites: Sites) = strings.note
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            imeAction = ImeAction.Done
+            imeAction = ImeAction.Done,
         )
     }
 
     override fun getName(sites: Sites) = strings.pool.pool
     override fun getIcon(sites: Sites) = Icons.Default.Pool
     override fun getWidgets(sites: Sites) = listOf(
-        listOf(
-            usagePeriod,
-            placement,
-            waterType,
-        ),
-        listOf(
-            shape,
-            length,
-            width,
-            radius,
-            depth,
-        ),
-        listOf(
-            coverage,
-            desiredTemperature,
-        ),
+        listOf(usagePeriod, placement, waterType),
+        listOf(shape, length, width, radius, depth),
+        listOf(coverage, desiredTemperature),
         listOf(note),
     )
 }
@@ -783,6 +1214,8 @@ data class AdditionalSources(
         is HeatingElementInStoreHeating -> copy(heatingElementInStoreHeating = newWidget)
         else -> this
     }
+
+    override fun showSite(sites: Sites) = 0 in sites.contacts.demandSubject.chosenIndices
 
     @Serializable
     data object TitleTopeni : HasTitle {
@@ -900,29 +1333,15 @@ data class AdditionalSources(
         override fun changeText(text: String?) = copy(text = text)
         override fun getLabel(sites: Sites) = strings.note
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            imeAction = ImeAction.Done
+            imeAction = ImeAction.Done,
         )
     }
 
     override fun getName(sites: Sites) = strings.additionalSources.sources
     override fun getIcon(sites: Sites) = Icons.Default.AcUnit
     override fun getWidgets(sites: Sites) = listOf(
-        listOf(
-            TitleTopeni,
-            heatingElementInStoreHeating,
-            electricBoilerHeating,
-            gasBoilerHeating,
-            fireplaceHeating,
-            otherHeating
-        ),
-        listOf(
-            TitleTeplaVoda,
-            heatingElementInStoreHotWater,
-            electricBoilerHotWater,
-            gasBoilerHotWater,
-            fireplaceHotWater,
-            otherHotWater
-        ),
+        listOf(TitleTopeni, heatingElementInStoreHeating, electricBoilerHeating, gasBoilerHeating, fireplaceHeating, otherHeating),
+        listOf(TitleTeplaVoda, heatingElementInStoreHotWater, electricBoilerHotWater, gasBoilerHotWater, fireplaceHotWater, otherHotWater),
         listOf(note),
     )
 }
@@ -944,6 +1363,8 @@ data class Accessories(
         is HeatingCable -> copy(heatingCable = newWidget)
         else -> this
     }
+
+    override fun showSite(sites: Sites) = 0 in sites.contacts.demandSubject.chosenIndices
 
     @Serializable
     data class Hose(
@@ -1003,19 +1424,14 @@ data class Accessories(
         override fun changeText(text: String?) = copy(text = text)
         override fun getLabel(sites: Sites) = strings.note
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            imeAction = ImeAction.Done
+            imeAction = ImeAction.Done,
         )
     }
 
     override fun getName(sites: Sites) = strings.accessories.accessories
     override fun getIcon(sites: Sites) = Icons.Default.AddShoppingCart
     override fun getWidgets(sites: Sites) = listOf(
-        listOf(
-            hose,
-            heatingCable,
-            wallSupportBracket,
-            roomUnitsAndSensors,
-        ),
+        listOf(hose, heatingCable, wallSupportBracket, roomUnitsAndSensors),
         listOf(note),
     )
 }
@@ -1028,8 +1444,18 @@ fun Sites.createXml(
 
 <!-- 
 Tento soubor byl vygenerován automaticky aplikací Regulus Dotazník
-Verze dokumentu: 2.3 (Zaveden ve verzi aplikace 5.1.0)
+Verze dokumentu: 3.0 (Zaveden ve verzi aplikace 5.1.1)
 Verze aplikace: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) (${BuildConfig.BUILD_TYPE})
+-->
+
+<!--
+Změny ve verzi 3.0 oproti verzi 2.3:
+- Přidána všechna pole "řeší" v sekci /xml/system
+  - Né každá poptávka nyní řeší TČ
+- Přidána fotovoltaická elektrárna
+  - Přidána sekce /xml/fve - pouze pokud je poptávána
+  - Sekce  /xml/detailobjektu, /xml/tc, /xml/zdrojeTop, /xml/tv, /xml/zdrojeTV, /xml/bazen, /xml/prislusenstvi jsou zahrnuty pouze pokud je poptávané TČ
+  - Přidána poznámka k FVE (/xml/poznamka/fve)
 -->
 
 <!--
@@ -1047,7 +1473,15 @@ Změny ve verzi 2.3 oproti verzi 2.2:
 <xml>
     <system>
         <kod1>${contacts.demandOrigin.toXmlEntry()}</kod1>
-        <resi_tc>Ano</resi_tc>
+        <resi_tc>${if (0 in contacts.demandSubject.chosenIndices) strings.yes else strings.no}</resi_tc>
+        <resi_fve>${if (1 in contacts.demandSubject.chosenIndices) strings.yes else strings.no}</resi_fve>
+        <resi_sol>${strings.no}</resi_sol>
+        <resi_rek>${strings.no}</resi_rek>
+        <resi_krb>${strings.no}</resi_krb>
+        <resi_konz>${strings.no}</resi_konz>
+        <resi_jine>${strings.no}</resi_jine>
+        <resi_jine_uvedte>${strings.no}</resi_jine_uvedte>
+        <resi_doporuc>${strings.no}</resi_doporuc>
         <cislo_ko>${user.koNumber}</cislo_ko>
         <odesilatel>${user.email}</odesilatel>
         <odberatel_ico>${user.crn}</odberatel_ico>
@@ -1064,7 +1498,8 @@ Změny ve verzi 2.3 oproti verzi 2.2:
 }</psc>
         <mesto>${contacts.city.toXmlEntry()}</mesto>
         <partner_ico>${contacts.assemblyCompany.crn}</partner_ico>
-    </kontakt>
+    </kontakt>${
+    """
     <detailobjektu>
         <os_popis>${system.heatingSystem.toXmlEntry()}</os_popis>
         <tepelna_ztrata>${objectDetails.heatLost.toXmlEntry()}</tepelna_ztrata>
@@ -1123,6 +1558,40 @@ Změny ve verzi 2.3 oproti verzi 2.2:
         <drzak_na_tc>${accessories.wallSupportBracket.toXmlEntry()}</drzak_na_tc>
         <pokojova_cidla_a_jednotky>${accessories.roomUnitsAndSensors.toXmlEntry()}</pokojova_cidla_a_jednotky>
     </prislusenstvi>
+""".takeIf { 0 in contacts.demandSubject.chosenIndices }.orEmpty()
+}${
+    """
+    <fve>
+        <stavajici_topeni>${photovoltaicPowerPlant.currentHeating.toXmlEntry()}</stavajici_topeni>
+        <stavajici_tuv>${photovoltaicPowerPlant.currentHotWater.toXmlEntry()}</stavajici_tuv>
+        <stavajici_zasobniky>${photovoltaicPowerPlant.currentTanks.toXmlEntry()}</stavajici_zasobniky>
+        <stavajici_spotreba>${photovoltaicPowerPlant.currentConsumption.toXmlEntry()}</stavajici_spotreba>
+        <jistic>${photovoltaicPowerPlant.breakerSize.toXmlEntry()}</jistic>
+        <sazba>${photovoltaicPowerPlant.tariff.toXmlEntry()}</sazba>
+        <umisteni_rozvadece>${photovoltaicPowerPlant.breakerBoxLocation.toXmlEntry()}</umisteni_rozvadece>
+        <pozadovany_vykon>${photovoltaicPowerPlant.requiredPower.toXmlEntry()}</pozadovany_vykon>
+        <rozmer_1>${photovoltaicPowerPlant.size1.toXmlEntry()}</rozmer_1>
+        <orientace_1>${photovoltaicPowerPlant.orientation1.toXmlEntry()}</orientace_1>
+        <sklon_1>${photovoltaicPowerPlant.slope1.toXmlEntry()}</sklon_1>
+        <rozmer_2>${photovoltaicPowerPlant.size2.toXmlEntry()}</rozmer_2>
+        <orientace_2>${photovoltaicPowerPlant.orientation2.toXmlEntry()}</orientace_2>
+        <sklon_2>${photovoltaicPowerPlant.slope2.toXmlEntry()}</sklon_2>
+        <rozmer_3>${photovoltaicPowerPlant.size3.toXmlEntry()}</rozmer_3>
+        <orientace_3>${photovoltaicPowerPlant.orientation3.toXmlEntry()}</orientace_3>
+        <sklon_3>${photovoltaicPowerPlant.slope3.toXmlEntry()}</sklon_3>
+        <rozmer_4>${photovoltaicPowerPlant.size4.toXmlEntry()}</rozmer_4>
+        <orientace_4>${photovoltaicPowerPlant.orientation4.toXmlEntry()}</orientace_4>
+        <sklon_4>${photovoltaicPowerPlant.slope4.toXmlEntry()}</sklon_4>
+        <material_strecha>${photovoltaicPowerPlant.roofMaterial.toXmlEntry()}</material_strecha>
+        <baterie>${photovoltaicPowerPlant.battery.checkBox.toXmlEntry()}</baterie>
+        <baterie_kapacita>${photovoltaicPowerPlant.battery.textField.toXmlEntry()}</baterie_kapacita>
+        <voda>${photovoltaicPowerPlant.water.toXmlEntry()}</voda>
+        <sit>${photovoltaicPowerPlant.network.checkBox.toXmlEntry()}</sit>
+        <sit_vykon>${photovoltaicPowerPlant.network.textField.toXmlEntry()}</sit_vykon>
+        <dobijeni>${photovoltaicPowerPlant.charging.toXmlEntry()}</dobijeni>
+    </fve>
+""".takeIf { 1 in contacts.demandSubject.chosenIndices }.orEmpty()
+}
     <poznamka>
         <kontakty>${contacts.note.toXmlEntry()}</kontakty>
         <detail_objektu>${objectDetails.note.toXmlEntry()}</detail_objektu>
@@ -1130,6 +1599,7 @@ Změny ve verzi 2.3 oproti verzi 2.2:
         <bazen>${pool.note.toXmlEntry()}</bazen>
         <doplnkove_zdroje>${additionalSources.note.toXmlEntry()}</doplnkove_zdroje>
         <prislusenstvi>${accessories.note.toXmlEntry()}</prislusenstvi>
+        <fve>${photovoltaicPowerPlant.note.toXmlEntry()}</fve>
     </poznamka>
 </xml>
 """
