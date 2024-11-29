@@ -2,6 +2,7 @@ package cz.regulus.dotaznik.dotaznik
 
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
+import cz.regulus.dotaznik.strings.strings
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -123,8 +124,8 @@ context(Sites) @Style3 fun DoubleChooser.toXmlEntry() = "${getChosen(this@Sites)
 context(Sites) @Style3 fun TextField.toXmlEntry() = getText(this@Sites)
 context(Sites) @Style3 fun TextFieldWithUnits.toXmlEntry() = getText(this@Sites)
 context(Sites) @Style3 fun TextFieldWithUnits.toXmlEntry2() = getChosenUnit(this@Sites)
-context(Sites) @Style3 fun CheckBox.toXmlEntry() = if (getChecked(this@Sites)) "Ano" else "Ne"
-context(Sites) @Style3 fun CheckBoxWithChooser.toXmlEntry() = if (getChecked(this@Sites)) getChosen(this@Sites) else "Ne"
+context(Sites) @Style3 fun CheckBox.toXmlEntry() = if (getChecked(this@Sites)) strings.yes else strings.no
+context(Sites) @Style3 fun CheckBoxWithChooser.toXmlEntry() = if (getChecked(this@Sites)) getChosen(this@Sites) else strings.no
 context(Sites) @Style3 fun DropdownWithAmount.toXmlEntry() = getValuesWithAmounts(this@Sites)
 context(Sites) @Style3 fun Contacts.DemandOrigin.toXmlEntry() = getCode(this@Sites)
 context(Sites) fun String.emptyUnlessChecked(widget: HasCheckBox) = if (widget.getChecked(this@Sites)) this else ""
