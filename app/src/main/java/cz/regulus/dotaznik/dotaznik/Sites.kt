@@ -15,6 +15,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import cz.regulus.dotaznik.BuildConfig
 import cz.regulus.dotaznik.Products
 import cz.regulus.dotaznik.User
+import cz.regulus.dotaznik.dotaznik.Pool.WantsPool
 import cz.regulus.dotaznik.strings.strings
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -392,6 +393,7 @@ data class System(
     val waterTankVolume: WaterTankVolume = WaterTankVolume(),
     val heatingSystem: HeatingSystem = HeatingSystem(),
     val hotWaterCirculation: HotWaterCirculation = HotWaterCirculation(),
+    val wantsPool: WantsPool = WantsPool(),
     val note: Note = Note(),
 ) : Site {
     override fun copyWidget(newWidget: Widget) = when (newWidget) {
@@ -405,6 +407,7 @@ data class System(
         is IndoorUnitType -> copy(indoorUnitType = newWidget)
         is WaterTankType -> copy(waterTankType = newWidget)
         is HotWaterCirculation -> copy(hotWaterCirculation = newWidget)
+        is WantsPool -> copy(wantsPool = newWidget)
         else -> this
     }
 
@@ -543,6 +546,7 @@ data class System(
         listOf(waterTankType, waterTankVolume),
         listOf(heatingSystem),
         listOf(hotWaterCirculation),
+        listOf(wantsPool),
         listOf(note),
     )
 }
@@ -550,7 +554,6 @@ data class System(
 @Serializable
 @SerialName("Pool")
 data class Pool(
-    val wantsPool: WantsPool = WantsPool(),
     val usagePeriod: UsagePeriod = UsagePeriod(),
     val placement: Placement = Placement(),
     val waterType: WaterType = WaterType(),
@@ -575,9 +578,10 @@ data class Pool(
         is Shape -> copy(shape = newWidget)
         is Placement -> copy(placement = newWidget)
         is Coverage -> copy(coverage = newWidget)
-        is WantsPool -> copy(wantsPool = newWidget)
         else -> this
     }
+
+    override fun showSite(sites: Sites) = sites.system.wantsPool.getChecked(sites)
 
     @Serializable
     data class WantsPool(
@@ -597,8 +601,6 @@ data class Pool(
             strings.pool.periodYearlong,
             strings.pool.periodSeasonal,
         )
-
-        override fun showWidget(sites: Sites) = sites.pool.wantsPool.getChecked(sites)
     }
 
     @Serializable
@@ -611,8 +613,6 @@ data class Pool(
             strings.pool.locationOutdoor,
             strings.pool.locationIndoor,
         )
-
-        override fun showWidget(sites: Sites) = sites.pool.wantsPool.getChecked(sites)
     }
 
     @Serializable
@@ -625,8 +625,6 @@ data class Pool(
             strings.pool.freshType,
             strings.pool.saltType,
         )
-
-        override fun showWidget(sites: Sites) = sites.pool.wantsPool.getChecked(sites)
     }
 
     @Serializable
@@ -640,8 +638,6 @@ data class Pool(
             strings.pool.shapeOval,
             strings.pool.shapeCircle,
         )
-
-        override fun showWidget(sites: Sites) = sites.pool.wantsPool.getChecked(sites)
     }
 
     @Serializable
@@ -651,8 +647,7 @@ data class Pool(
         override fun changeText(text: String?) = copy(text = text)
         override fun getLabel(sites: Sites) = strings.pool.length
         override fun getSuffix(sites: Sites) = strings.units.m
-        override fun showWidget(sites: Sites) =
-            sites.pool.wantsPool.getChecked(sites) && sites.pool.shape.getChosen(sites) != strings.pool.shapeCircle
+        override fun showWidget(sites: Sites) = sites.pool.shape.getChosen(sites) != strings.pool.shapeCircle
 
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
             keyboardType = KeyboardType.Decimal
@@ -666,8 +661,7 @@ data class Pool(
         override fun changeText(text: String?) = copy(text = text)
         override fun getLabel(sites: Sites) = strings.pool.width
         override fun getSuffix(sites: Sites) = strings.units.m
-        override fun showWidget(sites: Sites) =
-            sites.pool.wantsPool.getChecked(sites) && sites.pool.shape.getChosen(sites) != strings.pool.shapeCircle
+        override fun showWidget(sites: Sites) = sites.pool.shape.getChosen(sites) != strings.pool.shapeCircle
 
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
             keyboardType = KeyboardType.Decimal
@@ -681,8 +675,7 @@ data class Pool(
         override fun changeText(text: String?) = copy(text = text)
         override fun getLabel(sites: Sites) = strings.pool.radius
         override fun getSuffix(sites: Sites) = strings.units.m
-        override fun showWidget(sites: Sites) =
-            sites.pool.wantsPool.getChecked(sites) && sites.pool.shape.getChosen(sites) == strings.pool.shapeCircle
+        override fun showWidget(sites: Sites) = sites.pool.shape.getChosen(sites) == strings.pool.shapeCircle
 
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
             keyboardType = KeyboardType.Decimal
@@ -696,7 +689,6 @@ data class Pool(
         override fun changeText(text: String?) = copy(text = text)
         override fun getLabel(sites: Sites) = strings.pool.depth
         override fun getSuffix(sites: Sites) = strings.units.m
-        override fun showWidget(sites: Sites) = sites.pool.wantsPool.getChecked(sites)
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
             keyboardType = KeyboardType.Decimal
         )
@@ -714,8 +706,6 @@ data class Pool(
             strings.pool.coveragePolycarbonate,
             strings.otherNeuter,
         )
-
-        override fun showWidget(sites: Sites) = sites.pool.wantsPool.getChecked(sites)
     }
 
     @Serializable
@@ -725,7 +715,6 @@ data class Pool(
         override fun changeText(text: String?) = copy(text = text)
         override fun getLabel(sites: Sites) = strings.pool.temperature
         override fun getSuffix(sites: Sites) = strings.units.degreeCelsius
-        override fun showWidget(sites: Sites) = sites.pool.wantsPool.getChecked(sites)
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
             keyboardType = KeyboardType.Number
         )
@@ -746,7 +735,6 @@ data class Pool(
     override fun getIcon(sites: Sites) = Icons.Default.Pool
     override fun getWidgets(sites: Sites) = listOf(
         listOf(
-            wantsPool,
             usagePeriod,
             placement,
             waterType,
@@ -1117,17 +1105,17 @@ Změny ve verzi 2.3 oproti verzi 2.2:
         <jiny_zdroj>${additionalSources.otherHotWater.toXmlEntry()}</jiny_zdroj>
     </zdrojeTV>
     <bazen>
-        <ohrev>${pool.wantsPool.toXmlEntry()}</ohrev>
-        <doba_vyuzivani>${pool.usagePeriod.toXmlEntry().emptyUnlessChecked(pool.wantsPool)}</doba_vyuzivani>
-        <umisteni>${pool.placement.toXmlEntry().emptyUnlessChecked(pool.wantsPool)}</umisteni>
-        <zakryti>${pool.coverage.toXmlEntry().emptyUnlessChecked(pool.wantsPool)}</zakryti>
-        <tvar>${pool.shape.toXmlEntry().emptyUnlessChecked(pool.wantsPool)}</tvar>
+        <ohrev>${system.wantsPool.toXmlEntry()}</ohrev>
+        <doba_vyuzivani>${pool.usagePeriod.toXmlEntry().emptyUnlessChecked(system.wantsPool)}</doba_vyuzivani>
+        <umisteni>${pool.placement.toXmlEntry().emptyUnlessChecked(system.wantsPool)}</umisteni>
+        <zakryti>${pool.coverage.toXmlEntry().emptyUnlessChecked(system.wantsPool)}</zakryti>
+        <tvar>${pool.shape.toXmlEntry().emptyUnlessChecked(system.wantsPool)}</tvar>
         <sirka>${pool.width.toXmlEntry()}</sirka>
         <delka>${pool.length.toXmlEntry()}</delka>
         <hloubka>${pool.depth.toXmlEntry()}</hloubka>
         <prumer>${pool.radius.toXmlEntry()}</prumer>
         <teplota>${pool.desiredTemperature.toXmlEntry()}</teplota>
-        <voda>${pool.waterType.toXmlEntry().emptyUnlessChecked(pool.wantsPool)}</voda>
+        <voda>${pool.waterType.toXmlEntry().emptyUnlessChecked(system.wantsPool)}</voda>
     </bazen>
     <prislusenstvi>
         <hadice>${accessories.hose.toXmlEntry()}</hadice>
