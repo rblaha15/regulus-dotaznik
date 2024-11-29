@@ -1,5 +1,6 @@
 package cz.regulus.dotaznik.dotaznik
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -62,9 +63,11 @@ fun Widget(
         is TextField -> TextField(widget, sites, editWidget)
         is TextFieldWithUnits -> TextFieldWithUnits(widget, sites, editWidget)
         is Chooser -> Chooser(widget, editWidget, sites)
+        is MultiChooser -> MultiChooser(widget, editWidget, sites)
         is DoubleChooser -> DoubleChooser(widget, editWidget, sites)
         is CheckBox -> Checkbox(widget, sites, editWidget)
         is CheckBoxWithChooser -> CheckboxWithChooser(widget, sites, editWidget)
+        is CheckBoxWithTextField -> CheckBoxWithTextField(widget, sites, editWidget)
         is DropdownWithAmount -> DropdownWithAmount(widget, sites, editWidget)
         is Contacts.AssemblyCompany -> AssemblyCompany(widget, companies, editWidget)
         else -> {}
@@ -78,7 +81,7 @@ private fun Title(
 ) = Text(
     text = widget.getTitle(sites),
     Modifier.padding(all = 8.dp),
-    style = MaterialTheme.typography.headlineSmall,
+    style = widget.getStyle(sites)(MaterialTheme.typography),
 )
 
 @Composable
@@ -196,6 +199,29 @@ private fun Chooser(
         .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
     label = widget.getLabel(sites),
     placeholder = widget.getPlaceholder(sites),
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MultiChooser(
+    widget: MultiChooser,
+    editWidget: (Widget) -> Unit,
+    sites: Sites,
+) = CoreChooser(
+    value = widget.getChosen(sites).joinToString(),
+    options = widget.getOptions(sites),
+    onClick = { i, _ ->
+        editWidget(widget.toggleIndex(i))
+    },
+    Modifier
+        .fillMaxWidth()
+        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+    label = widget.getLabel(sites),
+    placeholder = widget.getPlaceholder(sites),
+    isSelected = { i, _ ->
+        i in widget.chosenIndices
+    },
+    close = false,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -353,6 +379,59 @@ private fun CheckboxWithChooser(
             }
         }
     }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun CheckBoxWithTextField(
+    widget: CheckBoxWithTextField,
+    sites: Sites,
+    editWidget: (Widget) -> Unit,
+) = Row(
+    Modifier
+        .fillMaxWidth()
+        .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+    verticalAlignment = Alignment.CenterVertically,
+) {
+    val focusManager = LocalFocusManager.current
+    var checked by remember { mutableStateOf(widget.getChecked(sites)) }
+    var text by remember { mutableStateOf(widget.getText(sites)) }
+    Checkbox(
+        checked = checked,
+        onCheckedChange = {
+            checked = it
+            editWidget(widget.changeChecked(it))
+        },
+    )
+    OutlinedTextField(
+        value = if (checked) text else "",
+        onValueChange = {
+            text = it
+            editWidget(widget.changeText(it))
+        },
+        Modifier
+            .fillMaxWidth()
+            .clickable(!checked) {
+                checked = true
+                editWidget(widget.changeChecked(true))
+            }
+            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+        label = { Text(widget.getLabel(sites)) },
+        placeholder = { Text(widget.getPlaceholder(sites)) },
+        trailingIcon = {
+            Text(text = widget.getSuffix(sites))
+        },
+        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
+            disabledLabelColor = LocalContentColor.current,
+            disabledBorderColor = Color.Transparent,
+        ),
+        enabled = checked,
+        keyboardActions = KeyboardActions {
+            focusManager.moveFocus(FocusDirection.Down)
+        },
+        singleLine = true,
+        keyboardOptions = widget.getKeyboard(sites),
+    )
 }
 
 @Composable
@@ -543,6 +622,8 @@ fun CoreChooser(
     options: List<String>,
     onClick: (Int, String) -> Unit,
     modifier: Modifier = Modifier,
+    isSelected: ((Int, String) -> Boolean)? = { _, v -> v == value },
+    close: Boolean = true,
     label: String = "",
     placeholder: String = "",
     colors: TextFieldColors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
@@ -583,13 +664,15 @@ fun CoreChooser(
                     text = { Text(option) },
                     onClick = {
                         onClick(i, option)
-                        expanded = false
-                        focusManager.clearFocus()
+                        if (close) {
+                            expanded = false
+                            focusManager.clearFocus()
+                        }
                     },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                    leadingIcon = {
-                        if (option == value) Icon(Icons.Default.Check, null)
-                    }
+                    leadingIcon = isSelected?.let { {
+                        if (it(i, option)) Icon(Icons.Default.Check, null)
+                    } },
                 )
             }
         }

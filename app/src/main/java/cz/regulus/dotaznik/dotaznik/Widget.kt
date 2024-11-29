@@ -1,7 +1,10 @@
 package cz.regulus.dotaznik.dotaznik
 
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Typography
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import cz.regulus.dotaznik.strings.strings
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -39,6 +42,15 @@ interface HasChooser : Widget {
     val chosenIndex: Int? get() = null
     fun changeChosenIndex(chosenIndex: Int?): HasChooser
     fun getDefaultIndex(sites: Sites) = 0
+}
+
+interface HasMultiChooser : Widget {
+    fun getOptions(sites: Sites): List<String>
+    fun getPlaceholder(sites: Sites): String = ""
+
+    val chosenIndices: Set<Int> get() = emptySet()
+    fun changeChosenIndices(chosenIndices: Set<Int>): HasMultiChooser
+    fun getDefaultIndices(sites: Sites) = emptySet<Int>()
 }
 
 interface HasFollowUpChooser : Widget {
@@ -80,13 +92,16 @@ interface HasMaxSumOfNumbers : Widget, HasAmount {
 
 interface HasTitle : Widget {
     fun getTitle(sites: Sites): String
+    fun getStyle(sites: Sites): (Typography) -> TextStyle = Typography::headlineSmall
 }
 
 @Serializable @SerialName("TextField") sealed interface TextField : HasTextField, HasLabel
 @Serializable @SerialName("TextFieldWithUnits") sealed interface TextFieldWithUnits : HasTextField, HasUnits, HasLabel
 @Serializable @SerialName("Chooser") sealed interface Chooser : HasChooser, HasLabel
+@Serializable @SerialName("MultiChooser") sealed interface MultiChooser : HasMultiChooser, HasLabel
 @Serializable @SerialName("DoubleChooser") sealed interface DoubleChooser : HasChooser, HasFollowUpChooser, HasLabel
 @Serializable @SerialName("CheckBox") sealed interface CheckBox : HasCheckBox, HasLabel
+@Serializable @SerialName("CheckBoxWithTextField") sealed interface CheckBoxWithTextField : HasCheckBox, HasTextField, HasLabel
 @Serializable @SerialName("CheckBoxWithChooser") sealed interface CheckBoxWithChooser : HasCheckBox, HasChooser, HasLabel
 @Serializable @SerialName("DropdownWithAmount") sealed interface DropdownWithAmount : HasDropdown, HasAmount, HasLabel
 @Serializable @SerialName("Other") sealed interface Other : Widget
@@ -113,8 +128,8 @@ context(Sites) @Style3 fun DoubleChooser.toXmlEntry() = "${getChosen(this@Sites)
 context(Sites) @Style3 fun TextField.toXmlEntry() = getText(this@Sites)
 context(Sites) @Style3 fun TextFieldWithUnits.toXmlEntry() = getText(this@Sites)
 context(Sites) @Style3 fun TextFieldWithUnits.toXmlEntry2() = getChosenUnit(this@Sites)
-context(Sites) @Style3 fun CheckBox.toXmlEntry() = if (getChecked(this@Sites)) "Ano" else "Ne"
-context(Sites) @Style3 fun CheckBoxWithChooser.toXmlEntry() = if (getChecked(this@Sites)) getChosen(this@Sites) else "Ne"
+context(Sites) @Style3 fun CheckBox.toXmlEntry() = if (getChecked(this@Sites)) strings.yes else strings.no
+context(Sites) @Style3 fun CheckBoxWithChooser.toXmlEntry() = if (getChecked(this@Sites)) getChosen(this@Sites) else strings.no
 context(Sites) @Style3 fun DropdownWithAmount.toXmlEntry() = getValuesWithAmounts(this@Sites)
 context(Sites) @Style3 fun Contacts.DemandOrigin.toXmlEntry() = getCode(this@Sites)
 context(Sites) fun String.emptyUnlessChecked(widget: HasCheckBox) = if (widget.getChecked(this@Sites)) this else ""
@@ -130,6 +145,14 @@ fun HasChooser.getDefault(sites: Sites) =
     if (getShowPlaceholder(sites)) "" else getOptions(sites)[getDefaultIndex(sites)]
 fun HasChooser.getChosen(sites: Sites) = chosenIndex?.let { getOptions(sites).getOrNull(it) } ?: getDefault(sites)
 fun HasChooser.getChosenIndex(sites: Sites) = chosenIndex ?: getDefaultIndex(sites)
+
+fun HasMultiChooser.getShowPlaceholder(sites: Sites) = getPlaceholder(sites).isNotEmpty()
+fun HasMultiChooser.getDefault(sites: Sites) =
+    if (getShowPlaceholder(sites)) emptyList() else getOptions(sites).slice(getDefaultIndices(sites))
+
+fun HasMultiChooser.getChosen(sites: Sites) = getOptions(sites).slice(chosenIndices)
+fun HasMultiChooser.toggleIndex(index: Int) =
+    if (index in chosenIndices) changeChosenIndices(chosenIndices - index) else changeChosenIndices(chosenIndices + index)
 
 fun HasFollowUpChooser.getShowPlaceholder2(sites: Sites) = getPlaceholder2(sites).isNotEmpty()
 fun HasFollowUpChooser.getDefault2(sites: Sites) =
@@ -160,3 +183,6 @@ fun HasAmount.getValuesWithAmounts(sites: Sites) = this
 fun HasMaxSumOfNumbers.getCurrentSum(sites: Sites): Int = getAmounts(sites).values.sum()
 
 fun HasDropdown.getItemCount(sites: Sites) = getItems(sites).size
+
+val <T> T.checkBox where T : HasCheckBox, T : HasLabel get() = this as CheckBox
+val <T> T.textField where T : HasTextField, T : HasLabel get() = this as TextField
