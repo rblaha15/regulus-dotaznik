@@ -152,8 +152,9 @@ fun Questionnaire(
     removeAll: () -> Unit,
     isDebug: Boolean,
 ) {
+    val sitesToShow by remember(sites) { derivedStateOf { sites.orEmpty().let { sites -> sites.vse.filter { it.showSite(sites) } } } }
     val pagerState = rememberPagerState(pageCount = {
-        (sites.orEmpty()).vse.size
+        sitesToShow.count()
     })
     val drawerState = rememberDrawerState(DrawerValue.Open)
     val scope = rememberCoroutineScope()
@@ -195,7 +196,7 @@ fun Questionnaire(
 
                         HorizontalDivider(Modifier.fillMaxWidth())
 
-                        sites.orEmpty().vse.forEachIndexed { i, site ->
+                        sitesToShow.forEachIndexed { i, site ->
                             NavigationDrawerItem(
                                 label = {
                                     Text(site.getName(sites.orEmpty()))
@@ -288,8 +289,8 @@ fun Questionnaire(
     ) {
         ShowSendDialogs(sendState, changeState)
 
-        val currentSite = remember(pagerState.currentPage, sites) { sites?.vse?.get(pagerState.currentPage) }
-        if (currentSite != null && sites != null) Scaffold(
+        val currentSite = remember(pagerState.currentPage, sites) { sitesToShow.get(pagerState.currentPage) }
+        if (sites != null) Scaffold(
             Modifier
                 .imePadding()
                 .navigationBarsPadding(),
@@ -329,14 +330,14 @@ fun Questionnaire(
                 Modifier
                     .padding(paddingValues),
                 pageSpacing = 8.dp,
-                key = { sites.vse[it].getName(sites) },
+                key = { sitesToShow.getOrNull(it)?.getName(sites).orEmpty() },
             ) { i ->
                 Scaffold(
                     floatingActionButton = {
                         val posun = remember {
                             Animatable(0F)
                         }
-                        if (i == sites.vse.lastIndex) {
+                        if (i == sitesToShow.lastIndex) {
                             FloatingActionButton(
                                 onClick = {
                                     scope.launch {
@@ -361,10 +362,8 @@ fun Questionnaire(
                         Modifier
                             .fillMaxSize()
                     ) {
-                        val site by remember(sites.vse, i) {
-                            derivedStateOf {
-                                sites.vse[i]
-                            }
+                        val site by remember(sitesToShow, i) {
+                            derivedStateOf { sitesToShow[i] }
                         }
                         Column(
                             Modifier

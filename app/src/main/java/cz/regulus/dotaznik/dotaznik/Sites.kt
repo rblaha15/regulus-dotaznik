@@ -53,6 +53,7 @@ sealed interface Site {
     fun getName(sites: Sites): String
     fun getIcon(sites: Sites): ImageVector
     fun getWidgets(sites: Sites): List<List<Widget>>
+    fun showSite(sites: Sites) = true
 }
 
 @Serializable
