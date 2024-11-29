@@ -1,6 +1,8 @@
 package cz.regulus.dotaznik.dotaznik
 
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Typography
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import cz.regulus.dotaznik.strings.strings
 import kotlinx.serialization.SerialName
@@ -90,6 +92,7 @@ interface HasMaxSumOfNumbers : Widget, HasAmount {
 
 interface HasTitle : Widget {
     fun getTitle(sites: Sites): String
+    fun getStyle(sites: Sites): (Typography) -> TextStyle = Typography::headlineSmall
 }
 
 @Serializable @SerialName("TextField") sealed interface TextField : HasTextField, HasLabel

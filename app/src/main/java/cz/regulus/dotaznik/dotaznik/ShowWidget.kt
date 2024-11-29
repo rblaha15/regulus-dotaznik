@@ -79,7 +79,7 @@ private fun Title(
 ) = Text(
     text = widget.getTitle(sites),
     Modifier.padding(all = 8.dp),
-    style = MaterialTheme.typography.headlineSmall,
+    style = widget.getStyle(sites)(MaterialTheme.typography),
 )
 
 @Composable
