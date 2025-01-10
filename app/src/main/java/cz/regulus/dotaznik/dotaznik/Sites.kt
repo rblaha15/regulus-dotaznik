@@ -57,6 +57,7 @@ sealed interface Site {
     fun getName(sites: Sites): String
     fun getIcon(sites: Sites): ImageVector
     fun getWidgets(sites: Sites): List<List<Widget>>
+    fun getNote(sites: Sites): Widget
     fun showSite(sites: Sites) = true
 }
 
@@ -235,8 +236,8 @@ data class Contacts(
         listOf(demandOrigin, demandSubject),
         listOf(surname, name, street, city, zip, phone, email),
         listOf(assemblyCompany),
-        listOf(note),
     )
+    override fun getNote(sites: Sites) = note
 }
 
 @Serializable
@@ -706,8 +707,8 @@ data class PhotovoltaicPowerPlant(
             size3, orientation3, slope3, size4, orientation4, slope4
         ),
         listOf(battery, water, network, charging),
-        listOf(note),
     )
+    override fun getNote(sites: Sites) = note
 }
 
 @Serializable
@@ -884,8 +885,8 @@ data class ObjectDetails(
         listOf(heatNeedsForHeating, heatNeedsForHotWater),
         listOf(heatedArea, heatedVolume),
         listOf(heatingCosts, fuelType, fuelConsumption, fuelType2, fuelConsumption2),
-        listOf(note),
     )
+    override fun getNote(sites: Sites) = note
 }
 
 @Serializable
@@ -1066,8 +1067,8 @@ data class System(
         listOf(heatingSystem),
         listOf(hotWaterCirculation),
         listOf(wantsPool),
-        listOf(note),
     )
+    override fun getNote(sites: Sites) = note
 }
 
 @Serializable
@@ -1253,8 +1254,8 @@ data class Pool(
         listOf(usagePeriod, placement, waterType),
         listOf(shape, length, width, radius, depth),
         listOf(coverage, desiredTemperature),
-        listOf(note),
     )
+    override fun getNote(sites: Sites) = note
 }
 
 @Serializable
@@ -1414,8 +1415,8 @@ data class AdditionalSources(
     override fun getWidgets(sites: Sites) = listOf(
         listOf(TitleTopeni, heatingElementInStoreHeating, electricBoilerHeating, gasBoilerHeating, fireplaceHeating, otherHeating),
         listOf(TitleTeplaVoda, heatingElementInStoreHotWater, electricBoilerHotWater, gasBoilerHotWater, fireplaceHotWater, otherHotWater),
-        listOf(note),
     )
+    override fun getNote(sites: Sites) = note
 }
 
 @Serializable
@@ -1504,8 +1505,8 @@ data class Accessories(
     override fun getIcon(sites: Sites) = Icons.Default.AddShoppingCart
     override fun getWidgets(sites: Sites) = listOf(
         listOf(hose, heatingCable, wallSupportBracket, roomUnitsAndSensors),
-        listOf(note),
     )
+    override fun getNote(sites: Sites) = note
 }
 
 @Language("xml")

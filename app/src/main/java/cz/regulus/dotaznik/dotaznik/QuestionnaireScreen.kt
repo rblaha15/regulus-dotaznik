@@ -370,7 +370,7 @@ fun Questionnaire(
                                 .weight(1F)
                                 .verticalScroll(rememberScrollState())
                         ) {
-                            site.getWidgets(sites).dropLast(1).forEachIndexed { i, widgets ->
+                            site.getWidgets(sites).forEachIndexed { i, widgets ->
                                 widgets.forEach { widget ->
                                     Surface(
                                         Modifier.fillMaxWidth(),
@@ -392,7 +392,7 @@ fun Questionnaire(
                         Widget(
                             sites = sites,
                             companies = companies,
-                            widget = site.getWidgets(sites).last().last(),
+                            widget = site.getNote(sites),
                             editWidget = { newWidget ->
                                 editSites(sites.copySite(site.copyWidget(newWidget)))
                             },
@@ -476,20 +476,6 @@ private fun ShowSendDialogs(sendState: SendState, changeState: (moveOn: Boolean)
         },
         text = {
             Text(text = strings.export.pleaseFillInField(sendState.fieldLabel))
-        },
-    )
-
-    SendState.Sending -> AlertDialog(
-        onDismissRequest = {},
-        confirmButton = {},
-        dismissButton = {},
-        text = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                CircularProgressIndicator()
-                Text(text = strings.export.sending, Modifier.padding(8.dp))
-            }
         },
     )
 
