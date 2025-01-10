@@ -86,20 +86,22 @@ interface FVEStrings {
     val breakerBoxLocation: String
     val requirements: String
     val requiredPower: String
+    val locationBuidingType: String
+    val lightningRod: String
+    val familyHouseEtc: String
     val avaiableAreas: String
-    val size1: String
-    val orientation1: String
-    val slope1: String
-    val size2: String
-    val orientation2: String
-    val slope2: String
-    val size3: String
-    val orientation3: String
-    val slope3: String
-    val size4: String
-    val orientation4: String
-    val slope4: String
     val roofMaterial: String
+    val roofAge: String
+    val tile: String
+    val tileType: String
+    val metalSheetFolded: String
+    val metalSheetTrapezoidal: String
+    val foil: String
+    val asphaltShingle: String
+    val useOptimizers: String
+    val size: (Int) -> String
+    val orientation: (Int) -> String
+    val slope: (Int) -> String
     val battery: String
     val batteryCapacity: String
     val water: String

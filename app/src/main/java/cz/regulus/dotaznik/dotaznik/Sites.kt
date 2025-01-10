@@ -107,7 +107,7 @@ data class Contacts(
         override val chosenIndex: Int? = null,
     ) : Chooser {
         override fun getOptions(sites: Sites) = getOrigins().keys.toList()
-        override fun getLabel(sites: Sites) = strings.contacts.demandOrigin + "*"
+        override fun getLabel(sites: Sites) = strings.contacts.demandOrigin + " *"
         override fun getPlaceholder(sites: Sites) = strings.choose
         override fun changeChosenIndex(chosenIndex: Int?): HasChooser =
             copy(chosenIndex = chosenIndex)
@@ -251,6 +251,12 @@ data class PhotovoltaicPowerPlant(
     val tariff: Tariff = Tariff(),
     val breakerBoxLocation: BreakerBoxLocation = BreakerBoxLocation(),
     val requiredPower: RequiredPower = RequiredPower(),
+    val locationBuidingType: LocationBuidingType = LocationBuidingType(),
+    val lightningRod: LightningRod = LightningRod(),
+    val roofMaterial: RoofMaterial = RoofMaterial(),
+    val tileType: TileType = TileType(),
+    val roofAge: RoofAge = RoofAge(),
+    val useOptimizers: UseOptimizers = UseOptimizers(),
     val size1: Size1 = Size1(),
     val orientation1: Orientation1 = Orientation1(),
     val slope1: Slope1 = Slope1(),
@@ -263,7 +269,6 @@ data class PhotovoltaicPowerPlant(
     val size4: Size4 = Size4(),
     val orientation4: Orientation4 = Orientation4(),
     val slope4: Slope4 = Slope4(),
-    val roofMaterial: RoofMaterial = RoofMaterial(),
     val battery: Battery = Battery(),
     val water: Water = Water(),
     val network: Network = Network(),
@@ -279,6 +284,12 @@ data class PhotovoltaicPowerPlant(
         is Tariff -> copy(tariff = newWidget)
         is BreakerBoxLocation -> copy(breakerBoxLocation = newWidget)
         is RequiredPower -> copy(requiredPower = newWidget)
+        is LocationBuidingType -> copy(locationBuidingType = newWidget)
+        is LightningRod -> copy(lightningRod = newWidget)
+        is RoofMaterial -> copy(roofMaterial = newWidget)
+        is TileType -> copy(tileType = newWidget)
+        is RoofAge -> copy(roofAge = newWidget)
+        is UseOptimizers -> copy(useOptimizers = newWidget)
         is Size1 -> copy(size1 = newWidget)
         is Orientation1 -> copy(orientation1 = newWidget)
         is Slope1 -> copy(slope1 = newWidget)
@@ -291,7 +302,6 @@ data class PhotovoltaicPowerPlant(
         is Size4 -> copy(size4 = newWidget)
         is Orientation4 -> copy(orientation4 = newWidget)
         is Slope4 -> copy(slope4 = newWidget)
-        is RoofMaterial -> copy(roofMaterial = newWidget)
         is Battery -> copy(battery = newWidget)
         is Water -> copy(water = newWidget)
         is Network -> copy(network = newWidget)
@@ -408,6 +418,80 @@ data class PhotovoltaicPowerPlant(
     }
 
     @Serializable
+    data class LocationBuidingType(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.locationBuidingType
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+        override fun getPlaceholder(sites: Sites) = strings.fve.familyHouseEtc
+    }
+
+    @Serializable
+    data class LightningRod(
+        override val checked: Boolean? = null,
+    ) : CheckBox {
+        override fun changeChecked(checked: Boolean?) = copy(checked = checked)
+        override fun getLabel(sites: Sites) = strings.fve.lightningRod
+    }
+
+    @Serializable
+    data class RoofMaterial(
+        override val text: String? = null,
+    ) : TextFieldWithHint {
+        override fun getOptions(sites: Sites) = listOf(
+            strings.fve.tile,
+            strings.fve.metalSheetFolded,
+            strings.fve.metalSheetTrapezoidal,
+            strings.fve.foil,
+            strings.fve.asphaltShingle,
+        )
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.roofMaterial
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class TileType(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.tileType
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+
+        override fun showWidget(sites: Sites) = sites.photovoltaicPowerPlant.roofMaterial.text == strings.fve.tile
+    }
+
+    @Serializable
+    data class RoofAge(
+        override val text: String? = null,
+    ) : TextField {
+        override fun changeText(text: String?) = copy(text = text)
+        override fun getLabel(sites: Sites) = strings.fve.roofAge
+        override fun getKeyboard(sites: Sites) = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+        )
+    }
+
+    @Serializable
+    data class UseOptimizers(
+        override val checked: Boolean? = null,
+    ) : CheckBox {
+        override fun changeChecked(checked: Boolean?) = copy(checked = checked)
+        override fun getLabel(sites: Sites) = strings.fve.useOptimizers
+    }
+
+    @Serializable
     data object TitleAreas : HasTitle {
         override fun getTitle(sites: Sites) = strings.fve.avaiableAreas
         override fun getStyle(sites: Sites) = Typography::titleSmall::get
@@ -418,7 +502,7 @@ data class PhotovoltaicPowerPlant(
         override val text: String? = null,
     ) : TextField {
         override fun changeText(text: String?) = copy(text = text)
-        override fun getLabel(sites: Sites) = strings.fve.size1
+        override fun getLabel(sites: Sites) = strings.fve.size(1)
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Text,
@@ -430,7 +514,7 @@ data class PhotovoltaicPowerPlant(
         override val text: String? = null,
     ) : TextField {
         override fun changeText(text: String?) = copy(text = text)
-        override fun getLabel(sites: Sites) = strings.fve.orientation1
+        override fun getLabel(sites: Sites) = strings.fve.orientation(1)
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Text,
@@ -442,7 +526,7 @@ data class PhotovoltaicPowerPlant(
         override val text: String? = null,
     ) : TextField {
         override fun changeText(text: String?) = copy(text = text)
-        override fun getLabel(sites: Sites) = strings.fve.slope1
+        override fun getLabel(sites: Sites) = strings.fve.slope(1)
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Text,
@@ -454,7 +538,7 @@ data class PhotovoltaicPowerPlant(
         override val text: String? = null,
     ) : TextField {
         override fun changeText(text: String?) = copy(text = text)
-        override fun getLabel(sites: Sites) = strings.fve.size2
+        override fun getLabel(sites: Sites) = strings.fve.size(2)
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Text,
@@ -466,7 +550,7 @@ data class PhotovoltaicPowerPlant(
         override val text: String? = null,
     ) : TextField {
         override fun changeText(text: String?) = copy(text = text)
-        override fun getLabel(sites: Sites) = strings.fve.orientation2
+        override fun getLabel(sites: Sites) = strings.fve.orientation(2)
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Text,
@@ -478,7 +562,7 @@ data class PhotovoltaicPowerPlant(
         override val text: String? = null,
     ) : TextField {
         override fun changeText(text: String?) = copy(text = text)
-        override fun getLabel(sites: Sites) = strings.fve.slope2
+        override fun getLabel(sites: Sites) = strings.fve.slope(2)
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Text,
@@ -490,7 +574,7 @@ data class PhotovoltaicPowerPlant(
         override val text: String? = null,
     ) : TextField {
         override fun changeText(text: String?) = copy(text = text)
-        override fun getLabel(sites: Sites) = strings.fve.size3
+        override fun getLabel(sites: Sites) = strings.fve.size(3)
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Text,
@@ -502,7 +586,7 @@ data class PhotovoltaicPowerPlant(
         override val text: String? = null,
     ) : TextField {
         override fun changeText(text: String?) = copy(text = text)
-        override fun getLabel(sites: Sites) = strings.fve.orientation3
+        override fun getLabel(sites: Sites) = strings.fve.orientation(3)
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Text,
@@ -514,7 +598,7 @@ data class PhotovoltaicPowerPlant(
         override val text: String? = null,
     ) : TextField {
         override fun changeText(text: String?) = copy(text = text)
-        override fun getLabel(sites: Sites) = strings.fve.slope3
+        override fun getLabel(sites: Sites) = strings.fve.slope(3)
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Text,
@@ -526,7 +610,7 @@ data class PhotovoltaicPowerPlant(
         override val text: String? = null,
     ) : TextField {
         override fun changeText(text: String?) = copy(text = text)
-        override fun getLabel(sites: Sites) = strings.fve.size4
+        override fun getLabel(sites: Sites) = strings.fve.size(4)
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Text,
@@ -538,7 +622,7 @@ data class PhotovoltaicPowerPlant(
         override val text: String? = null,
     ) : TextField {
         override fun changeText(text: String?) = copy(text = text)
-        override fun getLabel(sites: Sites) = strings.fve.orientation4
+        override fun getLabel(sites: Sites) = strings.fve.orientation(4)
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Text,
@@ -550,19 +634,7 @@ data class PhotovoltaicPowerPlant(
         override val text: String? = null,
     ) : TextField {
         override fun changeText(text: String?) = copy(text = text)
-        override fun getLabel(sites: Sites) = strings.fve.slope4
-        override fun getKeyboard(sites: Sites) = KeyboardOptions(
-            imeAction = ImeAction.Next,
-            keyboardType = KeyboardType.Text,
-        )
-    }
-
-    @Serializable
-    data class RoofMaterial(
-        override val text: String? = null,
-    ) : TextField {
-        override fun changeText(text: String?) = copy(text = text)
-        override fun getLabel(sites: Sites) = strings.fve.roofMaterial
+        override fun getLabel(sites: Sites) = strings.fve.slope(4)
         override fun getKeyboard(sites: Sites) = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Text,
@@ -628,7 +700,7 @@ data class PhotovoltaicPowerPlant(
     override fun getIcon(sites: Sites) = Icons.Default.SolarPower
     override fun getWidgets(sites: Sites) = listOf(
         listOf(TitleCurrent, currentHeating, currentHotWater, currentTanks, currentConsumption, breakerSize, tariff, breakerBoxLocation),
-        listOf(TitleRequirements, requiredPower, roofMaterial),
+        listOf(TitleRequirements, requiredPower, locationBuidingType, lightningRod, roofMaterial, tileType, roofAge, useOptimizers),
         listOf(
             TitleAreas, size1, orientation1, slope1, size2, orientation2, slope2,
             size3, orientation3, slope3, size4, orientation4, slope4
@@ -1570,6 +1642,12 @@ Změny ve verzi 2.3 oproti verzi 2.2:
         <sazba>${photovoltaicPowerPlant.tariff.toXmlEntry()}</sazba>
         <umisteni_rozvadece>${photovoltaicPowerPlant.breakerBoxLocation.toXmlEntry()}</umisteni_rozvadece>
         <pozadovany_vykon>${photovoltaicPowerPlant.requiredPower.toXmlEntry()}</pozadovany_vykon>
+        <typ_budovy_instalace>${photovoltaicPowerPlant.locationBuidingType.toXmlEntry()}</typ_budovy_instalace>
+        <hromosvod>${photovoltaicPowerPlant.lightningRod.toXmlEntry()}</hromosvod>
+        <material_krytiny>${photovoltaicPowerPlant.roofMaterial.toXmlEntry()}</material_krytiny>
+        <typ_tasek>${photovoltaicPowerPlant.tileType.toXmlEntry()}</typ_tasek>
+        <stari_krytiny>${photovoltaicPowerPlant.roofAge.toXmlEntry()}</stari_krytiny>
+        <pouzit_optimizatory>${photovoltaicPowerPlant.useOptimizers.toXmlEntry()}</pouzit_optimizatory>
         <rozmer_1>${photovoltaicPowerPlant.size1.toXmlEntry()}</rozmer_1>
         <orientace_1>${photovoltaicPowerPlant.orientation1.toXmlEntry()}</orientace_1>
         <sklon_1>${photovoltaicPowerPlant.slope1.toXmlEntry()}</sklon_1>
@@ -1582,7 +1660,6 @@ Změny ve verzi 2.3 oproti verzi 2.2:
         <rozmer_4>${photovoltaicPowerPlant.size4.toXmlEntry()}</rozmer_4>
         <orientace_4>${photovoltaicPowerPlant.orientation4.toXmlEntry()}</orientace_4>
         <sklon_4>${photovoltaicPowerPlant.slope4.toXmlEntry()}</sklon_4>
-        <material_strecha>${photovoltaicPowerPlant.roofMaterial.toXmlEntry()}</material_strecha>
         <baterie>${photovoltaicPowerPlant.battery.checkBox.toXmlEntry()}</baterie>
         <baterie_kapacita>${photovoltaicPowerPlant.battery.textField.toXmlEntry()}</baterie_kapacita>
         <voda>${photovoltaicPowerPlant.water.toXmlEntry()}</voda>
