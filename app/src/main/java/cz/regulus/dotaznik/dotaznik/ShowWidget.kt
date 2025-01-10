@@ -62,6 +62,7 @@ fun Widget(
         is HasTitle -> Title(widget, sites)
         is TextField -> TextField(widget, sites, editWidget)
         is TextFieldWithUnits -> TextFieldWithUnits(widget, sites, editWidget)
+        is TextFieldWithHint -> TextFieldWithHint(widget, sites, editWidget)
         is Chooser -> Chooser(widget, editWidget, sites)
         is MultiChooser -> MultiChooser(widget, editWidget, sites)
         is DoubleChooser -> DoubleChooser(widget, editWidget, sites)
@@ -101,9 +102,7 @@ private fun TextField(
         Modifier
             .fillMaxWidth()
             .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
-        label = {
-            Text(widget.getLabel(sites))
-        },
+        label = { Text(widget.getLabel(sites)) },
         placeholder = { Text(widget.getPlaceholder(sites)) },
         trailingIcon = {
             Text(text = widget.getSuffix(sites))
@@ -180,6 +179,69 @@ private fun TextFieldWithUnits(
         },
         keyboardOptions = widget.getKeyboard(sites),
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TextFieldWithHint(
+    widget: TextFieldWithHint,
+    sites: Sites,
+    editWidget: (Widget) -> Unit,
+) {
+    var value by remember { mutableStateOf(widget.getText(sites)) }
+    var expanded by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        Modifier
+            .fillMaxWidth()
+            .padding(top = 0.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+    ) {
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(MenuAnchorType.PrimaryEditable),
+            value = value,
+            onValueChange = {
+                value = it
+                editWidget(widget.changeText(it))
+            },
+            singleLine = true,
+            label = { Text(text = widget.getLabel(sites)) },
+            placeholder = { Text(text = widget.getPlaceholder(sites)) },
+            trailingIcon = {
+                Row {
+                    Text(widget.getSuffix(sites))
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                }
+            },
+            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+            keyboardActions = KeyboardActions {
+                focusManager.moveFocus(FocusDirection.Down)
+            },
+            keyboardOptions = widget.getKeyboard(sites)
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = {
+                expanded = false
+                focusManager.clearFocus()
+            },
+        ) {
+            widget.getOptions(sites).forEachIndexed { i, option ->
+                DropdownMenuItem(
+                    text = { Text(option) },
+                    onClick = {
+                        value = option
+                        editWidget(widget.changeText(option))
+                        expanded = false
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                )
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -670,11 +732,14 @@ fun CoreChooser(
                         }
                     },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                    leadingIcon = isSelected?.let { {
-                        if (it(i, option)) Icon(Icons.Default.Check, null)
-                    } },
+                    leadingIcon = isSelected?.let {
+                        {
+                            if (it(i, option)) Icon(Icons.Default.Check, null)
+                        }
+                    },
                 )
             }
         }
     }
 }
+

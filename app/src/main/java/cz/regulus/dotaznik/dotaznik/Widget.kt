@@ -35,8 +35,11 @@ interface HasUnits : Widget {
     fun getDefaultUnitIndex(sites: Sites) = 0
 }
 
-interface HasChooser : Widget {
+interface HasOptions : Widget {
     fun getOptions(sites: Sites): List<String>
+}
+
+interface HasChooser : Widget, HasOptions {
     fun getPlaceholder(sites: Sites): String = ""
 
     val chosenIndex: Int? get() = null
@@ -97,6 +100,7 @@ interface HasTitle : Widget {
 
 @Serializable @SerialName("TextField") sealed interface TextField : HasTextField, HasLabel
 @Serializable @SerialName("TextFieldWithUnits") sealed interface TextFieldWithUnits : HasTextField, HasUnits, HasLabel
+@Serializable @SerialName("TextFieldWithHint") sealed interface TextFieldWithHint : HasTextField, HasOptions, HasLabel
 @Serializable @SerialName("Chooser") sealed interface Chooser : HasChooser, HasLabel
 @Serializable @SerialName("MultiChooser") sealed interface MultiChooser : HasMultiChooser, HasLabel
 @Serializable @SerialName("DoubleChooser") sealed interface DoubleChooser : HasChooser, HasFollowUpChooser, HasLabel
@@ -127,6 +131,7 @@ context(Sites) @Style3 fun Chooser.toXmlEntry() = getChosen(this@Sites)
 context(Sites) @Style3 fun DoubleChooser.toXmlEntry() = "${getChosen(this@Sites)} ${getChosen2(this@Sites)}"
 context(Sites) @Style3 fun TextField.toXmlEntry() = getText(this@Sites)
 context(Sites) @Style3 fun TextFieldWithUnits.toXmlEntry() = getText(this@Sites)
+context(Sites) @Style3 fun TextFieldWithHint.toXmlEntry() = getText(this@Sites)
 context(Sites) @Style3 fun TextFieldWithUnits.toXmlEntry2() = getChosenUnit(this@Sites)
 context(Sites) @Style3 fun CheckBox.toXmlEntry() = if (getChecked(this@Sites)) strings.yes else strings.no
 context(Sites) @Style3 fun CheckBoxWithChooser.toXmlEntry() = if (getChecked(this@Sites)) getChosen(this@Sites) else strings.no
