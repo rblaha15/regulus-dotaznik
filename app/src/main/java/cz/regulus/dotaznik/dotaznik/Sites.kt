@@ -968,7 +968,7 @@ data class System(
 
         override fun getOptions2(sites: Sites): List<String> {
             val chosen = sites.system.thermalStoreType.getChosen(sites)
-            return sites.products.thermalStores[chosen] ?: listOf()
+            return sites.products.thermalStores[chosen] ?: listOf("")
         }
 
         override fun changeChosenIndex(chosenIndex: Int?): HasChooser = copy(chosenIndex = chosenIndex)
