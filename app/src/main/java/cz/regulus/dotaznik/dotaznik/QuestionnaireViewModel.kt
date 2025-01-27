@@ -102,7 +102,7 @@ class QuestionnaireViewModel(
     }
 
     private val session = Session.getInstance(
-        System.getProperties().apply {
+        java.lang.System.getProperties().apply {
             set("mail.smtp.host", "smtp.gmail.com")
             set("mail.smtp.socketFactory.port", "465")
             set("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory")
