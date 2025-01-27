@@ -105,8 +105,8 @@ interface HasTitle : Widget {
 @Serializable @SerialName("MultiChooser") sealed interface MultiChooser : HasMultiChooser, HasLabel
 @Serializable @SerialName("DoubleChooser") sealed interface DoubleChooser : HasChooser, HasFollowUpChooser, HasLabel
 @Serializable @SerialName("CheckBox") sealed interface CheckBox : HasCheckBox, HasLabel
-@Serializable @SerialName("CheckBoxWithTextField") sealed interface CheckBoxWithTextField : HasCheckBox, HasTextField, HasLabel
-@Serializable @SerialName("CheckBoxWithChooser") sealed interface CheckBoxWithChooser : HasCheckBox, HasChooser, HasLabel
+@Serializable @SerialName("CheckBoxWithTextField") sealed interface CheckBoxWithTextField : CheckBox, TextField
+@Serializable @SerialName("CheckBoxWithChooser") sealed interface CheckBoxWithChooser : CheckBox, Chooser
 @Serializable @SerialName("DropdownWithAmount") sealed interface DropdownWithAmount : HasDropdown, HasAmount, HasLabel
 @Serializable @SerialName("Other") sealed interface Other : Widget
 
@@ -189,5 +189,5 @@ fun HasMaxSumOfNumbers.getCurrentSum(sites: Sites): Int = getAmounts(sites).valu
 
 fun HasDropdown.getItemCount(sites: Sites) = getItems(sites).size
 
-val <T> T.checkBox where T : HasCheckBox, T : HasLabel get() = this as CheckBox
-val <T> T.textField where T : HasTextField, T : HasLabel get() = this as TextField
+val CheckBox.checkBox get() = this
+val TextField.textField get() = this
