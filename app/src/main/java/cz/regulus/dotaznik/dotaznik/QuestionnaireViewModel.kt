@@ -23,13 +23,11 @@ import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.Named
 import java.io.File
-import java.lang.System
 import java.util.Locale
 import javax.activation.DataHandler
 import javax.activation.FileDataSource
 import javax.mail.Authenticator
 import javax.mail.Message
-import javax.mail.MessagingException
 import javax.mail.PasswordAuthentication
 import javax.mail.Session
 import javax.mail.Transport
@@ -126,7 +124,7 @@ class QuestionnaireViewModel(
         }
     }
 
-    private suspend fun sendEmail() {
+    private suspend fun sendEmail() = try {
         _sendState.value = SendState.Sending
 
         val sites = repo.sites.first()
@@ -142,58 +140,56 @@ class QuestionnaireViewModel(
             sites.createXml(repo.authenticationState.first().userOrNull!!)
         )
 
-        try {
-            Transport.send(MimeMessage(session).apply {
-                setFrom(InternetAddress(EmailCredentials.EMAIL, "Aplikace Regulus"))
-                replyTo = arrayOf(InternetAddress(user.email))
+        Transport.send(MimeMessage(session).apply {
+            setFrom(InternetAddress(EmailCredentials.EMAIL, "Aplikace Regulus Dotazník"))
+            replyTo = arrayOf(InternetAddress(user.email))
 
-                subject = "REGULUS – Apka – OSOBA: $name $surname"
+            subject = "REGULUS – Apka – OSOBA: $name $surname"
 
+            addRecipient(
+                Message.RecipientType.TO,
+                InternetAddress(recipientAdress(user))
+            )
+            if (!isDebug) {
                 addRecipient(
-                    Message.RecipientType.TO,
-                    InternetAddress(recipientAdress(user))
+                    Message.RecipientType.CC,
+                    InternetAddress(user.email)
                 )
-                if (!isDebug) {
-                    addRecipient(
-                        Message.RecipientType.CC,
-                        InternetAddress(user.email)
-                    )
-                }
+            }
 
-                setContent(MimeMultipart().apply {
-                    addBodyPart(MimeBodyPart().apply {
-                        setText(user.constructEmail(), null, "html")
-                    })
-
-                    addBodyPart(MimeBodyPart().apply {
-                        dataHandler = DataHandler(FileDataSource(file))
-                        fileName = file.name
-                    })
-
-                    repo.getPhotosForExport().forEach { file ->
-                        addBodyPart(MimeBodyPart().apply {
-                            attachFile(file)
-                            setHeader("Content-Type", "image/jpg; charset=UTF-8 name=\"${file.name}\"")
-                        })
-                    }
+            setContent(MimeMultipart().apply {
+                addBodyPart(MimeBodyPart().apply {
+                    setText(user.constructEmail(), null, "html")
                 })
+
+                addBodyPart(MimeBodyPart().apply {
+                    dataHandler = DataHandler(FileDataSource(file))
+                    fileName = file.name
+                })
+
+                repo.getPhotosForExport().forEach { file ->
+                    addBodyPart(MimeBodyPart().apply {
+                        attachFile(file)
+                        setHeader("Content-Type", "image/jpg; charset=UTF-8 name=\"${file.name}\"")
+                    })
+                }
             })
+        })
 
-            _sendState.value = SendState.Success
+        _sendState.value = SendState.Success
 
-        } catch (e: MessagingException) {
-            val wrapper = RuntimeException("Could not send email", e)
-            wrapper.printStackTrace()
-            Firebase.crashlytics.recordException(wrapper)
+    } catch (e: Exception) {
+        val wrapper = RuntimeException("Could not send email", e)
+        wrapper.printStackTrace()
+        Firebase.crashlytics.recordException(wrapper)
 
-            error = wrapper.stackTraceToString()
+        error = wrapper.stackTraceToString()
 
-            _sendState.value =
-                if (e is MailConnectException)
-                    SendState.Error.Offline
-                else
-                    SendState.Error.Other
-        }
+        _sendState.value =
+            when (e) {
+                is MailConnectException -> SendState.Error.Offline
+                else -> SendState.Error.Other
+            }
     }
 
     private suspend fun removeData() {
@@ -221,6 +217,4 @@ class QuestionnaireViewModel(
 private fun User.constructEmail() = """
     <p>Prosím o přípravu nabídky. Děkuji.</p>
     ${if (crn.isNotBlank()) "<p>$name $surname, IČO: $crn</p>" else "<p>$name $surname</p>"}
-    <hr style='color: gray' />
-    <p style='color: gray'>Tento email byl vygenerován automaticky, pokud chcete odpovědět, zvolte Odpovědět všem.</p>
 """.trimIndent()
