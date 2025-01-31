@@ -60,16 +60,16 @@ fun Widget(
     val show = widget.showWidget(sites)
     if (show) when (widget) {
         is HasTitle -> Title(widget, sites)
-        is TextField -> TextField(widget, sites, editWidget)
+        is CheckBoxWithChooser -> CheckboxWithChooser(widget, sites, editWidget)
+        is CheckBoxWithTextField -> CheckBoxWithTextField(widget, sites, editWidget)
         is TextFieldWithUnits -> TextFieldWithUnits(widget, sites, editWidget)
         is TextFieldWithHint -> TextFieldWithHint(widget, sites, editWidget)
+        is DropdownWithAmount -> DropdownWithAmount(widget, sites, editWidget)
+        is TextField -> TextField(widget, sites, editWidget)
         is Chooser -> Chooser(widget, editWidget, sites)
         is MultiChooser -> MultiChooser(widget, editWidget, sites)
         is DoubleChooser -> DoubleChooser(widget, editWidget, sites)
         is CheckBox -> Checkbox(widget, sites, editWidget)
-        is CheckBoxWithChooser -> CheckboxWithChooser(widget, sites, editWidget)
-        is CheckBoxWithTextField -> CheckBoxWithTextField(widget, sites, editWidget)
-        is DropdownWithAmount -> DropdownWithAmount(widget, sites, editWidget)
         is Contacts.AssemblyCompany -> AssemblyCompany(widget, companies, editWidget)
         else -> {}
     }
