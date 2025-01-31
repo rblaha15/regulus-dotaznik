@@ -12,14 +12,14 @@ plugins {
 
 android {
     namespace = "cz.regulus.dotaznik"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "cz.regulus.dotaznik"
         minSdk = 21
-        targetSdk = 34
-        versionCode = 13
-        versionName = "5.1.0"
+        targetSdk = 35
+        versionCode = 18
+        versionName = "5.1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -63,6 +63,9 @@ android {
                 kotlin.srcDir("build/generated/ksp/${name}/kotlin")
             }
         }
+    }
+    lint {
+        disable += "PermissionLaunchedDuringComposition"
     }
 }
 

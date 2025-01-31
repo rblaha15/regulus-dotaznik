@@ -8,7 +8,6 @@ import com.sun.mail.util.MailConnectException
 import cz.regulus.dotaznik.BuildConfig
 import cz.regulus.dotaznik.Repository
 import cz.regulus.dotaznik.User
-import cz.regulus.dotaznik.dotaznik.Sites.Site.Widget.Companion.getChosenIndex
 import cz.regulus.dotaznik.userOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +28,6 @@ import javax.activation.DataHandler
 import javax.activation.FileDataSource
 import javax.mail.Authenticator
 import javax.mail.Message
-import javax.mail.MessagingException
 import javax.mail.PasswordAuthentication
 import javax.mail.Session
 import javax.mail.Transport
@@ -88,8 +86,8 @@ class QuestionnaireViewModel(
         else _sendState.value = SendState.Nothing
     }
 
-    private suspend fun recipientAdress() = when {
-        isDebug -> repo.authenticationState.first().userOrNull!!.email
+    private fun recipientAdress(user: User) = when {
+        isDebug -> user.email
         Locale.getDefault().language == Locale("sk").language -> "obchod@regulus.sk"
         else -> "poptavky@regulus.cz"
     }
@@ -100,11 +98,11 @@ class QuestionnaireViewModel(
 
         _sendState.value = if (demandOrigin.getChosenIndex(sites) == 0) SendState.MissingField(
             demandOrigin.getLabel(sites)
-        ) else SendState.ConfirmSend(recipientAdress())
+        ) else SendState.ConfirmSend(recipientAdress(repo.authenticationState.first().userOrNull!!))
     }
 
     private val session = Session.getInstance(
-        System.getProperties().apply {
+        java.lang.System.getProperties().apply {
             set("mail.smtp.host", "smtp.gmail.com")
             set("mail.smtp.socketFactory.port", "465")
             set("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory")
@@ -126,7 +124,7 @@ class QuestionnaireViewModel(
         }
     }
 
-    private suspend fun sendEmail() {
+    private suspend fun sendEmail() = try {
         _sendState.value = SendState.Sending
 
         val sites = repo.sites.first()
@@ -142,57 +140,56 @@ class QuestionnaireViewModel(
             sites.createXml(repo.authenticationState.first().userOrNull!!)
         )
 
-        try {
-            Transport.send(MimeMessage(session).apply {
-                setFrom(InternetAddress(EmailCredentials.EMAIL, "Aplikace Regulus"))
+        Transport.send(MimeMessage(session).apply {
+            setFrom(InternetAddress(EmailCredentials.EMAIL, "Aplikace Regulus Dotazník"))
+            replyTo = arrayOf(InternetAddress(user.email))
 
-                subject = "REGULUS – Apka – OSOBA: $name $surname"
+            subject = "REGULUS – Apka – OSOBA: $name $surname"
 
+            addRecipient(
+                Message.RecipientType.TO,
+                InternetAddress(recipientAdress(user))
+            )
+            if (!isDebug) {
                 addRecipient(
-                    Message.RecipientType.TO,
-                    InternetAddress(recipientAdress())
+                    Message.RecipientType.CC,
+                    InternetAddress(user.email)
                 )
-                if (!isDebug) {
-                    addRecipient(
-                        Message.RecipientType.CC,
-                        InternetAddress(user.email)
-                    )
-                }
+            }
 
-                setContent(MimeMultipart().apply {
-                    addBodyPart(MimeBodyPart().apply {
-                        setText(user.constructEmail(), null, "html")
-                    })
-
-                    addBodyPart(MimeBodyPart().apply {
-                        dataHandler = DataHandler(FileDataSource(file))
-                        fileName = file.name
-                    })
-
-                    repo.getPhotosForExport().forEach { file ->
-                        addBodyPart(MimeBodyPart().apply {
-                            attachFile(file)
-                            setHeader("Content-Type", "image/jpg; charset=UTF-8 name=\"${file.name}\"")
-                        })
-                    }
+            setContent(MimeMultipart().apply {
+                addBodyPart(MimeBodyPart().apply {
+                    setText(user.constructEmail(), null, "html")
                 })
+
+                addBodyPart(MimeBodyPart().apply {
+                    dataHandler = DataHandler(FileDataSource(file))
+                    fileName = file.name
+                })
+
+                repo.getPhotosForExport().forEach { file ->
+                    addBodyPart(MimeBodyPart().apply {
+                        attachFile(file)
+                        setHeader("Content-Type", "image/jpg; charset=UTF-8 name=\"${file.name}\"")
+                    })
+                }
             })
+        })
 
-            _sendState.value = SendState.Success
+        _sendState.value = SendState.Success
 
-        } catch (e: MessagingException) {
-            val wrapper = RuntimeException("Could not send email", e)
-            wrapper.printStackTrace()
-            Firebase.crashlytics.recordException(wrapper)
+    } catch (e: Exception) {
+        val wrapper = RuntimeException("Could not send email", e)
+        wrapper.printStackTrace()
+        Firebase.crashlytics.recordException(wrapper)
 
-            error = wrapper.stackTraceToString()
+        error = wrapper.stackTraceToString()
 
-            _sendState.value =
-                if (e is MailConnectException)
-                    SendState.Error.Offline
-                else
-                    SendState.Error.Other
-        }
+        _sendState.value =
+            when (e) {
+                is MailConnectException -> SendState.Error.Offline
+                else -> SendState.Error.Other
+            }
     }
 
     private suspend fun removeData() {
@@ -220,6 +217,4 @@ class QuestionnaireViewModel(
 private fun User.constructEmail() = """
     <p>Prosím o přípravu nabídky. Děkuji.</p>
     ${if (crn.isNotBlank()) "<p>$name $surname, IČO: $crn</p>" else "<p>$name $surname</p>"}
-    <hr style='color: gray' />
-    <p style='color: gray'>Tento email byl vygenerován automaticky, pokud chcete odpovědět, zvolte Odpovědět všem.</p>
 """.trimIndent()

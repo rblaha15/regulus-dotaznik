@@ -49,6 +49,18 @@ class Repository(
         private val KEY_PHOTOS = stringSetPreferencesKey("fotkyIds")
 
         private const val MAX_PHOTO_AMOUNT = 5
+
+
+        private val json = Json {
+            ignoreUnknownKeys = true
+        }
+
+        private inline fun <reified T> T.toJson() = json.encodeToString(this)
+        private inline fun <reified T> String.fromJson() = try {
+            json.decodeFromString<T>(this)
+        } catch (e: SerializationException) {
+            null
+        }
     }
 
     val isDebug = BuildConfig.DEBUG || '-' in BuildConfig.VERSION_NAME
@@ -76,17 +88,6 @@ class Repository(
             }
             emit(result)
         }
-    }
-
-    private val json = Json {
-        ignoreUnknownKeys = true
-    }
-
-    private inline fun <reified T> T.toJson() = json.encodeToString(this)
-    private inline fun <reified T> String.fromJson() = try {
-        json.decodeFromString<T>(this)
-    } catch (e: SerializationException) {
-        null
     }
 
     val people = isRemoteConfigLoaded.map {
@@ -132,7 +133,7 @@ class Repository(
     val sites = prefs.data.map { preferences ->
         preferences[KEY_SITES]?.fromJson<Sites>() ?: Sites()
     }.combine(products) { sites, products ->
-        sites.withProducts(products)
+        sites with products
     }
 
     suspend fun editSites(sites: Sites) {
@@ -258,4 +259,4 @@ class Repository(
     }
 }
 
-fun Sites.withProducts(products: Products) = copy(products = products)
+infix fun Sites.with(products: Products) = copy(products = products)
